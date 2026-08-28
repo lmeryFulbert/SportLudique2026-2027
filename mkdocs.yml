@@ -41,6 +41,8 @@ markdown_extensions:
       alternate_style: true
 
 plugins:
+  - search:
+      lang: fr
   - mermaid2
 #  - with-pdf:
 #      author: MERY Ludovic

@@ -1,13 +1,15 @@
-# Bienvenue 👋
+# Accueil
 
-Cette documentation va vous accompagner tout au long du projet.
+Cette documentation va vous accompagner tout au long du projet SportLudique pour l'année scolaire 2026-2027
 
 L'objectif n'est pas de vous faire lire 200 pages avant de commencer, mais de regrouper au même endroit les informations, ressources et procédures dont vous aurez besoin au fil de l'année.
 
 Vous y trouverez donc aussi bien des rappels techniques que des procédures, des exemples de configuration et quelques ressources pour aller plus loin.
 
 !!! tip "Un conseil"
-Ne cherchez pas à tout lire maintenant. Revenez ici quand vous en avez besoin : une documentation technique est faite pour être **utilisée**, pas apprise par cœur.
+    Ne cherchez pas à tout lire maintenant. Revenez ici quand vous en avez besoin : 
+    
+    une documentation technique est faite pour être **utilisée**, pas apprise par cœur.
 
 ## Comment utiliser cette documentation ?
 
@@ -50,24 +52,21 @@ GitHub Pages
 Vous venez donc déjà de rencontrer une petite chaîne de **CI/CD**.
 
 ??? info "CI/CD : derrière les acronymes"
+    **CI — Continuous Integration**
 
-```
-**CI — Continuous Integration**
+    Les modifications sont régulièrement intégrées dans un dépôt commun. Des traitements automatiques peuvent alors vérifier que le projet fonctionne toujours correctement.
 
-Les modifications sont régulièrement intégrées dans un dépôt commun. Des traitements automatiques peuvent alors vérifier que le projet fonctionne toujours correctement.
+    **CD — Continuous Delivery**
 
-**CD — Continuous Delivery**
+    Le projet est automatiquement préparé pour pouvoir être livré ou déployé.
 
-Le projet est automatiquement préparé pour pouvoir être livré ou déployé.
+    **CD — Continuous Deployment**
 
-**CD — Continuous Deployment**
+    On va encore plus loin : si les vérifications passent, la nouvelle version peut être automatiquement déployée.
 
-On va encore plus loin : si les vérifications passent, la nouvelle version peut être automatiquement déployée.
+    Dans notre cas, c'est assez simple : vous modifiez la documentation, vous faites un `git push`, GitHub travaille et le site est mis à jour.
 
-Dans notre cas, c'est assez simple : vous modifiez la documentation, vous faites un `git push`, GitHub travaille et le site est mis à jour.
-
-Pas besoin d'envoyer `documentation_finale_v2_definitive_CORRIGEE.zip` par mail.
-```
+    Pas besoin d'envoyer `documentation_finale_v2_definitive_CORRIGEE.zip` par mail.
 
 ---
 
@@ -87,19 +86,18 @@ Votre documentation devra donc être :
 Vous transmettrez l'URL de cette documentation à vos enseignants.
 
 !!! warning "Une documentation n'est pas un compte rendu"
-Évitez le classique :
+    Évitez le classique :
 
-```
-*« J'ai installé Debian, ensuite j'ai cliqué ici, ensuite j'ai fait ça… »*
+    "-  J'ai installé Debian, <br/>
+     -  ensuite j'ai cliqué ici, <br/>
+     -  ensuite j'ai fait ça…"<br/>
 
-Documentez plutôt ce qui permet de **comprendre, administrer, reproduire et dépanner** votre solution.
-```
+    Documentez plutôt ce qui permet de **comprendre, administrer, reproduire et dépanner** votre solution.
 
-Une bonne documentation ne répond donc pas seulement à la question **« comment ? »**.
 
-Elle doit aussi permettre de comprendre **« pourquoi ? »**.
+    Une bonne documentation ne répond donc pas seulement à la question **« comment ? »**.
 
----
+    Elle doit aussi permettre de comprendre **« pourquoi ? »**.
 
 # 🤖 Et les IA dans tout ça ?
 
@@ -121,21 +119,22 @@ Ce que nous attendons, c'est que vous compreniez :
 * et, lorsque plusieurs solutions existent, **pourquoi vous avez choisi celle-ci**.
 
 !!! warning "Le piège du copier-coller"
-Une IA peut parfaitement produire une commande correcte… ou une commande plausible mais complètement fausse.
+    Une IA peut parfaitement produire une commande correcte… ou une commande plausible mais complètement fausse.
 
-```
-Elle peut également proposer une configuration qui fonctionne sans que vous compreniez pourquoi elle fonctionne.
+    Elle peut également proposer une configuration qui fonctionne sans que vous compreniez pourquoi elle fonctionne.
 
-Dans les deux cas, lors d'une présentation, d'une modification ou d'une panne, le problème apparaîtra très vite.
-```
+    Dans les deux cas, lors d'une présentation, d'une modification ou d'une panne, le problème apparaîtra très vite.
+
+!!! danger "Examens ☠️ ☠️ ☠️"
+    ☠️ **Pendant les examens, vous serez très rapidement démasqués si vous ne maîtrisez pas votre infrastructure !** ☠️
+    
+
 
 L'IA peut donc être un **outil d'aide**, exactement comme une documentation officielle, un moteur de recherche, Stack Overflow ou un forum.
 
 Mais elle ne doit pas réfléchir à votre place.
 
 > **Si vous ne pouvez pas expliquer ce que vous avez écrit ou configuré, alors ce n'est pas vraiment votre documentation.**
-
-Et oui : les émojis sont parfois un excellent indice. 😉
 
 ---
 
@@ -148,75 +147,52 @@ Petit détour historique : avant Markdown, on trouvait notamment **DocBook**, ba
 Vous êtes libres d'explorer plusieurs solutions.
 
 === "MkDocs"
-
-````
-Simple, efficace et particulièrement adapté à la documentation technique.
-
-Avec **Material for MkDocs**, il permet rapidement d'obtenir une documentation très agréable à utiliser.
-
-```text
-https://squidfunk.github.io/mkdocs-material/
-```
-````
+    Simple, efficace et particulièrement adapté à la documentation technique.
+    Avec **Material for MkDocs**, il permet rapidement d'obtenir une documentation très agréable à utiliser.
+    ```text
+    https://squidfunk.github.io/mkdocs-material/
+    ```
 
 === "Hugo"
-
-````
-Un générateur de sites statiques extrêmement rapide, écrit en Go.
-
-Il peut servir à créer de la documentation, mais également des blogs ou des sites beaucoup plus complets grâce à son système de thèmes.
-
-```text
-https://gohugo.io/
-```
-````
+    Un générateur de sites statiques extrêmement rapide, écrit en Go.
+    Il peut servir à créer de la documentation, mais également des blogs ou des sites beaucoup plus complets grâce à son système de thèmes.
+    ```text
+    https://gohugo.io/
+    ```
 
 === "Docusaurus"
 
-````
-Développé autour de l'écosystème React, Docusaurus est particulièrement populaire pour la documentation de projets logiciels.
-
-```text
-https://docusaurus.io/fr/
-```
-````
+    Développé autour de l'écosystème React, Docusaurus est particulièrement populaire pour la documentation de projets logiciels.
+    ```text
+    https://docusaurus.io/fr/
+    ```
 
 === "Sphinx"
-
-````
-Très utilisé dans l'écosystème Python et dans les documentations techniques importantes.
-
-Il supporte notamment reStructuredText et Markdown.
-
-```text
-https://www.sphinx-doc.org/
-```
-````
+    Très utilisé dans l'écosystème Python et dans les documentations techniques importantes.
+    Il supporte notamment reStructuredText et Markdown.
+    ```text
+    https://www.sphinx-doc.org/
+    ```
 
 === "Astro"
-
-````
-Plus généraliste et très moderne, Astro permet de construire des sites statiques rapides et offre notamment **Starlight**, spécialement conçu pour la documentation.
-
-```text
-https://docs.astro.build/
-```
-````
+    Plus généraliste et très moderne, Astro permet de construire des sites statiques rapides et offre notamment **Starlight**, spécialement conçu pour la documentation.
+    ```text
+    https://docs.astro.build/
+    ```
 
 !!! question "Lequel choisir ?"
-**MkDocs** est probablement le plus simple pour commencer.
+    **MkDocs** est probablement le plus simple pour commencer.
 
-```
-Mais si vous voulez tester Hugo, Docusaurus, Sphinx ou Astro : faites-vous plaisir.
+    Mais si vous voulez tester Hugo, Docusaurus, Sphinx ou Astro : faites-vous plaisir.
 
-Le générateur importe finalement moins que le résultat : **une documentation claire, structurée, versionnée et maintenue à jour.**
-```
+    Le générateur importe finalement moins que le résultat : **une documentation claire, structurée, versionnée et maintenue à jour.**
+
 
 ---
 
 # 🔐 Et les mots de passe ?
 
-Votre documentation sera versionnée avec Git et pourra être publiée sur Internet.
+Votre documentation sera versionnée avec Git et devra être publiée et accessible publiquement sur Internet.
 
 La règle est donc très simple :
 
@@ -234,16 +210,17 @@ admin:
 
 Et remplacer le mot de passe quelques minutes plus tard ne règle pas nécessairement le problème : **Git conserve un historique**.
 
-Vous avez déjà étudié — ou étudierez — ces problématiques dans le cadre du **cours de cybersécurité** : gestion des secrets, authentification, bonnes pratiques concernant les mots de passe et risques liés à leur divulgation.
+Vous avez un compte Office 365 à votre disposition, le cloud est donc un moyen très efficace pour accéder à votre « base de secrets » depuis n'importe quel terminal.
+Nous vous rappelons que le téléphone portable est désormais interdit dans l'établissement ! Il ne sera toléré que pour les authentifications OTP.
+
+Vous avez déjà étudié ces problématiques dans le cadre du **cours de cybersécurité** : gestion des secrets, authentification, bonnes pratiques concernant les mots de passe et risques liés à leur divulgation.
 
 Appliquez ici les mêmes principes.
 
 !!! danger "Un secret publié n'est plus un secret"
-Si un véritable mot de passe, token ou secret est envoyé par erreur sur le dépôt, considérez-le comme **compromis**.
+    Si un véritable mot de passe, token ou secret est envoyé par erreur sur le dépôt, considérez-le comme **compromis**.
 
-```
-La première chose à faire n'est pas de modifier le fichier : **le secret doit être révoqué ou changé**.
-```
+    La première chose à faire n'est pas de modifier le fichier : **le secret doit être révoqué ou changé**.
 
 Pour les éléments qui doivent réellement être partagés au sein de votre équipe, utilisez une solution adaptée de gestion des secrets ou des mots de passe.
 
@@ -270,3 +247,22 @@ Vous allez aussi casser des configurations, chercher pendant deux heures pourquo
 Bref : **faire de l'informatique.**
 
 Et idéalement, documenter comment vous avez réussi à remettre tout ça en état.
+
+## Une dernière chose avant de commencer 🛠️
+
+Nous vous souhaitons une excellente année scolaire 2026-2027 avec nous, pleine de projets, de découvertes et de réussite.
+
+Mais soyons clairs : **vous allez aussi souffrir un peu.**
+
+Un service refusera de démarrer sans raison apparente. Une configuration parfaitement fonctionnelle la veille ne fonctionnera plus le lendemain. Vous passerez parfois des heures sur un problème avant de découvrir qu'il venait d'une ligne, d'un caractère, d'un port, d'un droit ou d'une option oubliée.
+
+C'est normal. **C'est aussi le métier.**
+
+L'objectif n'est pas de ne jamais rencontrer de difficultés, mais d'apprendre à les affronter : chercher, lire la documentation, tester, se tromper, revenir en arrière, demander de l'aide lorsque c'est nécessaire et surtout comprendre ce qui s'est passé.
+
+La compétence technique compte. **La curiosité, la méthode et la résilience aussi.**
+
+Alors ne vous découragez pas au premier `ERROR`.
+
+Bienvenue dans le projet 2026-2027.
+
