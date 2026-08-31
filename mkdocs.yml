@@ -44,6 +44,7 @@ plugins:
   - search:
       lang: fr
   - mermaid2
+  - mkdocs_quiz
 #  - with-pdf:
 #      author: MERY Ludovic
 #      copyright: ludovic.mery@lyceefulbert.fr
