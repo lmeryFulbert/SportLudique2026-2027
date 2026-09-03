@@ -162,8 +162,8 @@ Les passerelles actuellement définies pour les différents accès sont les suiv
 
 |       | Chartres          | Tours             | Orléans           | Bourges           | Blois             |
 | ----- | ----------------- | ----------------- | ----------------- | ----------------- | ----------------- |
-| FAI 1 | `183.44.28.2/30`  | `183.44.37.2/30`  | `183.44.45.2/30`  | `183.44.18.2/30`  | `183.44.41.2/30`  |
-| FAI 2 | `221.87.128.1/30` | `221.87.137.1/30` | `221.87.145.1/30` | `221.87.118.1/30` | `221.87.141.1/30` |
+| FAI 2 | `183.44.28.1/30`  | `183.44.37.1/30`  | `183.44.45.1/30`  | `183.44.18.1/30`  | `183.44.41.1/30`  |
+| FAI 1 | `221.87.128.2/30` | `221.87.137.2/30` | `221.87.145.2/30` | `221.87.118.2/30` | `221.87.141.2/30` |
 
 !!! warning "Passerelle ou adresse de votre équipement ?"
     Les adresses indiquées dans le tableau correspondent aux **passerelles fournies par les opérateurs simulés**.
