@@ -259,3 +259,60 @@ Chaque groupe est administrateur de son propre site, mais les différents sites 
 Une mauvaise configuration peut donc perturber votre propre environnement, mais également avoir des conséquences sur les autres groupes ou sur les services communs.
 
 Avant toute modification importante, vous devrez comprendre **sur quel équipement vous intervenez, à quel réseau il appartient et quelles peuvent être les conséquences de votre configuration**.
+
+## Identifiants de VLAN disponibles
+
+Vous devrez segmenter le réseau de votre site en utilisant des **VLAN** adaptés aux différents besoins de SportLudique.
+
+Cependant, l'infrastructure du laboratoire utilise déjà de nombreux identifiants de VLAN pour son propre fonctionnement. Vous ne pouvez donc pas choisir librement n'importe quel numéro de VLAN.
+
+Une plage d'identifiants est réservée à chaque site :
+
+| Site     | VLAN de management | VLAN utilisables |
+| -------- | -----------------: | ---------------: |
+| Chartres |              `110` |    `220` à `229` |
+| Tours    |              `120` |    `230` à `239` |
+| Orléans  |              `130` |    `240` à `249` |
+| Bourges  |              `140` |    `210` à `219` |
+| Blois    |              `150` |    `260` à `269` |
+
+Le **VLAN de management** est imposé et réservé à l'administration de vos équipements.
+
+Pour les autres réseaux, vous devrez choisir les identifiants nécessaires **dans la plage attribuée à votre site**.
+
+Par exemple, si vous décidez de créer des VLAN distincts pour la comptabilité, les ressources humaines, les serveurs ou le Wi-Fi, vous devrez leur affecter des identifiants appartenant à cette plage.
+
+!!! important "Adaptez-vous à l'infrastructure existante"
+    Dans une infrastructure réelle, un administrateur ne choisit pas nécessairement ses identifiants de VLAN à partir de `1`.
+
+    Des VLAN existent déjà et certaines plages peuvent être réservées à d'autres usages.
+
+    Vous devez donc construire votre segmentation en tenant compte des **identifiants disponibles sur votre site**.
+
+
+!!! warning "Pourquoi pas VLAN 10, 20, 30... ?"
+    Certains identifiants de VLAN sont déjà utilisés par l'infrastructure pédagogique du laboratoire.
+
+    L'utilisation d'un VLAN en dehors de la plage attribuée à votre site pourrait provoquer des communications non souhaitées ou perturber d'autres services.
+
+
+    **N'utilisez que les identifiants de VLAN attribués à votre site.**
+
+
+### Ports disponibles
+
+Sur les switches Huawei de collecte, les VLAN de votre plage sont mis à disposition de la manière suivante :
+
+* le premier VLAN de la plage dispose de **4 ports configurés en mode access** ;
+* chacun des autres VLAN dispose de **2 ports configurés en mode access**.
+
+Ainsi, pour Bourges, le VLAN `210` dispose de 4 ports access et les VLAN `211` à `219` disposent chacun de 2 ports access.
+
+La même organisation est appliquée à Chartres (`220` à `229`), Tours (`230` à `239`) et Orléans (`240` à `249`).
+
+!!! warning "Cas particulier : Blois"
+    Les VLAN `250` à `259` étant déjà utilisés par l'infrastructure pédagogique, la plage attribuée au site de Blois commence au VLAN `260`.
+
+    Blois ne disposant pas directement d'un switch Huawei de collecte comme les autres sites, son raccordement devra également tenir compte de la topologie particulière décrite précédemment.
+
+
