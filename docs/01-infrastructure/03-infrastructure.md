@@ -147,10 +147,10 @@ Afin d'isoler les connexions de chaque site, les deux accès disposent désormai
 
 | Site     | Baie |      FAI 1 |      FAI 2 |
 | -------- | ---: | ---------: | ---------: |
-| Chartres |    1 | VLAN `101` | VLAN `201` |
-| Tours    |    2 | VLAN `102` | VLAN `202` |
-| Orléans  |    3 | VLAN `103` | VLAN `203` |
-| Bourges  |    4 | VLAN `104` | VLAN `204` |
+| Bourges  |    1 | VLAN `101` | VLAN `201` |
+| Chartres |    2 | VLAN `102` | VLAN `202` |
+| Tours    |    3 | VLAN `103` | VLAN `203` |
+| Orléans  |    4 | VLAN `104` | VLAN `204` |
 | Blois    |    5 | VLAN `105` | VLAN `205` |
 
 !!! important "Infrastructure opérateur"
@@ -270,10 +270,10 @@ Une plage d'identifiants est réservée à chaque site :
 
 | Site     | VLAN de management | VLAN utilisables |
 | -------- | -----------------: | ---------------: |
-| Chartres |              `110` |    `220` à `229` |
-| Tours    |              `120` |    `230` à `239` |
-| Orléans  |              `130` |    `240` à `249` |
-| Bourges  |              `140` |    `210` à `219` |
+| Bourges  |              `110` |    `210` à `219` |
+| Chartres |              `120` |    `220` à `229` |
+| Tours    |              `130` |    `230` à `239` |
+| Orléans  |              `140` |    `240` à `249` |
 | Blois    |              `150` |    `260` à `269` |
 
 Le **VLAN de management** est imposé et réservé à l'administration de vos équipements.
