@@ -1,12 +1,63 @@
 # Annexes
 
+!!! danger "Les annexes ne sont pas des corrigés"
+    Les schémas fournis dans les annexes représentent des **besoins et des principes d'architecture**.
+
+    Ils ne doivent pas être reproduits mécaniquement. Toute architecture mise en œuvre doit pouvoir être **expliquée et justifiée par le groupe**.
+
+
 ## Annexe 1 - Schéma logique minimal l’infrastructure de chaque site géographique
 
+!!! warning "Un schéma logique n'est pas un plan de câblage"
+    Ce schéma présente les **fonctions minimales** qui doivent être présentes sur chaque site et les principaux flux entre elles.
+
+    Il ne constitue **pas une architecture à reproduire à l'identique**.
+
+    À vous de déterminer notamment :
+
+    - quels équipements et machines virtuelles utiliser ;
+    - comment répartir les différents rôles ;
+    - quels VLAN sont nécessaires ;
+    - quel plan d'adressage utiliser ;
+    - où positionner les différents services ;
+    - quelles règles de filtrage sont nécessaires ;
+    - comment assurer la disponibilité et la sécurité de l'ensemble.
+
+    Vous devez être capable de **justifier vos choix techniques**.
+
+<!--
 ![infra](../medias/infrastructure/logique_minimum.png)
+-->
+
+!!! question "Avant de commencer"
+    À partir du schéma, identifiez les **besoins fonctionnels** représentés.
+
+    Ne cherchez pas immédiatement à reproduire le dessin : demandez-vous ce que chaque élément apporte à l'infrastructure et quelles autres architectures pourraient répondre au même besoin.
+
 
 ## Annexe 2 - Schéma logique du réseau de management
 
+!!! warning "Même principe : observez le besoin, pas le dessin"
+    Ce schéma illustre le **principe d'un réseau de management séparé des réseaux utilisateurs**.
+
+    Les équipements, interfaces, VLAN et adresses représentés ne doivent pas être repris sans réflexion.
+
+    Votre infrastructure doit respecter les contraintes du projet et s'intégrer à l'**infrastructure pédagogique existante**.
+
+<!--
 ![infra](../medias/infrastructure/management_logique.png)
+-->
+
+!!! question "À vous de concevoir"
+    Avant toute configuration, vous devez être capable d'expliquer :
+
+    - quels équipements doivent être accessibles depuis le réseau de management ;
+    - quels équipements ne doivent pas l'être ;
+    - comment un administrateur accède à ce réseau ;
+    - comment ce réseau est isolé des autres VLAN ;
+    - quels flux doivent néanmoins être autorisés.
+
+    Une configuration fonctionnelle mais que vous êtes incapable d'expliquer ne constitue pas une solution satisfaisante.
 
 ??? Warning "Nouveauté 2026"
 
@@ -17,7 +68,24 @@
 
 ## Annexe 3 - Schéma physique l’infrastructure
 
+!!! warning "Un schéma physique n'est pas une procédure de câblage"
+    Ce schéma présente un **exemple d'organisation physique** permettant de répondre aux besoins de l'infrastructure.
+
+    Il ne doit pas être reproduit à l'identique sans réflexion.
+
+    Avant de réaliser le câblage et la configuration, vous devez notamment déterminer :
+
+    - quels équipements physiques sont nécessaires ;
+    - quels ports doivent être utilisés ;
+    - quelles liaisons doivent transporter un ou plusieurs VLAN ;
+    - quelles liaisons nécessitent éventuellement une agrégation ;
+    - comment votre infrastructure se raccorde à l'infrastructure pédagogique existante.
+
+    Les choix réalisés doivent être cohérents avec votre **schéma logique** et vous devez être capables de les justifier.
+
+<!--
 ![infra](../medias/infrastructure/physique_minimum.png)
+-->
 
 Les ports sont evidement à choisir par les étudiants
 
