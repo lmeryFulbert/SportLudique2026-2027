@@ -25,9 +25,7 @@
 
     Vous devez être capable de **justifier vos choix techniques**.
 
-<!--
 ![infra](../medias/infrastructure/logique_minimum.png)
--->
 
 !!! question "Avant de commencer"
     À partir du schéma, identifiez les **besoins fonctionnels** représentés.
@@ -44,9 +42,8 @@
 
     Votre infrastructure doit respecter les contraintes du projet et s'intégrer à l'**infrastructure pédagogique existante**.
 
-<!--
 ![infra](../medias/infrastructure/management_logique.png)
--->
+
 
 !!! question "À vous de concevoir"
     Avant toute configuration, vous devez être capable d'expliquer :
@@ -61,7 +58,7 @@
 
 ??? Warning "Nouveauté 2026"
 
-    Un vlan de management dédié est utilisable sur la ferme de serveurs Nutanix: <br/>
+    Un vlan de management dédié est utilisable sur la ferme de serveurs ~~Nutanix~~ **Proxmox** : <br/>
     110 -->Bourges,<br/> 
     120 --> Chartres, <br/> 
     etc...
@@ -83,9 +80,7 @@
 
     Les choix réalisés doivent être cohérents avec votre **schéma logique** et vous devez être capables de les justifier.
 
-<!--
 ![infra](../medias/infrastructure/physique_minimum.png)
--->
 
 Les ports sont evidement à choisir par les étudiants
 
