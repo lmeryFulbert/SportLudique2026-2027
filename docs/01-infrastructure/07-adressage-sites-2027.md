@@ -104,47 +104,6 @@ Les deux plages réservées aux enseignants représentent ensemble **25 % de l'e
 
     Un groupe ne doit donc pas considérer qu'une adresse est utilisable simplement parce qu'elle appartient au réseau `172.28.0.0/16`.
 
-## Vue du découpage par site
-
-Le schéma suivant représente l'ordre des différentes plages dans l'espace `172.28.0.0/16`.
-
-```mermaid
-%%{init: {
-    "theme": "base",
-    "themeVariables": {
-        "primaryTextColor": "#000000",
-        "secondaryTextColor": "#000000",
-        "tertiaryTextColor": "#000000"
-    }
-}}%%
-
-flowchart LR
-    A["PROF 1<br/>172.28.0.0/19<br/>12,5 %"]
-    B["Blois<br/>172.28.32.0/19<br/>12,5 %"]
-    C["Tours<br/>172.28.64.0/18<br/>25 %"]
-    D["Orléans<br/>172.28.128.0/19<br/>12,5 %"]
-    E["Chartres<br/>172.28.160.0/19<br/>12,5 %"]
-    F["Bourges<br/>172.28.192.0/19<br/>12,5 %"]
-    G["PROF 2<br/>172.28.224.0/19<br/>12,5 %"]
-
-    A --- B
-    B --- C
-    C --- D
-    D --- E
-    E --- F
-    F --- G
-
-    style A fill:#ef9a9a,stroke:#b71c1c,stroke-width:3px,color:#000000
-    style B fill:#90caf9,stroke:#1565c0,stroke-width:2px,color:#000000
-    style C fill:#a5d6a7,stroke:#2e7d32,stroke-width:4px,color:#000000
-    style D fill:#ffe082,stroke:#f9a825,stroke-width:2px,color:#000000
-    style E fill:#ffcc80,stroke:#ef6c00,stroke-width:2px,color:#000000
-    style F fill:#ce93d8,stroke:#7b1fa2,stroke-width:2px,color:#000000
-    style G fill:#ef9a9a,stroke:#b71c1c,stroke-width:3px,color:#000000
-
-    linkStyle default stroke:#555555,stroke-width:2px
-```
-
 !!! warning "Une adresse disponible n'est pas nécessairement une adresse utilisable"
     Les plages `172.28.0.0/19` et `172.28.224.0/19` existent bien dans le plan d'adressage, mais elles sont **hors du périmètre attribué aux étudiants**.
 
