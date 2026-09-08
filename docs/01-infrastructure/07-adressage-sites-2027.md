@@ -109,6 +109,15 @@ Les deux plages réservées aux enseignants représentent ensemble **25 % de l'e
 Le schéma suivant représente l'ordre des différentes plages dans l'espace `172.28.0.0/16`.
 
 ```mermaid
+%%{init: {
+    "theme": "base",
+    "themeVariables": {
+        "primaryTextColor": "#000000",
+        "secondaryTextColor": "#000000",
+        "tertiaryTextColor": "#000000"
+    }
+}}%%
+
 flowchart LR
     A["PROF 1<br/>172.28.0.0/19<br/>12,5 %"]
     B["Blois<br/>172.28.32.0/19<br/>12,5 %"]
