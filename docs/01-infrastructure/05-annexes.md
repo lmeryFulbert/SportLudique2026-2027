@@ -249,9 +249,9 @@ Les ports sont evidement à choisir par les étudiants
 | | | PASSERELLE | 121.183.90.**206** | | | |
 | **200 (PROF)** | | RSportFulbert | Vers Internet simulé | 121.183.90.**206** /29 | 255.255.255.248 | 121.183.90.200 | 121.183.90.207 |
 | **200 (PROF)** | | | Réseau PROF | 172.16.200.**1** /24 | 255.255.255.0 | 172.16.200.0 | 172.16.200.255 |
-## Annexe 10
 
-**Les équipements de réseau**
+
+## Annexe 10   **Les équipements de réseau**
 
 ### DLINK 3200 AP
 
