@@ -43,14 +43,19 @@ L’hyperconvergence est une approche d’architecture informatique qui consiste
 
 Contrairement à une infrastructure traditionnelle où ces éléments sont gérés séparément (serveurs, SAN/NAS, commutateurs spécialisés fiber channel), l’hyperconvergence repose sur un hyperviseur et du stockage défini par logiciel (SDS) pour combiner toutes ces ressources au sein d’un même cluster.
 
-??? info "Notion"
+??? info "Exemple : Ceph"
 
-    Chez Proxmox la solution repose sur le système **CEPH**
+    **Proxmox VE peut s'appuyer sur Ceph** pour mettre en œuvre un stockage distribué dans une infrastructure hyperconvergée.
 
-!!! important "Important"
+!!! important "Ceph"
 
-    **Ceph** est une solution de stockage distribué open source conçue pour offrir une grande scalabilité, une tolérance aux pannes et des performances élevées. Il repose sur l’agrégation de disques présents dans plusieurs serveurs (appelés nœuds) pour créer un espace de stockage unique, vu comme un seul système.
-    **Utilisation :** souvent employé dans des environnements de cloud (OpenStack, Proxmox, Kubernetes) pour fournir un stockage résilient et distribué aux machines virtuelles et conteneurs.
+    **Ceph** est une solution de stockage distribué open source conçue pour offrir une grande scalabilité et une tolérance aux pannes.
+
+    Il agrège les disques présents dans plusieurs serveurs, appelés **nœuds**, afin de fournir un espace de stockage distribué et résilient.
+
+    Ceph est notamment utilisé dans des environnements de cloud et de virtualisation comme **Proxmox VE**, OpenStack ou Kubernetes.
+
+    **Ceph n'est cependant pas obligatoire avec Proxmox VE.**
 
 **Avantages :**
 
@@ -61,74 +66,110 @@ Contrairement à une infrastructure traditionnelle où ces éléments sont gér�
 
 ## Solutions techniques
 
-Les hyperviseurs sont des logiciels qui permettent de créer et de gérer des machines virtuelles (VMs) sur un serveur physique. Ils sont essentiels pour la virtualisation, qui permet d'exécuter plusieurs systèmes d'exploitation et applications sur un seul matériel physique. Voici un petit cours sur les hyperviseurs, en mettant en avant VMware, Hyper-V, VirtualBox et Nutanix, tout en discutant des spécificités de l'hyperconvergence.
+Il existe de nombreuses solutions de virtualisation. Certaines sont destinées à une utilisation locale sur un poste de travail, d'autres à des infrastructures de production composées de plusieurs serveurs.
 
-### VirtualBox :
+### VirtualBox
 
- **Type d'hyperviseur** : VirtualBox que vous avez utilisé l'an dernier est un hyperviseur de **type 2**, ce qui signifie qu'il s'exécute sur un système d'exploitation hôte existant (Windows, macOS, Linux).
-   
- **Caractéristiques** : VirtualBox est adapté pour les environnements de développement, de test et d'apprentissage. Il est open source et offre une interface utilisateur conviviale.
+**Type d'hyperviseur** : VirtualBox, que vous avez utilisé l'an dernier, est un hyperviseur de **type 2**. Il s'exécute au-dessus d'un système d'exploitation hôte existant (Windows, macOS ou Linux).
 
- **Concurents** : 
+**Caractéristiques** : VirtualBox est particulièrement adapté aux environnements de développement, de test et d'apprentissage.
 
-- **VMware Workstation** (et VMware Fusion pour macOS) : hyperviseurs de type 2 commerciaux offrant plus de fonctionnalités avancées et une meilleure intégration professionnelle.
+**Concurrents :**
 
-- **Hyper-V** (intégré aux éditions professionnelles et serveurs de Windows) : même si c’est un hyperviseur de type 1, il peut être vu comme un concurrent car il est directement disponible sur Windows et souvent utilisé pour la virtualisation locale.
+- **VMware Workstation** et **VMware Fusion** : hyperviseurs de type 2 destinés respectivement aux postes de travail Windows/Linux et macOS ;
+- **Hyper-V** : intégré à Windows, il peut également être utilisé pour virtualiser des systèmes sur un poste de travail.
 
-### VMware :
-   
- **Type d'hyperviseur** : VMware propose deux types d'hyperviseurs - VMware vSphere/ESXi pour les environnements d'entreprise et VMware Workstation/Fusion pour les environnements de développement et de test.
-   
- **Caractéristiques** : VMware est l'un des leaders du marché de la virtualisation. Il offre des fonctionnalités avancées telles que la migration à chaud, la gestion automatisée des ressources, la haute disponibilité, la réplication et la gestion centralisée avec vCenter Server.
+### VMware
 
- **Hyperconvergence** : VMware propose une solution hyperconvergée appelée VMware vSAN. Il combine stockage et calcul sur un même cluster de serveurs pour simplifier la gestion et améliorer les performances.
+VMware propose plusieurs solutions de virtualisation :
 
-### Hyper-V :
+- **VMware ESXi** : hyperviseur de type 1 destiné aux infrastructures de production ;
+- **VMware Workstation / Fusion** : hyperviseurs destinés aux postes de travail.
 
- **Type d'hyperviseur** : Hyper-V est l'hyperviseur de Microsoft, intégré à Windows Server. Il existe également une version gratuite appelée Hyper-V Server.
-   
- **Caractéristiques** : Hyper-V offre une virtualisation robuste avec des fonctionnalités telles que la migration en direct, la mise en cluster, la gestion à distance via Hyper-V Manager ou PowerShell, et la prise en charge des machines virtuelles Linux et Windows.
+Dans les infrastructures professionnelles, VMware propose notamment :
 
- **Hyperconvergence** : Microsoft propose Azure Stack HCI, une solution hyperconvergée basée sur Hyper-V. Elle offre une plateforme de calcul et de stockage hautement intégrée.
+- la migration à chaud des machines virtuelles ;
+- la haute disponibilité ;
+- la réplication ;
+- la gestion centralisée avec **vCenter Server**.
 
-### Nutanix :
+VMware propose également **vSAN**, une solution de stockage défini par logiciel permettant de construire une infrastructure hyperconvergée.
 
-**Type d'hyperviseur** : Nutanix est une plateforme hyperconvergée qui intègre son propre hyperviseur, appelé Acropolis Hypervisor (AHV). Cependant, il prend également en charge d'autres hyperviseurs comme VMware ESXi et Hyper-V.
-   
-**Caractéristiques** : Nutanix offre une solution hyperconvergée tout-en-un, combinant stockage, calcul et gestion dans un cluster évolutif. Il simplifie la gestion, offre une haute disponibilité et une scalabilité linéaire.
+### Hyper-V
 
-**Hyperconvergence** : Nutanix est une solution hyperconvergée par excellence, car elle combine tous les éléments nécessaires pour exécuter des charges de travail virtualisées de manière efficace.
+**Hyper-V** est l'hyperviseur de Microsoft. Il est notamment intégré à Windows Server et à certaines éditions de Windows.
 
-### Proxmox :
+Il permet notamment :
 
-**Type d'hyperviseur** : Proxmox VE est un hyperviseur de type 1 (bare-metal) basé sur **KVM (Kernel-based Virtual Machine)**pour la virtualisation matérielle et LXC (Linux Containers) pour la virtualisation basée sur conteneurs.
+- d'exécuter des machines virtuelles Windows et Linux ;
+- la migration en direct ;
+- la mise en cluster ;
+- la gestion à distance avec Hyper-V Manager ou PowerShell ;
+- la mise en œuvre de mécanismes de haute disponibilité.
+
+Microsoft propose également des solutions d'infrastructure hyperconvergée basées sur ses technologies de virtualisation.
+
+### Nutanix
+
+**Nutanix** est une plateforme d'**infrastructure hyperconvergée (HCI)**.
+
+Elle regroupe les ressources de **calcul** et de **stockage** de plusieurs serveurs dans un cluster administré comme un ensemble cohérent.
+
+Nutanix propose notamment son propre hyperviseur, **AHV (Acropolis Hypervisor)**, mais peut également fonctionner avec d'autres hyperviseurs.
+
+!!! info "Nutanix au lycée Fulbert"
+
+    Le lycée a utilisé pendant plusieurs années une infrastructure **Nutanix** pour héberger les services du BTS SIO.
+
+    Elle constituait un exemple concret d'**infrastructure hyperconvergée**.
+
+    Cette infrastructure a depuis été remplacée par un **cluster Proxmox**, notamment pour des raisons de coût.
+
+### Proxmox
+
+**Proxmox VE** est une plateforme de virtualisation de type 1 (*bare-metal*) basée principalement sur :
+
+- **KVM (Kernel-based Virtual Machine)** pour les machines virtuelles ;
+- **LXC (Linux Containers)** pour les conteneurs Linux.
 
 **Caractéristiques :**
-- Gestion centralisée des machines virtuelles et des conteneurs via une interface web conviviale.
-- Prise en charge de la haute disponibilité avec la possibilité de migration en direct des machines virtuelles.
-- Intégration du stockage défini par logiciel (Software-Defined Storage) pour la gestion des données.
-- Prise en charge des conteneurs Linux via LXC pour une efficacité accrue des ressources.
-- Intégration de la sauvegarde et de la restauration des machines virtuelles et des conteneurs.
 
+- gestion centralisée des machines virtuelles et des conteneurs via une interface web ;
+- regroupement de plusieurs serveurs au sein d'un cluster ;
+- migration des machines virtuelles entre les nœuds ;
+- haute disponibilité (HA) ;
+- prise en charge de différentes solutions de stockage ;
+- sauvegarde et restauration des machines virtuelles et des conteneurs.
 
-!!! important "Important"
+!!! important "KVM"
 
-    KVM (Kernel-based Virtual Machine) est un hyperviseur de type 1 intégré au noyau Linux, qui transforme un système Linux en plateforme de virtualisation complète. Il utilise les extensions matérielles (Intel VT-x, AMD-V) pour exécuter des machines virtuelles avec des performances proches du natif. Utilisation : KVM est largement employé dans les datacenters et solutions de cloud open source, comme Proxmox VE, OpenStack ou oVirt, pour gérer des machines virtuelles Linux et Windows de manière fiable et performante.
+    **KVM (Kernel-based Virtual Machine)** est une technologie de virtualisation intégrée au noyau Linux.
 
-### Xen :
+    Elle utilise les extensions matérielles **Intel VT-x** ou **AMD-V** pour exécuter des machines virtuelles avec des performances proches du matériel natif.
 
- **Type d'hyperviseur** : Xen est un hyperviseur de type 1 (bare-metal) open source, initialement développé à l’Université de Cambridge. Il a ensuite été commercialisé par XenSource, racheté en 2007 par **Citrix**, qui l’a intégré dans son produit XenServer (aujourd’hui appelé Citrix Hypervisor). Depuis 2013, le projet open source est géré par la Linux Foundation sous le nom de **Xen Project**, avec Citrix comme contributeur majeur aux côtés d’autres acteurs.
+    KVM est notamment utilisé par **Proxmox VE** et différentes plateformes de cloud open source.
 
- Il ne sera pas mis en oeuvre mais sachez qu'il existe. On priviligiera les solutions basées sur KVM.
+!!! important "Notre infrastructure Proxmox"
 
-**Caractéristiques :**
+    Notre infrastructure pédagogique est constituée de plusieurs nœuds **Proxmox** regroupés en cluster.
 
-Xen utilise une architecture particulière avec un domaine privilégié appelé Dom0, qui gère les interactions avec le matériel et les pilotes, et des domaines invités appelés DomU pour exécuter les machines virtuelles.
+    Nous n'utilisons **pas Ceph** : chaque nœud possède son propre stockage local basé sur **ZFS**.
 
-Il prend en charge deux modes de virtualisation : la paravirtualisation (PV), qui nécessite un OS modifié pour fonctionner efficacement, et la virtualisation complète (HVM), qui repose sur les extensions matérielles de virtualisation (Intel VT-x, AMD-V).
+    La disponibilité de certaines machines virtuelles repose sur deux mécanismes :
 
-Xen est reconnu pour sa sécurité renforcée et sa modularité, ce qui en fait un choix fréquent pour des environnements sensibles.
+    - la **réplication ZFS**, programmée pour copier régulièrement les données d'une VM vers un autre nœud ;
+    - la **haute disponibilité (HA)**, qui permet de redémarrer automatiquement une VM sur un autre nœud lorsqu'un nœud devient indisponible.
 
-**Utilisation** :
-Xen est largement utilisé dans les infrastructures de cloud computing, notamment par Amazon Web Services (AWS) pour son service EC2, ainsi que dans certains systèmes embarqués et environnements nécessitant une isolation forte.
+    Contrairement à une infrastructure utilisant **Ceph**, le stockage n'est donc pas distribué et partagé en permanence entre les nœuds.
 
+    La réplication ZFS étant périodique, les dernières modifications effectuées depuis la dernière réplication peuvent être perdues en cas de panne brutale.
+
+### Xen
+
+**Xen** est un hyperviseur open source de **type 1 (bare-metal)**.
+
+Il a notamment été utilisé dans différentes infrastructures de datacenter et de cloud.
+
+!!! note "Culture générale"
+
+    Xen ne sera pas mis en œuvre dans le cadre du BTS. Nous privilégierons les solutions basées sur **KVM**, notamment **Proxmox VE**.
