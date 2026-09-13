@@ -95,6 +95,22 @@ Dans les infrastructures professionnelles, VMware propose notamment :
 
 VMware propose également **vSAN**, une solution de stockage défini par logiciel permettant de construire une infrastructure hyperconvergée.
 
+!!! info "VMware au lycée Fulbert"
+
+    **VMware** a été historiquement la première solution de virtualisation utilisée pour héberger les services du BTS SIO au lycée.
+
+    L'infrastructure reposait sur plusieurs serveurs VMware associés à une **baie de stockage SAN**, sur laquelle étaient stockées les machines virtuelles.
+
+    Après **plus de dix ans d'exploitation**, le vieillissement du matériel a conduit au remplacement de cette infrastructure.
+
+    Le lycée a alors migré vers une solution **Nutanix**, basée sur une architecture hyperconvergée dans laquelle le stockage n'était plus assuré par une baie SAN dédiée.
+
+    Ces solutions professionnelles sont cependant **coûteuses**, aussi bien à l'achat qu'en licences, abonnements et support. Selon la taille de l'infrastructure et les fonctionnalités utilisées, les coûts logiciels peuvent représenter **plusieurs milliers à plusieurs dizaines de milliers d'euros par an**.
+
+    Depuis le rachat de VMware par **Broadcom en 2023**, le modèle de licence VMware a profondément évolué, avec notamment le passage à des abonnements calculés en fonction du nombre de cœurs des processeurs.
+
+    Ces changements ont entraîné de fortes augmentations de coûts pour certaines organisations et accélèrent actuellement de nombreux projets de migration vers des solutions alternatives comme **Proxmox VE**.
+
 ### Hyper-V
 
 **Hyper-V** est l'hyperviseur de Microsoft. Il est notamment intégré à Windows Server et à certaines éditions de Windows.
@@ -119,11 +135,15 @@ Nutanix propose notamment son propre hyperviseur, **AHV (Acropolis Hypervisor)**
 
 !!! info "Nutanix au lycée Fulbert"
 
-    Le lycée a utilisé pendant plusieurs années une infrastructure **Nutanix** pour héberger les services du BTS SIO.
+    Pour remplacer l'ancienne infrastructure **VMware + SAN**, le lycée a migré vers une solution **Nutanix**.
 
-    Elle constituait un exemple concret d'**infrastructure hyperconvergée**.
+    Cette nouvelle infrastructure constituait un exemple concret d'**hyperconvergence**, en regroupant calcul et stockage au sein des nœuds du cluster.
 
-    Cette infrastructure a depuis été remplacée par un **cluster Proxmox**, notamment pour des raisons de coût.
+    Comme VMware, Nutanix est une solution professionnelle dont le coût comprend le matériel, les licences et le support. Pour une infrastructure de plusieurs nœuds, le budget peut rapidement atteindre **plusieurs dizaines de milliers d'euros**, auquel s'ajoutent les coûts récurrents de licences et de maintenance.
+
+    Les lycées étant financés et équipés en grande partie par la **Région**, le renouvellement d'une telle infrastructure dépend également des budgets qu'elle alloue aux établissements.
+
+    Faute de financement pour renouveler la solution Nutanix, l'infrastructure du BTS SIO a donc été remplacée par un **cluster Proxmox VE**, permettant de réutiliser du matériel disponible tout en réduisant fortement les coûts de licences.
 
 ### Proxmox
 
