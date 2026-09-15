@@ -81,13 +81,13 @@ ARP permet notamment à un poste de déterminer l'adresse MAC correspondant à u
 
 Les adresses IPv4 privées utilisées dans les réseaux locaux ne sont pas utilisées comme adresses globalement routables sur Internet.
 
-Le **NAT (Network Address Translation)** permet à un routeur de modifier les informations d'adressage IPv4 lorsqu'un paquet traverse celui-ci.
+Le **NAT (Network Address Translation)** permet à un routeur de modifier les informations d'adressage IPv4 lorsqu'un paquet le traverse.
 
-Dans cette activité, plusieurs postes du réseau interne doivent pouvoir utiliser **la même adresse IPv4 extérieure**.
+Dans cette activité, plusieurs postes du réseau interne doivent pouvoir accéder à Internet en utilisant **la même adresse IPv4 extérieure**.
 
-Le routeur utilise pour cela le **PAT (Port Address Translation)** : les différents flux sont distingués notamment grâce aux numéros de ports.
+Le routeur traduit alors les adresses IPv4 privées des postes en utilisant cette adresse IPv4 extérieure commune. Pour distinguer les différents flux, il s'appuie notamment sur les **numéros de ports source** des protocoles de transport (couche 4 du modèle OSI).
 
-Sur un routeur Cisco, ce fonctionnement est activé avec le mot-clé :
+Sur un routeur Cisco, ce mécanisme de **NAT avec surcharge** est activé avec le mot-clé :
 
 ```cisco
 overload
