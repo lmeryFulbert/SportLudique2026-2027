@@ -26,11 +26,22 @@
 
 Un poste peut disposer d'une adresse IP, d'un masque et d'un serveur DNS corrects, mais il ne peut joindre Internet que si sa **passerelle par défaut** fonctionne.
 
-```text
-Postes du LAN ─── Passerelle unique ─── Internet
-                         ✕
-                  point de panne unique
+```mermaid
+flowchart LR
+    LAN["Postes du LAN"]
+    GW["Passerelle unique"]
+    NET["Internet"]
+    SPOF["❌ SPOF"]
+
+    LAN --> GW --> NET
+    SPOF -.-> GW
 ```
+
+!!! definition "SPOF — Single Point of Failure"
+
+    Un **SPOF** (*Single Point of Failure*) est un composant dont la panne suffit, à elle seule, à provoquer l'indisponibilité d'un service.
+
+    Ici, la **passerelle unique** est un SPOF : si elle tombe en panne, les postes du LAN ne peuvent plus accéder à Internet.
 
 Si la passerelle tombe en panne, les postes restent capables de communiquer dans leur propre réseau, mais ils ne peuvent plus joindre les réseaux distants.
 
