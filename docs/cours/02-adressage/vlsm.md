@@ -1,6 +1,8 @@
 # VLSM - Dimensionner un plan d'adressage
 
-## Pourquoi utiliser des sous-réseaux de tailles différentes ?
+## Comprendre le VLSM
+
+### Pourquoi utiliser des sous-réseaux de tailles différentes ?
 
 Lors de la conception d'un réseau, tous les sous-réseaux n'ont généralement pas les mêmes besoins.
 
@@ -28,7 +30,7 @@ Le **VLSM (Variable Length Subnet Mask)** consiste à utiliser des préfixes de 
 
 L'objectif n'est cependant pas de choisir systématiquement le plus petit sous-réseau possible. Un plan d'adressage doit également prévoir une **marge d'évolution raisonnable**.
 
-## Rappel : combien d'hôtes dans un sous-réseau ?
+### Rappel : combien d'hôtes dans un sous-réseau ?
 
 Une adresse IPv4 contient **32 bits**.
 
@@ -51,7 +53,7 @@ Le nombre d'adresses utilisables est donc :
 2^n - 2
 ```
 
-### Quelques préfixes à connaître
+#### Quelques préfixes à connaître
 
 | Préfixe | Adresses totales | Adresses utilisables |
 | ------: | ---------------: | -------------------: |
@@ -64,7 +66,7 @@ Le nombre d'adresses utilisables est donc :
 
 Il n'est pas nécessaire d'apprendre ce tableau par cœur si vous savez retrouver les valeurs.
 
-## Déterminer le préfixe nécessaire
+### Déterminer le préfixe nécessaire
 
 Supposons qu'un réseau doive accueillir **50 équipements**.
 
@@ -242,7 +244,9 @@ Le résultat peut être documenté dans un tableau.
 | B      |     25 |   `/27` | `192.168.1.64` | `192.168.1.65`   | `192.168.1.94`   | `192.168.1.95`  |
 | C      |     10 |   `/28` | `192.168.1.96` | `192.168.1.97`   | `192.168.1.110`  | `192.168.1.111` |
 
-## La méthode à retenir
+## Contrôler et documenter le plan d'adressage
+
+### La méthode à retenir
 
 Pour construire un plan d'adressage VLSM :
 
@@ -260,7 +264,7 @@ Pour construire un plan d'adressage VLSM :
 
     Ne vous contentez donc pas d'obtenir un résultat : **vérifiez-le**.
 
-## Vérifier son plan d'adressage
+### Vérifier son plan d'adressage
 
 Pour chaque sous-réseau, vous devez être capables de déterminer :
 
@@ -278,7 +282,9 @@ Vous devez également vérifier que :
 * aucun sous-réseau ne chevauche un autre sous-réseau ;
 * tous les sous-réseaux restent à l'intérieur du bloc d'adresses qui vous a été attribué.
 
-## Application à SportLudique
+## Mettre en pratique
+
+### Application à SportLudique
 
 Vous disposez maintenant de la méthode permettant de dimensionner les différents réseaux de votre infrastructure.
 
@@ -314,7 +320,7 @@ Vous pourrez seulement ensuite construire votre plan d'adressage.
 Votre première tâche consiste à proposer et à justifier votre plan d'adressage.
 
 
-## Vérifiez votre compréhension
+### Vérifiez votre compréhension
 
 <quiz>
 Un sous-réseau doit accueillir 50 équipements. Quel est le plus petit préfixe permettant de répondre à ce besoin ?
