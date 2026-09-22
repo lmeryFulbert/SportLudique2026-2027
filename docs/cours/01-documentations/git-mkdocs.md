@@ -39,7 +39,9 @@ Vous utiliserez cette chaîne pendant toute la durée du projet.
 
 ---
 
-# 1. Préparer l'environnement de travail
+## Environnement de travail
+
+### 1. Préparer l'environnement de travail
 
 Pour travailler localement, nous avons besoin de :
 
@@ -71,7 +73,7 @@ pip3 --version
 
 ---
 
-# 2. Python et les environnements virtuels
+### 2. Python et les environnements virtuels
 
 MkDocs est écrit en Python et s'installe comme un paquet Python.
 
@@ -79,7 +81,7 @@ Il serait possible d'installer directement les différents paquets dans le syst�
 
 Nous allons plutôt utiliser un **environnement virtuel Python**.
 
-## Pourquoi un environnement virtuel ?
+#### Pourquoi un environnement virtuel ?
 
 Un environnement virtuel permet d'installer les dépendances nécessaires à un projet sans modifier l'environnement Python global de la machine.
 
@@ -94,7 +96,7 @@ Nous retrouverons cette idée, poussée beaucoup plus loin, lorsque nous étudie
 
 - l'application sera alors empaquetée avec son environnement d'exécution et ses dépendances.
 
-## En pratique
+#### En pratique
 
 Dans le répertoire de votre projet :
 
@@ -156,7 +158,9 @@ deactivate
 
 ---
 
-# 3. Créer le dépôt GitHub
+## Git et GitHub : créer le dépôt
+
+### 3. Créer le dépôt GitHub
 
 Notre documentation doit être versionnée et partagée entre les membres du groupe.
 
@@ -191,7 +195,7 @@ Nous allons donc commencer par créer un dépôt sur GitHub.
 
 ---
 
-# 4. Cloner le dépôt
+### 4. Cloner le dépôt
 
 Le dépôt existe maintenant sur GitHub, mais nous voulons travailler sur notre machine.
 
@@ -241,7 +245,7 @@ Vous possédez maintenant une copie locale du dépôt présent sur GitHub.
 
 ---
 
-# 5. Identifier l'auteur des commits
+### 5. Identifier l'auteur des commits
 
 Un commit Git possède un auteur.
 
@@ -272,7 +276,7 @@ git config --global --list
 
 ---
 
-# 6. S'authentifier auprès de GitHub avec SSH
+### 6. S'authentifier auprès de GitHub avec SSH
 
 Git sait maintenant qui crée les commits.
 
@@ -280,7 +284,7 @@ Mais GitHub doit encore vérifier que vous êtes autorisé à envoyer des modifi
 
 Nous allons utiliser une **clé SSH**.
 
-## Générer la clé
+#### Générer la clé
 
 Nous utiliserons **Ed25519** :
 
@@ -302,7 +306,7 @@ Vous pouvez protéger votre clé privée avec une phrase de passe.
 
     **Vous ne devez jamais envoyer votre clé privée sur GitHub ou l'ajouter à votre dépôt.**
 
-## Et RSA ?
+#### Et RSA ?
 
 Vous rencontrerez également très souvent des clés RSA dans les documentations :
 
@@ -314,7 +318,7 @@ RSA reste très répandu, notamment sur des systèmes plus anciens.
 
 Pour notre environnement, nous privilégierons **Ed25519**, qui permet notamment d'utiliser des clés beaucoup plus petites tout en offrant un niveau de sécurité adapté à notre usage.
 
-## Afficher la clé publique
+#### Afficher la clé publique
 
 ```bash
 cat ~/.ssh/id_ed25519.pub
@@ -332,7 +336,7 @@ Settings
 
 Collez votre clé publique et donnez-lui un nom permettant d'identifier la machine.
 
-## Tester la connexion
+#### Tester la connexion
 
 ```bash
 ssh -T git@github.com
@@ -353,7 +357,9 @@ Une fois l'authentification correctement configurée, GitHub doit vous reconnaî
 
 ---
 
-# 7. Initialiser MkDocs
+## MkDocs : créer la documentation
+
+### 7. Initialiser MkDocs
 
 Nous avons maintenant :
 
@@ -379,7 +385,7 @@ mon-projet-mkdocs/
 
 Ces deux éléments ont des rôles différents.
 
-## Le répertoire `docs/`
+#### Le répertoire `docs/`
 
 Il contient les pages de votre documentation, principalement sous forme de fichiers Markdown.
 
@@ -393,7 +399,7 @@ docs/
 └── supervision.md
 ```
 
-## Le fichier `mkdocs.yml`
+#### Le fichier `mkdocs.yml`
 
 Il contient la configuration du site : thème, extensions, plugins, navigation, etc.
 
@@ -416,7 +422,7 @@ theme:
 
 ---
 
-# 8. Tester la documentation localement
+### 8. Tester la documentation localement
 
 Il serait assez pénible de faire un `push` sur GitHub chaque fois que vous voulez vérifier une modification.
 
@@ -465,7 +471,9 @@ Ctrl+C
 
 ---
 
-# 9. Comprendre le cycle Git
+## Git : versionner le travail
+
+### 9. Comprendre le cycle Git
 
 Avant d'utiliser les commandes, il faut comprendre ce que Git manipule.
 
@@ -504,7 +512,7 @@ Ces étapes ont des rôles différents.
 
 ---
 
-# 10. Faire un commit
+### 10. Faire un commit
 
 Après avoir travaillé sur votre documentation, commencez par regarder ce qui a changé :
 
@@ -545,7 +553,7 @@ Quelques mois plus tard, votre historique Git doit encore avoir un sens.
 
 ---
 
-# 11. Envoyer les commits sur GitHub
+### 11. Envoyer les commits sur GitHub
 
 Les commits précédents existent pour l'instant uniquement dans votre dépôt local.
 
@@ -567,7 +575,7 @@ Vous pouvez alors vérifier sur GitHub que les nouveaux commits sont présents.
 
 ---
 
-# 12. Récupérer les modifications
+### 12. Récupérer les modifications
 
 Vous ne travaillerez pas seuls sur le projet.
 
@@ -611,7 +619,7 @@ git push
 
 ---
 
-# 13. Travailler avec des branches
+### 13. Travailler avec des branches
 
 Jusqu'ici, nous avons principalement travaillé sur `main`.
 
@@ -660,7 +668,9 @@ git push -u origin documentation-supervision
 
 ---
 
-# 14. Pull Requests et revue du travail
+## GitHub : collaborer et publier
+
+### 14. Pull Requests et revue du travail
 
 La branche existe maintenant sur GitHub, mais elle n'est pas encore intégrée à `main`.
 
@@ -693,7 +703,7 @@ Une fois les modifications validées, la Pull Request peut être fusionnée dans
 
 ---
 
-# 15. GitHub comme plateforme CI/CD
+### 15. GitHub comme plateforme CI/CD
 
 Jusqu'ici, GitHub nous a principalement servi à héberger notre dépôt et à collaborer.
 
@@ -733,7 +743,7 @@ Nous avons donc les bases d'une chaîne de **CI/CD**.
 
 ---
 
-# 16. Créer un workflow GitHub Actions
+### 16. Créer un workflow GitHub Actions
 
 Les workflows GitHub Actions sont décrits dans des fichiers YAML placés dans :
 
@@ -791,7 +801,7 @@ git pull origin main
 
 ---
 
-# 17. Publier avec GitHub Pages
+### 17. Publier avec GitHub Pages
 
 La documentation générée par MkDocs est constituée de fichiers statiques : HTML, CSS, JavaScript, images, etc.
 
@@ -833,7 +843,7 @@ https://votre-utilisateur.github.io/votre-projet/
 
 ---
 
-# 18. Le workflow complet
+### 18. Le workflow complet
 
 Nous pouvons maintenant reprendre toute la chaîne.
 
@@ -901,35 +911,37 @@ Ce qui pouvait sembler au départ être simplement « écrire quelques fichiers 
 
 ---
 
-# 19. Les commandes Git à connaître
+## Synthèse et commandes essentielles
+
+### 19. Les commandes Git à connaître
 
 Vous n'avez pas besoin de mémoriser immédiatement des dizaines de commandes.
 
 Celles-ci couvrent déjà une grande partie de vos besoins :
 
 ```bash
-# Voir l'état du dépôt
+#### Voir l'état du dépôt
 git status
 
-# Récupérer les modifications
+#### Récupérer les modifications
 git pull
 
-# Voir les branches
+#### Voir les branches
 git branch
 
-# Créer une branche et basculer dessus
+#### Créer une branche et basculer dessus
 git checkout -b ma-branche
 
-# Ajouter les modifications
+#### Ajouter les modifications
 git add .
 
-# Créer un commit
+#### Créer un commit
 git commit -m "Description de la modification"
 
-# Envoyer les commits
+#### Envoyer les commits
 git push
 
-# Voir l'historique
+#### Voir l'historique
 git log
 ```
 
@@ -945,7 +957,7 @@ git log
 
 ---
 
-# 20. Ce que vous devez surtout retenir
+### 20. Ce que vous devez surtout retenir
 
 À la fin de cette partie, l'objectif n'est pas de réciter les commandes Git par cœur.
 
