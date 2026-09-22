@@ -17,9 +17,16 @@ theme:
         name: 'Switch to dark mode'
   features:
      - content.code.copy
-  #  - navigation.tabs
-  #  - navigation.top
+     #- navigation.tabs
+     #- navigation.sections
+     - toc.follow
 copyright: Copyright &copy; 2026-2027 MERY Ludovic & Kevin Huet - Lycée Fulbert - Chartres
+
+extra_javascript:
+  - javascripts/toc-deroulant.js
+
+extra_css:
+  - stylesheets/toc-deroulant.css
 
 markdown_extensions:
   - attr_list
@@ -28,6 +35,9 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.details
+  - toc:
+      permalink: true
+      toc_depth: 3
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid

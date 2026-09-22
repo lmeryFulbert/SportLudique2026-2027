@@ -20,9 +20,10 @@
     2. Quelle panne est réellement détectée ?
     3. Que se passe-t-il précisément après cette panne ?
 
----
 
-## Le problème : une passerelle unique
+## Socle commun
+
+### Le problème : une passerelle unique
 
 Un poste peut disposer d'une adresse IP, d'un masque et d'un serveur DNS corrects, mais il ne peut joindre Internet que si sa **passerelle par défaut** fonctionne.
 
@@ -58,7 +59,7 @@ Un second routeur est ajouté sur le LAN. La passerelle configurée sur tous les
 
 ---
 
-## Le principe d'une passerelle virtuelle
+### Le principe d'une passerelle virtuelle
 
 Deux équipements partagent une **adresse IP virtuelle**, appelée aussi **VIP** (*Virtual IP address*).
 
@@ -82,7 +83,7 @@ Le protocole de redondance détermine quel équipement répond pour cette adress
 
 ---
 
-## HSRP : un actif et un secours
+### HSRP : un actif et un secours
 
 **HSRP** (*Hot Standby Router Protocol*) est un protocole **propriétaire Cisco** de redondance de la passerelle par défaut.
 
@@ -124,7 +125,7 @@ flowchart LR
 
 En fonctionnement normal, **R1 transmet les paquets**. R2 ne partage pas le trafic de ce groupe : il attend une panne.
 
-### Élection du routeur Active
+#### Élection du routeur Active
 
 Le choix s'effectue principalement selon :
 
@@ -137,7 +138,7 @@ La priorité par défaut est `100`.
 
     R1 possède une priorité de `110` et R2 une priorité de `100`. R1 est donc élu **Active**.
 
-### Le rôle de `preempt`
+#### Le rôle de `preempt`
 
 La commande `preempt` autorise un routeur devenu plus prioritaire à reprendre le rôle **Active**.
 
@@ -145,9 +146,9 @@ Sans `preempt`, après le retour de R1, R2 peut rester Active même si sa priori
 
 ---
 
-## Configuration HSRP minimale
+#### Configuration HSRP minimale
 
-### R1
+##### R1
 
 ```cisco
 interface GigabitEthernet0/0
@@ -158,7 +159,7 @@ interface GigabitEthernet0/0
  standby 1 preempt
 ```
 
-### R2
+##### R2
 
 ```cisco
 interface GigabitEthernet0/0
@@ -178,7 +179,7 @@ Les paramètres suivants doivent être cohérents sur les deux équipements :
 
 Les adresses réelles doivent en revanche être différentes.
 
-### Vérification
+#### Vérification
 
 ```cisco
 show standby brief
@@ -197,7 +198,125 @@ Une vérification ne consiste pas seulement à constater `Active` ou `Standby`. 
 
 ---
 
-## Le piège : le routeur fonctionne, mais Internet est inaccessible
+### Failover et load balancing : deux objectifs différents
+
+| Notion | Question posée | Fonctionnement |
+|---|---|---|
+| **Failover** | « Qui prend le relais si l'actif tombe ? » | un équipement transmet, un autre attend |
+| **Load balancing** | « Comment utiliser plusieurs chemins en même temps ? » | le trafic est réparti entre plusieurs équipements ou liens |
+
+#### HSRP classique
+
+Pour un groupe HSRP donné :
+
+- un seul routeur est **Active** ;
+- le routeur **Standby** ne transmet pas le trafic destiné à la VIP ;
+- il s'agit donc principalement de **failover**.
+
+HSRP peut être utilisé pour répartir indirectement la charge en créant plusieurs groupes ou plusieurs VLAN : R1 est Active pour certains groupes, R2 pour les autres. Ce n'est toutefois pas une répartition automatique du trafic à l'intérieur d'un même groupe.
+
+#### Exemple avec deux VLAN
+
+| VLAN | Routeur Active | Routeur Standby |
+|---|---|---|
+| VLAN 10 | R1 | R2 |
+| VLAN 20 | R2 | R1 |
+
+Les deux routeurs travaillent, mais chaque VLAN conserve un seul routeur Active.
+
+
+### Vérifier sa compréhension — Socle commun
+
+Essayez de répondre **avant** de valider. Lisez la correction : l'objectif est de comprendre le mécanisme, pas seulement de trouver la bonne réponse.
+
+---
+
+#### Quiz 1 — Qui transmet ?
+
+R1 a une priorité HSRP de `110`, R2 une priorité de `100`. Les deux utilisent `preempt` et fonctionnent normalement.
+
+<quiz>
+Quel équipement transmet les paquets envoyés à la VIP ?
+
+- [x] R1, car sa priorité HSRP est la plus élevée.
+- [ ] R2, car le routeur ayant la priorité la plus faible devient Active.
+- [ ] R1 et R2 simultanément, car HSRP répartit la charge.
+- [ ] Les deux alternativement selon les paquets.
+> **Explication :** R1 est **Active** et transmet les paquets. R2 reste **Standby**. Un groupe HSRP classique ne réalise pas de répartition de charge entre les deux routeurs.
+</quiz>
+
+---
+
+#### Quiz 2 — La bonne passerelle
+
+Un poste possède la configuration suivante :
+
+```text
+Adresse IP : 172.28.x.20/24
+Passerelle : 172.28.x.251
+```
+
+La VIP du groupe HSRP est `172.28.x.254`.
+
+<quiz>
+La haute disponibilité HSRP est-elle effective pour ce poste ?
+
+- [ ] Oui, car R1 appartient au groupe HSRP.
+- [ ] Oui, car R2 prendra automatiquement l'adresse `172.28.x.251`.
+- [x] Non, car le poste utilise l'adresse réelle de R1 au lieu de la VIP.
+- [ ] Non, car HSRP nécessite deux passerelles configurées sur le poste.
+> **Explication :** la passerelle du poste doit être la **VIP `172.28.x.254`**. Si le poste utilise directement `172.28.x.251`, la disparition de R1 rend sa passerelle inaccessible.
+</quiz>
+
+---
+
+#### Quiz 3 — Retour de R1
+
+R1, priorité `110`, était Active. Après sa panne, R2 est devenu Active.
+
+R1 redémarre, mais `preempt` n'est configuré sur aucun routeur.
+
+<quiz>
+Quel routeur reste Active ?
+
+- [ ] R1, car sa priorité `110` est supérieure à celle de R2.
+- [x] R2, car R1 ne peut pas reprendre automatiquement le rôle sans `preempt`.
+- [ ] Les deux deviennent Active.
+- [ ] Une nouvelle élection choisit aléatoirement R1 ou R2.
+> **Explication :** une priorité supérieure ne suffit pas à reprendre le rôle à un routeur déjà **Active**. `preempt` permet au routeur ayant la priorité supérieure de reprendre le rôle Active.
+</quiz>
+
+---
+
+#### Quiz 8 — Failover ou load balancing ?
+
+<quiz>
+R2 prend le relais après la panne de R1. Quelle notion décrit ce comportement ?
+
+- [x] Failover
+- [ ] Load balancing
+- [ ] Routage dynamique
+- [ ] Agrégation de liens
+> **Explication :** le **failover** consiste à faire prendre le relais à un équipement lorsqu'un autre devient indisponible.
+</quiz>
+
+<quiz>
+R1 et R2 transmettent simultanément du trafic pour des postes différents. Quelle notion décrit ce comportement ?
+
+- [ ] Failover
+- [x] Load balancing
+- [ ] Preemption
+- [ ] Tracking
+> **Explication :** le **load balancing** consiste à répartir le trafic normal entre plusieurs équipements disponibles.
+</quiz>
+
+---
+
+## Concepts avancés
+
+---
+
+### Le piège : le routeur fonctionne, mais Internet est inaccessible
 
 HSRP surveille naturellement la présence de l'autre membre sur le réseau partagé. Il peut détecter la disparition du routeur Active ou de son interface LAN.
 
@@ -239,53 +358,9 @@ R2 possède une priorité de `100`. Avec `preempt`, R2 devient alors Active.
 
     Le câble entre R1 et l'équipement opérateur peut être actif alors qu'une panne existe plus loin. Pour tester réellement un chemin, on peut utiliser **IP SLA**, puis associer son résultat à un objet suivi avec `track`.
 
-### Exemple avec IP SLA
-
-```cisco
-ip sla 10
- icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
- frequency 5
-ip sla schedule 10 life forever start-time now
-
-track 10 ip sla 10 reachability
-
-interface GigabitEthernet0/0
- standby 1 track 10 decrement 20
-```
-
-L'adresse testée doit être choisie avec soin : elle doit représenter le service ou le chemin que l'on souhaite surveiller.
-
 ---
 
-## Failover et load balancing : deux objectifs différents
-
-| Notion | Question posée | Fonctionnement |
-|---|---|---|
-| **Failover** | « Qui prend le relais si l'actif tombe ? » | un équipement transmet, un autre attend |
-| **Load balancing** | « Comment utiliser plusieurs chemins en même temps ? » | le trafic est réparti entre plusieurs équipements ou liens |
-
-### HSRP classique
-
-Pour un groupe HSRP donné :
-
-- un seul routeur est **Active** ;
-- le routeur **Standby** ne transmet pas le trafic destiné à la VIP ;
-- il s'agit donc principalement de **failover**.
-
-HSRP peut être utilisé pour répartir indirectement la charge en créant plusieurs groupes ou plusieurs VLAN : R1 est Active pour certains groupes, R2 pour les autres. Ce n'est toutefois pas une répartition automatique du trafic à l'intérieur d'un même groupe.
-
-### Exemple avec deux VLAN
-
-| VLAN | Routeur Active | Routeur Standby |
-|---|---|---|
-| VLAN 10 | R1 | R2 |
-| VLAN 20 | R2 | R1 |
-
-Les deux routeurs travaillent, mais chaque VLAN conserve un seul routeur Active.
-
----
-
-## GLBP : répartition de charge et redondance
+### GLBP : répartition de charge et redondance
 
 **GLBP** (*Gateway Load Balancing Protocol*) est également un protocole propriétaire Cisco. Les postes utilisent une seule IP virtuelle, mais plusieurs routeurs peuvent transmettre simultanément.
 
@@ -316,9 +391,9 @@ GLBP apporte :
 
     Avec la méthode courante *round-robin*, l'AVG alterne les adresses MAC dans ses réponses ARP. Un même poste conserve ensuite l'adresse MAC apprise dans son cache ARP pendant un certain temps.
 
-### Configuration GLBP minimale
+#### Configuration GLBP minimale
 
-#### R1
+##### R1
 
 ```cisco
 interface GigabitEthernet0/0
@@ -328,7 +403,7 @@ interface GigabitEthernet0/0
  glbp 1 preempt
 ```
 
-#### R2
+##### R2
 
 ```cisco
 interface GigabitEthernet0/0
@@ -338,7 +413,7 @@ interface GigabitEthernet0/0
  glbp 1 preempt
 ```
 
-### Vérification
+#### Vérification
 
 ```cisco
 show glbp brief
@@ -352,7 +427,7 @@ show arp
 
 ---
 
-## Comparaison synthétique
+### Comparaison synthétique
 
 | Critère | HSRP | GLBP |
 |---|---|---|
@@ -363,6 +438,110 @@ show arp
 | Routeur de secours | Standby | autre AVG/AVF capable de reprendre |
 | Répartition native dans un groupe | non | oui |
 | Complexité | plus faible | plus élevée |
+
+---
+
+### Vérifier sa compréhension — Concepts avancés
+
+---
+
+Essayez de répondre **avant** de valider. Lisez la correction : l'objectif est de comprendre le mécanisme, pas seulement de trouver la bonne réponse.
+
+---
+
+#### Quiz 4 — La fausse haute disponibilité
+
+R1 reste allumé et son interface LAN est active. Sa liaison WAN est coupée.
+
+Aucun suivi d'interface ni IP SLA n'est configuré.
+
+<quiz>
+HSRP bascule-t-il nécessairement vers R2 ?
+
+- [ ] Oui, HSRP vérifie automatiquement l'accès à Internet.
+- [ ] Oui, toute perte d'une interface de R1 déclenche automatiquement le basculement.
+- [x] Non, R1 peut rester Active car HSRP fonctionne toujours sur le LAN.
+- [ ] Non, HSRP ne peut basculer qu'après l'arrêt complet du routeur.
+> **Explication :** HSRP peut continuer à fonctionner normalement sur le LAN alors que R1 a perdu sa sortie Internet. Il faut mettre en place un **suivi adapté**, par exemple le suivi de l'interface WAN ou un test IP SLA.
+</quiz>
+
+---
+
+#### Quiz 5 — Calcul de priorité
+
+R1 possède une priorité de `115`.
+
+Le suivi de son accès Internet prévoit un décrément de `10`.
+
+R2 possède une priorité de `100`.
+
+<quiz>
+La panne suivie suffit-elle à faire basculer le groupe vers R2 ?
+
+- [ ] Oui, car toute diminution de priorité provoque un basculement.
+- [ ] Oui, car la priorité de R1 devient `95`.
+- [x] Non, car la priorité de R1 devient `105` et reste supérieure à celle de R2.
+- [ ] Non, car une priorité HSRP ne peut pas être modifiée dynamiquement.
+> **Explication :** `115 - 10 = 105`. R1 conserve donc une priorité supérieure à celle de R2 (`100`). Le décrément doit rendre la priorité de R1 inférieure à celle de R2.
+</quiz>
+
+---
+
+#### Quiz 6 — HSRP ou GLBP ?
+
+L'administrateur veut que R1 et R2 transmettent **tous les deux du trafic** pour les postes d'un même VLAN, tout en présentant une seule adresse IP de passerelle.
+
+<quiz>
+Quel protocole répond directement à ce besoin ?
+
+- [ ] HSRP, car les routeurs Active et Standby transmettent simultanément.
+- [x] GLBP, car plusieurs routeurs peuvent transmettre derrière une même VIP.
+- [ ] HSRP, à condition d'activer `preempt`.
+- [ ] VRRP, car le routeur Backup transmet une partie du trafic.
+> **Explication :** GLBP permet à plusieurs **AVF** (*Active Virtual Forwarders*) de transmettre simultanément derrière une même VIP. Dans un groupe HSRP classique, un seul routeur Active transmet pour la passerelle virtuelle.
+</quiz>
+
+---
+
+#### Quiz 7 — Une IP, plusieurs MAC
+
+Deux postes utilisent la même passerelle `172.28.x.254`, mais leur cache ARP associe cette IP à deux adresses MAC virtuelles différentes.
+
+<quiz>
+Ce résultat est-il cohérent avec HSRP ou avec GLBP ?
+
+- [ ] HSRP, car Active et Standby possèdent chacun une MAC virtuelle utilisée simultanément.
+- [x] GLBP, car une même VIP peut être associée à plusieurs MAC virtuelles.
+- [ ] HSRP, mais uniquement lorsque `preempt` est activé.
+- [ ] Aucun des deux, car une adresse IP ne peut jamais être associée à plusieurs adresses MAC.
+> **Explication :** avec GLBP, l'**AVG** (*Active Virtual Gateway*) peut répondre aux requêtes ARP avec différentes adresses MAC virtuelles. Les postes peuvent ainsi envoyer leur trafic vers différents **AVF**.
+</quiz>
+
+---
+
+## Expertise
+
+---
+
+### Superviser réellement le chemin avec IP SLA
+
+```text
+ip sla 10
+ icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
+ frequency 5
+ip sla schedule 10 life forever start-time now
+
+track 10 ip sla 10 reachability
+
+interface GigabitEthernet0/0
+ standby 1 track 10 decrement 20
+```
+
+L'adresse testée doit être choisie avec soin : elle doit représenter le service ou le chemin que l'on souhaite surveiller.
+
+---
+
+### Élargir la haute disponibilité au-delà de la passerelle
 
 !!! info "D'autres solutions de haute disponibilité"
 
@@ -380,173 +559,9 @@ show arp
 
 ---
 
-# Vérifier sa compréhension
+### Activité : prédire, vérifier, expliquer
 
-Essayez de répondre **avant** de valider. Lisez la correction : l'objectif est de comprendre le mécanisme, pas seulement de trouver la bonne réponse.
-
-## Quiz 1 — Qui transmet ?
-
-R1 a une priorité HSRP de `110`, R2 une priorité de `100`. Les deux utilisent `preempt` et fonctionnent normalement.
-
-<quiz>
-Quel équipement transmet les paquets envoyés à la VIP ?
-
-- [x] R1, car sa priorité HSRP est la plus élevée.
-- [ ] R2, car le routeur ayant la priorité la plus faible devient Active.
-- [ ] R1 et R2 simultanément, car HSRP répartit la charge.
-- [ ] Les deux alternativement selon les paquets.
-
-> **Explication :** R1 est **Active** et transmet les paquets. R2 reste **Standby**. Un groupe HSRP classique ne réalise pas de répartition de charge entre les deux routeurs.
-</quiz>
-
----
-
-## Quiz 2 — La bonne passerelle
-
-Un poste possède la configuration suivante :
-
-```text
-Adresse IP : 172.28.x.20/24
-Passerelle : 172.28.x.251
-```
-
-La VIP du groupe HSRP est `172.28.x.254`.
-
-<quiz>
-La haute disponibilité HSRP est-elle effective pour ce poste ?
-
-- [ ] Oui, car R1 appartient au groupe HSRP.
-- [ ] Oui, car R2 prendra automatiquement l'adresse `172.28.x.251`.
-- [x] Non, car le poste utilise l'adresse réelle de R1 au lieu de la VIP.
-- [ ] Non, car HSRP nécessite deux passerelles configurées sur le poste.
-
-> **Explication :** la passerelle du poste doit être la **VIP `172.28.x.254`**. Si le poste utilise directement `172.28.x.251`, la disparition de R1 rend sa passerelle inaccessible.
-</quiz>
-
----
-
-## Quiz 3 — Retour de R1
-
-R1, priorité `110`, était Active. Après sa panne, R2 est devenu Active.
-
-R1 redémarre, mais `preempt` n'est configuré sur aucun routeur.
-
-<quiz>
-Quel routeur reste Active ?
-
-- [ ] R1, car sa priorité `110` est supérieure à celle de R2.
-- [x] R2, car R1 ne peut pas reprendre automatiquement le rôle sans `preempt`.
-- [ ] Les deux deviennent Active.
-- [ ] Une nouvelle élection choisit aléatoirement R1 ou R2.
-
-> **Explication :** une priorité supérieure ne suffit pas à reprendre le rôle à un routeur déjà **Active**. `preempt` permet au routeur ayant la priorité supérieure de reprendre le rôle Active.
-</quiz>
-
----
-
-## Quiz 4 — La fausse haute disponibilité
-
-R1 reste allumé et son interface LAN est active. Sa liaison WAN est coupée.
-
-Aucun suivi d'interface ni IP SLA n'est configuré.
-
-<quiz>
-HSRP bascule-t-il nécessairement vers R2 ?
-
-- [ ] Oui, HSRP vérifie automatiquement l'accès à Internet.
-- [ ] Oui, toute perte d'une interface de R1 déclenche automatiquement le basculement.
-- [x] Non, R1 peut rester Active car HSRP fonctionne toujours sur le LAN.
-- [ ] Non, HSRP ne peut basculer qu'après l'arrêt complet du routeur.
-
-> **Explication :** HSRP peut continuer à fonctionner normalement sur le LAN alors que R1 a perdu sa sortie Internet. Il faut mettre en place un **suivi adapté**, par exemple le suivi de l'interface WAN ou un test IP SLA.
-</quiz>
-
----
-
-## Quiz 5 — Calcul de priorité
-
-R1 possède une priorité de `115`.
-
-Le suivi de son accès Internet prévoit un décrément de `10`.
-
-R2 possède une priorité de `100`.
-
-<quiz>
-La panne suivie suffit-elle à faire basculer le groupe vers R2 ?
-
-- [ ] Oui, car toute diminution de priorité provoque un basculement.
-- [ ] Oui, car la priorité de R1 devient `95`.
-- [x] Non, car la priorité de R1 devient `105` et reste supérieure à celle de R2.
-- [ ] Non, car une priorité HSRP ne peut pas être modifiée dynamiquement.
-
-> **Explication :** `115 - 10 = 105`. R1 conserve donc une priorité supérieure à celle de R2 (`100`). Le décrément doit rendre la priorité de R1 inférieure à celle de R2.
-</quiz>
-
----
-
-## Quiz 6 — HSRP ou GLBP ?
-
-L'administrateur veut que R1 et R2 transmettent **tous les deux du trafic** pour les postes d'un même VLAN, tout en présentant une seule adresse IP de passerelle.
-
-<quiz>
-Quel protocole répond directement à ce besoin ?
-
-- [ ] HSRP, car les routeurs Active et Standby transmettent simultanément.
-- [x] GLBP, car plusieurs routeurs peuvent transmettre derrière une même VIP.
-- [ ] HSRP, à condition d'activer `preempt`.
-- [ ] VRRP, car le routeur Backup transmet une partie du trafic.
-
-> **Explication :** GLBP permet à plusieurs **AVF** (*Active Virtual Forwarders*) de transmettre simultanément derrière une même VIP. Dans un groupe HSRP classique, un seul routeur Active transmet pour la passerelle virtuelle.
-</quiz>
-
----
-
-## Quiz 7 — Une IP, plusieurs MAC
-
-Deux postes utilisent la même passerelle `172.28.x.254`, mais leur cache ARP associe cette IP à deux adresses MAC virtuelles différentes.
-
-<quiz>
-Ce résultat est-il cohérent avec HSRP ou avec GLBP ?
-
-- [ ] HSRP, car Active et Standby possèdent chacun une MAC virtuelle utilisée simultanément.
-- [x] GLBP, car une même VIP peut être associée à plusieurs MAC virtuelles.
-- [ ] HSRP, mais uniquement lorsque `preempt` est activé.
-- [ ] Aucun des deux, car une adresse IP ne peut jamais être associée à plusieurs adresses MAC.
-
-> **Explication :** avec GLBP, l'**AVG** (*Active Virtual Gateway*) peut répondre aux requêtes ARP avec différentes adresses MAC virtuelles. Les postes peuvent ainsi envoyer leur trafic vers différents **AVF**.
-</quiz>
-
----
-
-## Quiz 8 — Failover ou load balancing ?
-
-<quiz>
-R2 prend le relais après la panne de R1. Quelle notion décrit ce comportement ?
-
-- [x] Failover
-- [ ] Load balancing
-- [ ] Routage dynamique
-- [ ] Agrégation de liens
-
-> **Explication :** le **failover** consiste à faire prendre le relais à un équipement lorsqu'un autre devient indisponible.
-</quiz>
-
-<quiz>
-R1 et R2 transmettent simultanément du trafic pour des postes différents. Quelle notion décrit ce comportement ?
-
-- [ ] Failover
-- [x] Load balancing
-- [ ] Preemption
-- [ ] Tracking
-
-> **Explication :** le **load balancing** consiste à répartir le trafic normal entre plusieurs équipements disponibles.
-</quiz>
-
----
-
-# Activité : prédire, vérifier, expliquer
-
-## Situation initiale
+#### Situation initiale
 
 - R1 : `172.28.x.251`, priorité HSRP `110`, `preempt` actif ;
 - R2 : `172.28.x.252`, priorité HSRP `100`, `preempt` actif ;
@@ -576,11 +591,11 @@ Pour chaque test, complétez le tableau **avant** de manipuler.
 
 ---
 
-# Diagnostic final
+### Diagnostic final
 
 Un groupe a réalisé la configuration suivante :
 
-### R1
+#### R1
 
 ```cisco
 interface GigabitEthernet0/0
@@ -589,7 +604,7 @@ interface GigabitEthernet0/0
  standby 1 priority 110
 ```
 
-### R2
+#### R2
 
 ```cisco
 interface GigabitEthernet0/0
@@ -601,7 +616,7 @@ interface GigabitEthernet0/0
 
 Les postes utilisent `172.28.x.251` comme passerelle. Aucun suivi du WAN n'est configuré.
 
-## Travail demandé
+#### Travail demandé
 
 Identifiez au moins **trois défauts**, puis expliquez pour chacun :
 
@@ -620,7 +635,7 @@ Identifiez au moins **trois défauts**, puis expliquez pour chacun :
 
 ---
 
-# À retenir
+## À retenir
 
 - Une **VIP** fournit une passerelle stable aux postes.
 - HSRP assure principalement un **failover** : un Active transmet, un Standby attend.
