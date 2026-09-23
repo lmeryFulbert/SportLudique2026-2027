@@ -1,4 +1,4 @@
-# 02 - Haute disponibilité de l'accès Internet : HSRP et GLBP
+# 02 - Haute disponibilité de l'accès Internet
 
 ## Objectifs
 
@@ -523,9 +523,136 @@ Ce résultat est-il cohérent avec HSRP ou avec GLBP ?
 
 ---
 
-### Superviser réellement le chemin avec IP SLA
+### Du suivi d'interface à IP SLA
+
+HSRP sait détecter la disparition du routeur Active ou la perte de son interface LAN. En revanche, il ne vérifie pas naturellement que le chemin utilisé pour sortir vers Internet fonctionne réellement.
+
+Il faut donc distinguer trois mécanismes :
+
+| Mécanisme | Ce qu'il surveille | Limite |
+|---|---|---|
+| HSRP seul | présence des membres du groupe sur le LAN | ne teste pas l'accès à Internet |
+| suivi d'interface | état local d'une interface | ne détecte pas une panne située plus loin |
+| IP SLA avec `track` | résultat d'un test actif vers une cible | dépend du choix de la cible et du test |
+
+#### Suivre directement l'interface WAN
+
+Une première solution consiste à diminuer la priorité HSRP lorsque l'interface WAN de R1 tombe :
+
+```cisco
+interface GigabitEthernet0/0
+ standby 1 track GigabitEthernet0/1 20
+```
+
+Dans cet exemple :
+
+- `GigabitEthernet0/0` est l'interface LAN qui porte HSRP ;
+- `GigabitEthernet0/1` est l'interface WAN suivie ;
+- `20` est le décrément appliqué à la priorité de R1 lorsque l'interface suivie devient indisponible.
+
+Si R1 possède initialement une priorité de `110` :
 
 ```text
+110 - 20 = 90
+```
+
+R2 possède une priorité de `100`. Sa priorité devient donc supérieure à celle de R1. Si `preempt` est configuré sur R2, il peut reprendre le rôle Active.
+
+#### Comprendre la limite du suivi d'interface
+
+Le suivi d'interface ne contrôle que l'état local de celle-ci.
+
+```mermaid
+flowchart LR
+    R1["R1<br/>interface WAN active"]
+    OP["Équipement opérateur"]
+    PANNE["Panne plus loin"]
+    NET["Internet"]
+
+    R1 --- OP
+    OP --- PANNE
+    PANNE -.- NET
+```
+
+Le câble entre R1 et l'équipement opérateur peut rester connecté et l'interface conserver l'état `up/up`, alors qu'une panne empêche toute communication au-delà de cet équipement.
+
+Dans cette situation, le simple suivi de `GigabitEthernet0/1` considère toujours le WAN comme disponible. R1 conserve sa priorité et peut rester Active alors qu'il ne fournit plus le service attendu.
+
+#### Tester réellement le chemin avec IP SLA
+
+**IP SLA** (*IP Service Level Agreements*) permet au routeur d'exécuter périodiquement un test actif. Ici, R1 envoie une requête ICMP vers une adresse située au-delà de sa liaison WAN :
+
+```cisco
+ip sla 10
+ icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
+ frequency 5
+```
+
+Cette configuration signifie :
+
+- `10` identifie l'opération IP SLA ;
+- `icmp-echo 203.0.113.1` définit la cible du test ;
+- `source-interface GigabitEthernet0/1` impose l'interface source utilisée ;
+- `frequency 5` relance le test toutes les cinq secondes.
+
+L'opération doit ensuite être planifiée :
+
+```cisco
+ip sla schedule 10 life forever start-time now
+```
+
+- `life forever` maintient l'opération active sans limite de durée ;
+- `start-time now` la démarre immédiatement.
+
+!!! warning "Créer une opération ne suffit pas"
+
+    Une opération IP SLA produit un résultat, mais elle ne modifie pas directement le comportement de HSRP. Il faut relier ce résultat à un objet de suivi avec `track`.
+
+#### Associer IP SLA à un objet `track`
+
+L'objet `track 10` surveille le résultat de l'opération IP SLA `10` :
+
+```cisco
+track 10 ip sla 10 reachability
+```
+
+Le mot-clé `reachability` indique que l'objet doit être considéré :
+
+- **Up** lorsque la cible répond au test ;
+- **Down** lorsque la cible n'est plus joignable.
+
+On associe ensuite cet objet à HSRP sur l'interface LAN :
+
+```cisco
+interface GigabitEthernet0/0
+ standby 1 track 10 decrement 20
+```
+
+La chaîne de décision complète devient alors :
+
+```mermaid
+flowchart LR
+    SLA["IP SLA<br/>teste la cible"]
+    TRACK["Objet track 10<br/>Up ou Down"]
+    PRIORITE["Priorité HSRP<br/>110 ou 90"]
+    ROLE["Rôle HSRP<br/>Active ou Standby"]
+
+    SLA --> TRACK --> PRIORITE --> ROLE
+```
+
+Lorsque la cible ne répond plus :
+
+1. l'opération IP SLA échoue ;
+2. l'objet `track 10` passe à l'état **Down** ;
+3. la priorité HSRP de R1 passe de `110` à `90` ;
+4. R2, dont la priorité est `100`, devient plus prioritaire ;
+5. avec `preempt`, R2 prend le rôle Active.
+
+Lorsque le chemin redevient disponible, l'objet suivi repasse à l'état **Up**. R1 retrouve sa priorité de `110` et peut reprendre le rôle Active grâce à `preempt`.
+
+#### Configuration complète sur R1
+
+```cisco
 ip sla 10
  icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
  frequency 5
@@ -534,10 +661,68 @@ ip sla schedule 10 life forever start-time now
 track 10 ip sla 10 reachability
 
 interface GigabitEthernet0/0
+ description LAN
+ ip address 172.28.x.251 255.255.255.0
+ standby 1 ip 172.28.x.254
+ standby 1 priority 110
+ standby 1 preempt
  standby 1 track 10 decrement 20
 ```
 
-L'adresse testée doit être choisie avec soin : elle doit représenter le service ou le chemin que l'on souhaite surveiller.
+!!! note "Pour une véritable redondance des deux chemins"
+
+    Dans une architecture complète, chaque routeur peut exécuter son propre test IP SLA et suivre son propre accès WAN. Il faut utiliser des numéros d'opérations et d'objets cohérents sur chaque équipement, sans supposer que les deux routeurs empruntent nécessairement le même chemin.
+
+#### Choisir correctement la cible
+
+La cible doit représenter le chemin ou le service que l'on souhaite réellement surveiller.
+
+Une mauvaise cible peut provoquer de mauvaises décisions :
+
+- une adresse située sur le lien directement connecté ne détecte pas une panne plus éloignée ;
+- une adresse qui bloque volontairement ICMP peut être considérée à tort comme indisponible ;
+- une cible instable peut provoquer des basculements inutiles ;
+- une cible accessible par un autre chemin peut masquer la panne que l'on cherche à détecter.
+
+Il faut donc choisir une cible fiable, stable et située suffisamment loin pour valider le chemin attendu.
+
+!!! warning "L'adresse utilisée dans l'exemple est documentaire"
+
+    `203.0.113.1` appartient à un préfixe réservé à la documentation. Dans votre infrastructure, remplacez-la par une adresse réellement joignable et pertinente pour le test.
+
+#### Vérifier IP SLA, l'objet track et HSRP
+
+Les trois niveaux doivent être vérifiés séparément :
+
+```cisco
+show ip sla configuration 10
+show ip sla statistics 10
+show track 10
+show standby brief
+show standby
+```
+
+| Commande | Vérification attendue |
+|---|---|
+| `show ip sla configuration 10` | paramètres et planification de l'opération |
+| `show ip sla statistics 10` | succès, échecs et temps de réponse du test |
+| `show track 10` | état `Up` ou `Down` de l'objet suivi |
+| `show standby brief` | rôle et priorité HSRP après application du décrément |
+| `show standby` | détail du groupe, de `preempt` et des objets suivis |
+
+#### Tester les scénarios de panne
+
+Une configuration n'est validée qu'après observation de son comportement réel.
+
+| Test | Suivi d'interface | IP SLA avec `track` |
+|---|---|---|
+| arrêt complet de R1 | basculement | basculement |
+| coupure de l'interface LAN de R1 | basculement | basculement |
+| coupure physique de l'interface WAN suivie | basculement | basculement |
+| panne située au-delà de l'interface WAN | généralement non détectée | détectée si la cible devient injoignable |
+| retour du chemin de R1 | priorité restaurée | priorité restaurée après réussite du test |
+
+Le basculement n'est pas nécessairement instantané : il dépend notamment de la fréquence du test, de son délai d'expiration et des mécanismes de convergence de HSRP.
 
 ---
 
