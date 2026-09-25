@@ -76,7 +76,7 @@ La machine d’administration Windows GUI possède deux interfaces :
 - une interface dans le **VLAN Management**, utilisée pour recevoir la connexion RDP ;
 - une interface dans le **VLAN Serveurs**, utilisée pour administrer les serveurs.
 
-![Architecture d’administration Active Directory](../../medias/cours/administration/architecture-administration-ad.png)
+![Architecture d’administration Active Directory](../../medias/cours/administration/architecture-administration-ad_v2.png)
 
 | Machine | VLAN Management | VLAN Serveurs | Fonction |
 |---|:---:|:---:|---|
