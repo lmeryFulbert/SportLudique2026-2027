@@ -1,0 +1,3666 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="https://lmeryfulbert.github.io/SportLudique2026-2027/cours/04-Acces-internet/hsrp-socle-avance-expertise/" rel="canonical"/>
+<link href="../../03-hyperviseurs/proxmox-vm/" rel="prev"/>
+<link href="../router-bordure/" rel="next"/>
+<link href="../../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.7" name="generator"/>
+<title>02 - Haute disponibilité de l'accès Internet - SportLudique Project 2026-2027</title>
+<link href="../../../assets/stylesheets/main.ec1eaa64.min.css" rel="stylesheet"/>
+<link href="../../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../../stylesheets/toc-deroulant.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="slate" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#02-haute-disponibilite-de-lacces-internet">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SportLudique Project 2026-2027" class="md-header__button md-logo" data-md-component="logo" href="../../.." title="SportLudique Project 2026-2027">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SportLudique Project 2026-2027
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              02 - Haute disponibilité de l'accès Internet
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SportLudique Project 2026-2027" class="md-nav__button md-logo" data-md-component="logo" href="../../.." title="SportLudique Project 2026-2027">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SportLudique Project 2026-2027
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../..">
+<span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    00 contexte
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    00 contexte
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/01-pr%C3%A9sentation/">
+<span class="md-ellipsis">
+    
+  
+    Présentation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/02-SystemeInformation/">
+<span class="md-ellipsis">
+    
+  
+    Le système d'information
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/03-objectifs/">
+<span class="md-ellipsis">
+    
+  
+    Les objectifs de la DSI
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    01 infrastructure
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    01 infrastructure
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/01-introduction/">
+<span class="md-ellipsis">
+    
+  
+    Organisation de l'infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/02-serveurs/">
+<span class="md-ellipsis">
+    
+  
+    Serveurs et services
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/03-infrastructure/">
+<span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/04-volumetrie/">
+<span class="md-ellipsis">
+    
+  
+    Organisation des sites
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/05-annexes/">
+<span class="md-ellipsis">
+    
+  
+    Annexes
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/06-fiche-recette/">
+<span class="md-ellipsis">
+    
+  
+    Fiche de recette
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/07-adressage-sites-2027/">
+<span class="md-ellipsis">
+    
+  
+    Plan d'adressage inter-sites
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Cours
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Cours
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    01 documentations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_1">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    01 documentations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-documentations/git-mkdocs/">
+<span class="md-ellipsis">
+    
+  
+    Git, GitHub et MkDocs
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-documentations/quizz-git/">
+<span class="md-ellipsis">
+    
+  
+    Quiz — Git, GitHub et MkDocs
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    02 adressage
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    02 adressage
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../02-adressage/vlsm/">
+<span class="md-ellipsis">
+    
+  
+    VLSM - Dimensionner un plan d'adressage
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    03 hyperviseurs
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    03 hyperviseurs
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/1-virtualisation/">
+<span class="md-ellipsis">
+    
+  
+    Virtualisation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/2-quizz-virtualisation/">
+<span class="md-ellipsis">
+    
+  
+    Quiz — Virtualisation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/proxmox-vm/">
+<span class="md-ellipsis">
+    
+  
+    Création d’une VM sous Proxmox
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    04 Acces internet
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    04 Acces internet
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    02 - Haute disponibilité de l'accès Internet
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    
+  
+    02 - Haute disponibilité de l'accès Internet
+  
+
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectifs">
+<span class="md-ellipsis">
+      
+        Objectifs
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#socle-commun">
+<span class="md-ellipsis">
+      
+        Socle commun
+      
+    </span>
+</a>
+<nav aria-label="Socle commun" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-probleme-une-passerelle-unique">
+<span class="md-ellipsis">
+      
+        Le problème : une passerelle unique
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-principe-dune-passerelle-virtuelle">
+<span class="md-ellipsis">
+      
+        Le principe d'une passerelle virtuelle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#hsrp-un-actif-et-un-secours">
+<span class="md-ellipsis">
+      
+        HSRP : un actif et un secours
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#failover-et-load-balancing-deux-objectifs-differents">
+<span class="md-ellipsis">
+      
+        Failover et load balancing : deux objectifs différents
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#verifier-sa-comprehension-socle-commun">
+<span class="md-ellipsis">
+      
+        Vérifier sa compréhension — Socle commun
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#concepts-avances">
+<span class="md-ellipsis">
+      
+        Concepts avancés
+      
+    </span>
+</a>
+<nav aria-label="Concepts avancés" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-piege-le-routeur-fonctionne-mais-internet-est-inaccessible">
+<span class="md-ellipsis">
+      
+        Le piège : le routeur fonctionne, mais Internet est inaccessible
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#suivre-la-liaison-vers-internet">
+<span class="md-ellipsis">
+      
+        Suivre la liaison vers Internet
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#glbp-repartition-de-charge-et-redondance">
+<span class="md-ellipsis">
+      
+        GLBP : répartition de charge et redondance
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comparaison-synthetique">
+<span class="md-ellipsis">
+      
+        Comparaison synthétique
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#verifier-sa-comprehension-concepts-avances">
+<span class="md-ellipsis">
+      
+        Vérifier sa compréhension — Concepts avancés
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expertise">
+<span class="md-ellipsis">
+      
+        Expertise
+      
+    </span>
+</a>
+<nav aria-label="Expertise" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#du-suivi-dinterface-a-ip-sla">
+<span class="md-ellipsis">
+      
+        Du suivi d'interface à IP SLA
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#elargir-la-haute-disponibilite-au-dela-de-la-passerelle">
+<span class="md-ellipsis">
+      
+        Élargir la haute disponibilité au-delà de la passerelle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#activite-predire-verifier-expliquer">
+<span class="md-ellipsis">
+      
+        Activité : prédire, vérifier, expliquer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#diagnostic-final">
+<span class="md-ellipsis">
+      
+        Diagnostic final
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-retenir">
+<span class="md-ellipsis">
+      
+        À retenir
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../router-bordure/">
+<span class="md-ellipsis">
+    
+  
+    01 - NAT/PAT sur un routeur Cisco
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    05 Services
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_5_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    05 Services
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-Services/active-directory/">
+<span class="md-ellipsis">
+    
+  
+    02 Active Directory, DNS et contrôleurs de domaine
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../05-Services/administration/">
+<span class="md-ellipsis">
+    
+  
+    01- Administration de l’infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectifs">
+<span class="md-ellipsis">
+      
+        Objectifs
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#socle-commun">
+<span class="md-ellipsis">
+      
+        Socle commun
+      
+    </span>
+</a>
+<nav aria-label="Socle commun" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-probleme-une-passerelle-unique">
+<span class="md-ellipsis">
+      
+        Le problème : une passerelle unique
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-principe-dune-passerelle-virtuelle">
+<span class="md-ellipsis">
+      
+        Le principe d'une passerelle virtuelle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#hsrp-un-actif-et-un-secours">
+<span class="md-ellipsis">
+      
+        HSRP : un actif et un secours
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#failover-et-load-balancing-deux-objectifs-differents">
+<span class="md-ellipsis">
+      
+        Failover et load balancing : deux objectifs différents
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#verifier-sa-comprehension-socle-commun">
+<span class="md-ellipsis">
+      
+        Vérifier sa compréhension — Socle commun
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#concepts-avances">
+<span class="md-ellipsis">
+      
+        Concepts avancés
+      
+    </span>
+</a>
+<nav aria-label="Concepts avancés" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-piege-le-routeur-fonctionne-mais-internet-est-inaccessible">
+<span class="md-ellipsis">
+      
+        Le piège : le routeur fonctionne, mais Internet est inaccessible
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#suivre-la-liaison-vers-internet">
+<span class="md-ellipsis">
+      
+        Suivre la liaison vers Internet
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#glbp-repartition-de-charge-et-redondance">
+<span class="md-ellipsis">
+      
+        GLBP : répartition de charge et redondance
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comparaison-synthetique">
+<span class="md-ellipsis">
+      
+        Comparaison synthétique
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#verifier-sa-comprehension-concepts-avances">
+<span class="md-ellipsis">
+      
+        Vérifier sa compréhension — Concepts avancés
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expertise">
+<span class="md-ellipsis">
+      
+        Expertise
+      
+    </span>
+</a>
+<nav aria-label="Expertise" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#du-suivi-dinterface-a-ip-sla">
+<span class="md-ellipsis">
+      
+        Du suivi d'interface à IP SLA
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#elargir-la-haute-disponibilite-au-dela-de-la-passerelle">
+<span class="md-ellipsis">
+      
+        Élargir la haute disponibilité au-delà de la passerelle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#activite-predire-verifier-expliquer">
+<span class="md-ellipsis">
+      
+        Activité : prédire, vérifier, expliquer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#diagnostic-final">
+<span class="md-ellipsis">
+      
+        Diagnostic final
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-retenir">
+<span class="md-ellipsis">
+      
+        À retenir
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="02-haute-disponibilite-de-lacces-internet">02 - Haute disponibilité de l'accès Internet<a class="headerlink" href="#02-haute-disponibilite-de-lacces-internet" title="Permanent link">¶</a></h1>
+<h2 id="objectifs">Objectifs<a class="headerlink" href="#objectifs" title="Permanent link">¶</a></h2>
+<p>À la fin de cette partie, vous devez être capable de :</p>
+<ul>
+<li>expliquer pourquoi deux équipements ne suffisent pas à assurer une haute disponibilité ;</li>
+<li>distinguer une <strong>adresse IP réelle</strong> d'une <strong>adresse IP virtuelle</strong> ;</li>
+<li>expliquer le rôle des routeurs <strong>Active</strong> et <strong>Standby</strong> avec HSRP ;</li>
+<li>distinguer clairement <strong>basculement</strong> (<em>failover</em>) et <strong>répartition de charge</strong> (<em>load balancing</em>) ;</li>
+<li>expliquer le fonctionnement général de GLBP ;</li>
+<li>prévoir le comportement du réseau lors d'une panne ;</li>
+<li>diagnostiquer une configuration de redondance incomplète.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Le but n'est pas de recopier une configuration</p>
+<p>Une configuration n'a de sens que si vous savez répondre à trois questions :</p>
+<ol>
+<li>Quel équipement transmet les paquets en fonctionnement normal ?</li>
+<li>Quelle panne est réellement détectée ?</li>
+<li>Que se passe-t-il précisément après cette panne ?</li>
+</ol>
+</div>
+<h2 id="socle-commun">Socle commun<a class="headerlink" href="#socle-commun" title="Permanent link">¶</a></h2>
+<h3 id="le-probleme-une-passerelle-unique">Le problème : une passerelle unique<a class="headerlink" href="#le-probleme-une-passerelle-unique" title="Permanent link">¶</a></h3>
+<p>Un poste peut disposer d'une adresse IP, d'un masque et d'un serveur DNS corrects, mais il ne peut joindre Internet que si sa <strong>passerelle par défaut</strong> fonctionne.</p>
+<pre class="mermaid"><code>flowchart LR
+    LAN["Postes du LAN"]
+    GW["Passerelle unique"]
+    NET["Internet"]
+    SPOF["❌ SPOF"]
+
+    LAN --&gt; GW --&gt; NET
+    SPOF -.-&gt; GW</code></pre>
+<div class="admonition definition">
+<p class="admonition-title">SPOF — Single Point of Failure</p>
+<p>Un <strong>SPOF</strong> (<em>Single Point of Failure</em>) est un composant dont la panne suffit, à elle seule, à provoquer l'indisponibilité d'un service.</p>
+<p>Ici, la <strong>passerelle unique</strong> est un SPOF : si elle tombe en panne, les postes du LAN ne peuvent plus accéder à Internet.</p>
+</div>
+<p>Si la passerelle tombe en panne, les postes restent capables de communiquer dans leur propre réseau, mais ils ne peuvent plus joindre les réseaux distants.</p>
+<p>Ajouter un second routeur ne résout pas encore le problème : les postes ne peuvent avoir qu'une passerelle par défaut effectivement utilisée à un instant donné. Il faut leur présenter une <strong>passerelle logique commune</strong>.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Un second routeur est ajouté sur le LAN. La passerelle configurée sur tous les postes reste l'adresse réelle de R1. R1 tombe en panne. Internet reste-t-il accessible ?
+
+- [ ] Oui, car R2 prend automatiquement le relais.
+- [x] Non, car les postes continuent d'envoyer leurs paquets à l'adresse de R1.
+- [ ] Oui, car les postes découvrent automatiquement R2 avec ARP.
+- [ ] Oui, à condition que R2 possède une route par défaut.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-0">
+<a class="quiz-header-link" href="#quiz-0">#</a>
+<div class="quiz-question" id="quiz-0-question">
+<p>Un second routeur est ajouté sur le LAN. La passerelle configurée sur tous les postes reste l'adresse réelle de R1. R1 tombe en panne. Internet reste-t-il accessible ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-0-question"><div><input id="quiz-0-0" name="answer" type="radio" value="0"/><label for="quiz-0-0">Oui, car R2 prend automatiquement le relais.</label></div><div><input data-correct="true" id="quiz-0-1" name="answer" type="radio" value="1"/><label for="quiz-0-1">Non, car les postes continuent d'envoyer leurs paquets à l'adresse de R1.</label></div><div><input id="quiz-0-2" name="answer" type="radio" value="2"/><label for="quiz-0-2">Oui, car les postes découvrent automatiquement R2 avec ARP.</label></div><div><input id="quiz-0-3" name="answer" type="radio" value="3"/><label for="quiz-0-3">Oui, à condition que R2 possède une route par défaut.</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="le-principe-dune-passerelle-virtuelle">Le principe d'une passerelle virtuelle<a class="headerlink" href="#le-principe-dune-passerelle-virtuelle" title="Permanent link">¶</a></h3>
+<p>Deux équipements partagent une <strong>adresse IP virtuelle</strong>, appelée aussi <strong>VIP</strong> (<em>Virtual IP address</em>).</p>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th style="text-align: right;">Adresse</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td style="text-align: right;"><code>172.28.x.251/24</code></td>
+<td>adresse réelle de R1</td>
+</tr>
+<tr>
+<td>R2</td>
+<td style="text-align: right;"><code>172.28.x.252/24</code></td>
+<td>adresse réelle de R2</td>
+</tr>
+<tr>
+<td>Passerelle virtuelle</td>
+<td style="text-align: right;"><code>172.28.x.254/24</code></td>
+<td>passerelle configurée sur les postes</td>
+</tr>
+</tbody>
+</table>
+<p>Les postes ne connaissent pas le routeur actuellement actif. Ils utilisent toujours :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>Passerelle par défaut : 172.28.x.254
+</span></code></pre></div>
+<p>Le protocole de redondance détermine quel équipement répond pour cette adresse virtuelle.</p>
+<div class="admonition note">
+<p class="admonition-title">IP virtuelle ne signifie pas machine virtuelle</p>
+<p>La VIP n'appartient pas définitivement à un équipement. Elle représente le <strong>service de passerelle</strong> fourni par plusieurs équipements.</p>
+</div>
+<hr/>
+<h3 id="hsrp-un-actif-et-un-secours">HSRP : un actif et un secours<a class="headerlink" href="#hsrp-un-actif-et-un-secours" title="Permanent link">¶</a></h3>
+<p><strong>HSRP</strong> (<em>Hot Standby Router Protocol</em>) est un protocole <strong>propriétaire Cisco</strong> de redondance de la passerelle par défaut.</p>
+<p>Dans un groupe HSRP :</p>
+<ul>
+<li>le routeur <strong>Active</strong> transmet les paquets envoyés à la passerelle virtuelle ;</li>
+<li>le routeur <strong>Standby</strong> surveille l'Active et se tient prêt à prendre le relais ;</li>
+<li>les autres routeurs éventuels restent à l'état <strong>Listen</strong> ;</li>
+<li>les postes utilisent une seule <strong>adresse IP virtuelle</strong> et une seule <strong>adresse MAC virtuelle</strong>.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">Et avec des équipements non Cisco ?</p>
+<p><strong>VRRP</strong> (<em>Virtual Router Redundancy Protocol</em>) répond au même besoin : fournir une <strong>passerelle virtuelle redondante</strong>.</p>
+<p>Contrairement à HSRP, VRRP est un <strong>standard ouvert</strong> défini par l'IETF et peut être utilisé par différents constructeurs.</p>
+<p>La logique est très proche : un équipement assure le rôle principal et un autre peut prendre le relais en cas de panne.</p>
+<p>Dans ce cours, nous utiliserons <strong>HSRP</strong> sur les équipements Cisco.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+    PC["Postes&lt;br/&gt;Passerelle : 172.28.x.254"]
+    LAN["LAN"]
+    R1["R1&lt;br/&gt;&lt;b&gt;Active&lt;/b&gt;"]
+    R2["R2&lt;br/&gt;&lt;b&gt;Standby&lt;/b&gt;"]
+    NET["Internet"]
+
+    PC --- LAN
+    LAN --- R1
+    LAN --- R2
+    R1 --&gt; NET
+    R2 --&gt; NET
+
+    VIP["Groupe HSRP 1&lt;br/&gt;&lt;b&gt;IP virtuelle : 172.28.x.254&lt;/b&gt;"]
+    VIP -.-&gt; R1
+    VIP -.-&gt; R2</code></pre>
+<p>En fonctionnement normal, <strong>R1 transmet les paquets</strong>. R2 ne partage pas le trafic de ce groupe : il attend une panne.</p>
+<h4 id="election-du-routeur-active">Élection du routeur Active<a class="headerlink" href="#election-du-routeur-active" title="Permanent link">¶</a></h4>
+<p>Le choix s'effectue principalement selon :</p>
+<ol>
+<li>la <strong>priorité HSRP</strong> la plus élevée ;</li>
+<li>en cas d'égalité, l'adresse IP réelle la plus élevée.</li>
+</ol>
+<p>La priorité par défaut est <code>100</code>.</p>
+<div class="admonition example">
+<p class="admonition-title">Exemple</p>
+<p>R1 possède une priorité de <code>110</code> et R2 une priorité de <code>100</code>. R1 est donc élu <strong>Active</strong>.</p>
+</div>
+<h4 id="le-role-de-preempt">Le rôle de <code>preempt</code><a class="headerlink" href="#le-role-de-preempt" title="Permanent link">¶</a></h4>
+<p>La commande <code>preempt</code> autorise un routeur devenu plus prioritaire à reprendre le rôle <strong>Active</strong>.</p>
+<p>Sans <code>preempt</code>, après le retour de R1, R2 peut rester Active même si sa priorité est plus faible. Ce comportement évite une nouvelle bascule, mais ne rétablit pas automatiquement le rôle habituel des équipements.</p>
+<hr/>
+<h4 id="configuration-hsrp-minimale">Configuration HSRP minimale<a class="headerlink" href="#configuration-hsrp-minimale" title="Permanent link">¶</a></h4>
+<h5 id="r1">R1<a class="headerlink" href="#r1" title="Permanent link">¶</a></h5>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a> description LAN
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a> ip address 172.28.x.251 255.255.255.0
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a> standby 1 ip 172.28.x.254
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a> standby 1 priority 110
+</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a> standby 1 preempt
+</span></code></pre></div>
+<h5 id="r2">R2<a class="headerlink" href="#r2" title="Permanent link">¶</a></h5>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a> description LAN
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a> ip address 172.28.x.252 255.255.255.0
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a> standby 1 ip 172.28.x.254
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a> standby 1 priority 100
+</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a> standby 1 preempt
+</span></code></pre></div>
+<p>Les paramètres suivants doivent être cohérents sur les deux équipements :</p>
+<ul>
+<li>le même numéro de groupe HSRP : <code>1</code> ;</li>
+<li>la même adresse IP virtuelle : <code>172.28.x.254</code> ;</li>
+<li>le même sous-réseau IP sur l'interface LAN.</li>
+<li>et forcement le même réseau de niveau 2 (même domaine de diffusion = même vlan)</li>
+</ul>
+<p>Les adresses réelles doivent en revanche être différentes.</p>
+<h4 id="verification">Vérification<a class="headerlink" href="#verification" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a>show standby brief
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>show standby
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>show ip interface brief
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a>show ip route
+</span></code></pre></div>
+<p>Une vérification ne consiste pas seulement à constater <code>Active</code> ou <code>Standby</code>. Il faut aussi contrôler :</p>
+<ul>
+<li>l'adresse virtuelle ;</li>
+<li>la priorité ;</li>
+<li>l'activation de <code>preempt</code> ;</li>
+<li>l'interface suivie ;</li>
+<li>la présence d'une route utilisable vers Internet.</li>
+</ul>
+<hr/>
+<h3 id="failover-et-load-balancing-deux-objectifs-differents">Failover et load balancing : deux objectifs différents<a class="headerlink" href="#failover-et-load-balancing-deux-objectifs-differents" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Notion</th>
+<th>Question posée</th>
+<th>Fonctionnement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Failover</strong></td>
+<td>« Qui prend le relais si l'actif tombe ? »</td>
+<td>un équipement transmet, un autre attend</td>
+</tr>
+<tr>
+<td><strong>Load balancing</strong></td>
+<td>« Comment utiliser plusieurs chemins en même temps ? »</td>
+<td>le trafic est réparti entre plusieurs équipements ou liens</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hsrp-classique">HSRP classique<a class="headerlink" href="#hsrp-classique" title="Permanent link">¶</a></h4>
+<p>Pour un groupe HSRP donné :</p>
+<ul>
+<li>un seul routeur est <strong>Active</strong> ;</li>
+<li>le routeur <strong>Standby</strong> ne transmet pas le trafic destiné à la VIP ;</li>
+<li>il s'agit donc principalement de <strong>failover</strong>.</li>
+</ul>
+<p>HSRP peut être utilisé pour répartir indirectement la charge en créant plusieurs groupes ou plusieurs VLAN : R1 est Active pour certains groupes, R2 pour les autres. Ce n'est toutefois pas une répartition automatique du trafic à l'intérieur d'un même groupe.</p>
+<h4 id="exemple-avec-deux-vlan">Exemple avec deux VLAN<a class="headerlink" href="#exemple-avec-deux-vlan" title="Permanent link">¶</a></h4>
+<table>
+<thead>
+<tr>
+<th>VLAN</th>
+<th>Routeur Active</th>
+<th>Routeur Standby</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VLAN 10</td>
+<td>R1</td>
+<td>R2</td>
+</tr>
+<tr>
+<td>VLAN 20</td>
+<td>R2</td>
+<td>R1</td>
+</tr>
+</tbody>
+</table>
+<p>Les deux routeurs travaillent, mais chaque VLAN conserve un seul routeur Active.</p>
+<h3 id="verifier-sa-comprehension-socle-commun">Vérifier sa compréhension — Socle commun<a class="headerlink" href="#verifier-sa-comprehension-socle-commun" title="Permanent link">¶</a></h3>
+<p>Essayez de répondre <strong>avant</strong> de valider. Lisez la correction : l'objectif est de comprendre le mécanisme, pas seulement de trouver la bonne réponse.</p>
+<hr/>
+<h4 id="quiz-1-qui-transmet">Quiz 1 — Qui transmet ?<a class="headerlink" href="#quiz-1-qui-transmet" title="Permanent link">¶</a></h4>
+<p>R1 a une priorité HSRP de <code>110</code>, R2 une priorité de <code>100</code>. Les deux utilisent <code>preempt</code> et fonctionnent normalement.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Quel équipement transmet les paquets envoyés à la VIP ?
+
+- [x] R1, car sa priorité HSRP est la plus élevée.
+- [ ] R2, car le routeur ayant la priorité la plus faible devient Active.
+- [ ] R1 et R2 simultanément, car HSRP répartit la charge.
+- [ ] Les deux alternativement selon les paquets.
+> **Explication :** R1 est **Active** et transmet les paquets. R2 reste **Standby**. Un groupe HSRP classique ne réalise pas de répartition de charge entre les deux routeurs.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-1">
+<a class="quiz-header-link" href="#quiz-1">#</a>
+<div class="quiz-question" id="quiz-1-question">
+<p>Quel équipement transmet les paquets envoyés à la VIP ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-1-question"><div><input data-correct="true" id="quiz-1-0" name="answer" type="radio" value="0"/><label for="quiz-1-0">R1, car sa priorité HSRP est la plus élevée.</label></div><div><input id="quiz-1-1" name="answer" type="radio" value="1"/><label for="quiz-1-1">R2, car le routeur ayant la priorité la plus faible devient Active.</label></div><div><input id="quiz-1-2" name="answer" type="radio" value="2"/><label for="quiz-1-2">R1 et R2 simultanément, car HSRP répartit la charge.</label></div><div><input id="quiz-1-3" name="answer" type="radio" value="3"/><label for="quiz-1-3">Les deux alternativement selon les paquets.</label><div class="answer-feedback hidden"><strong>Explication :</strong> R1 est <strong>Active</strong> et transmet les paquets. R2 reste <strong>Standby</strong>. Un groupe HSRP classique ne réalise pas de répartition de charge entre les deux routeurs.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-2-la-bonne-passerelle">Quiz 2 — La bonne passerelle<a class="headerlink" href="#quiz-2-la-bonne-passerelle" title="Permanent link">¶</a></h4>
+<p>Un poste possède la configuration suivante :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a>Adresse IP : 172.28.x.20/24
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>Passerelle : 172.28.x.251
+</span></code></pre></div>
+<p>La VIP du groupe HSRP est <code>172.28.x.254</code>.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+La haute disponibilité HSRP est-elle effective pour ce poste ?
+
+- [ ] Oui, car R1 appartient au groupe HSRP.
+- [ ] Oui, car R2 prendra automatiquement l'adresse `172.28.x.251`.
+- [x] Non, car le poste utilise l'adresse réelle de R1 au lieu de la VIP.
+- [ ] Non, car HSRP nécessite deux passerelles configurées sur le poste.
+> **Explication :** la passerelle du poste doit être la **VIP `172.28.x.254`**. Si le poste utilise directement `172.28.x.251`, la disparition de R1 rend sa passerelle inaccessible.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-2">
+<a class="quiz-header-link" href="#quiz-2">#</a>
+<div class="quiz-question" id="quiz-2-question">
+<p>La haute disponibilité HSRP est-elle effective pour ce poste ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-2-question"><div><input id="quiz-2-0" name="answer" type="radio" value="0"/><label for="quiz-2-0">Oui, car R1 appartient au groupe HSRP.</label></div><div><input id="quiz-2-1" name="answer" type="radio" value="1"/><label for="quiz-2-1">Oui, car R2 prendra automatiquement l'adresse <code>172.28.x.251</code>.</label></div><div><input data-correct="true" id="quiz-2-2" name="answer" type="radio" value="2"/><label for="quiz-2-2">Non, car le poste utilise l'adresse réelle de R1 au lieu de la VIP.</label></div><div><input id="quiz-2-3" name="answer" type="radio" value="3"/><label for="quiz-2-3">Non, car HSRP nécessite deux passerelles configurées sur le poste.</label><div class="answer-feedback hidden"><strong>Explication :</strong> la passerelle du poste doit être la <strong>VIP <code>172.28.x.254</code></strong>. Si le poste utilise directement <code>172.28.x.251</code>, la disparition de R1 rend sa passerelle inaccessible.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-3-retour-de-r1">Quiz 3 — Retour de R1<a class="headerlink" href="#quiz-3-retour-de-r1" title="Permanent link">¶</a></h4>
+<p>R1, priorité <code>110</code>, était Active. Après sa panne, R2 est devenu Active.</p>
+<p>R1 redémarre, mais <code>preempt</code> n'est configuré sur aucun routeur.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Quel routeur reste Active ?
+
+- [ ] R1, car sa priorité `110` est supérieure à celle de R2.
+- [x] R2, car R1 ne peut pas reprendre automatiquement le rôle sans `preempt`.
+- [ ] Les deux deviennent Active.
+- [ ] Une nouvelle élection choisit aléatoirement R1 ou R2.
+> **Explication :** une priorité supérieure ne suffit pas à reprendre le rôle à un routeur déjà **Active**. `preempt` permet au routeur ayant la priorité supérieure de reprendre le rôle Active.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-3">
+<a class="quiz-header-link" href="#quiz-3">#</a>
+<div class="quiz-question" id="quiz-3-question">
+<p>Quel routeur reste Active ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-3-question"><div><input id="quiz-3-0" name="answer" type="radio" value="0"/><label for="quiz-3-0">R1, car sa priorité <code>110</code> est supérieure à celle de R2.</label></div><div><input data-correct="true" id="quiz-3-1" name="answer" type="radio" value="1"/><label for="quiz-3-1">R2, car R1 ne peut pas reprendre automatiquement le rôle sans <code>preempt</code>.</label></div><div><input id="quiz-3-2" name="answer" type="radio" value="2"/><label for="quiz-3-2">Les deux deviennent Active.</label></div><div><input id="quiz-3-3" name="answer" type="radio" value="3"/><label for="quiz-3-3">Une nouvelle élection choisit aléatoirement R1 ou R2.</label><div class="answer-feedback hidden"><strong>Explication :</strong> une priorité supérieure ne suffit pas à reprendre le rôle à un routeur déjà <strong>Active</strong>. <code>preempt</code> permet au routeur ayant la priorité supérieure de reprendre le rôle Active.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-8-failover-ou-load-balancing">Quiz 8 — Failover ou load balancing ?<a class="headerlink" href="#quiz-8-failover-ou-load-balancing" title="Permanent link">¶</a></h4>
+<!-- mkdocs-quiz-source
+<quiz>
+R2 prend le relais après la panne de R1. Quelle notion décrit ce comportement ?
+
+- [x] Failover
+- [ ] Load balancing
+- [ ] Routage dynamique
+- [ ] Agrégation de liens
+> **Explication :** le **failover** consiste à faire prendre le relais à un équipement lorsqu'un autre devient indisponible.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-4">
+<a class="quiz-header-link" href="#quiz-4">#</a>
+<div class="quiz-question" id="quiz-4-question">
+<p>R2 prend le relais après la panne de R1. Quelle notion décrit ce comportement ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-4-question"><div><input data-correct="true" id="quiz-4-0" name="answer" type="radio" value="0"/><label for="quiz-4-0">Failover</label></div><div><input id="quiz-4-1" name="answer" type="radio" value="1"/><label for="quiz-4-1">Load balancing</label></div><div><input id="quiz-4-2" name="answer" type="radio" value="2"/><label for="quiz-4-2">Routage dynamique</label></div><div><input id="quiz-4-3" name="answer" type="radio" value="3"/><label for="quiz-4-3">Agrégation de liens</label><div class="answer-feedback hidden"><strong>Explication :</strong> le <strong>failover</strong> consiste à faire prendre le relais à un équipement lorsqu'un autre devient indisponible.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+R1 et R2 transmettent simultanément du trafic pour des postes différents. Quelle notion décrit ce comportement ?
+
+- [ ] Failover
+- [x] Load balancing
+- [ ] Preemption
+- [ ] Tracking
+> **Explication :** le **load balancing** consiste à répartir le trafic normal entre plusieurs équipements disponibles.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-5">
+<a class="quiz-header-link" href="#quiz-5">#</a>
+<div class="quiz-question" id="quiz-5-question">
+<p>R1 et R2 transmettent simultanément du trafic pour des postes différents. Quelle notion décrit ce comportement ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-5-question"><div><input id="quiz-5-0" name="answer" type="radio" value="0"/><label for="quiz-5-0">Failover</label></div><div><input data-correct="true" id="quiz-5-1" name="answer" type="radio" value="1"/><label for="quiz-5-1">Load balancing</label></div><div><input id="quiz-5-2" name="answer" type="radio" value="2"/><label for="quiz-5-2">Preemption</label></div><div><input id="quiz-5-3" name="answer" type="radio" value="3"/><label for="quiz-5-3">Tracking</label><div class="answer-feedback hidden"><strong>Explication :</strong> le <strong>load balancing</strong> consiste à répartir le trafic normal entre plusieurs équipements disponibles.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h2 id="concepts-avances">Concepts avancés<a class="headerlink" href="#concepts-avances" title="Permanent link">¶</a></h2>
+<hr/>
+<h3 id="le-piege-le-routeur-fonctionne-mais-internet-est-inaccessible">Le piège : le routeur fonctionne, mais Internet est inaccessible<a class="headerlink" href="#le-piege-le-routeur-fonctionne-mais-internet-est-inaccessible" title="Permanent link">¶</a></h3>
+<p>HSRP surveille naturellement la présence de l'autre membre sur le réseau partagé. Il peut détecter la disparition du routeur Active ou de son interface LAN.</p>
+<p>Mais imaginons la situation suivante :</p>
+<pre class="mermaid"><code>flowchart LR
+    LAN["LAN"]
+    R1["R1&lt;br/&gt;&lt;b&gt;Active&lt;/b&gt;"]
+    R2["R2&lt;br/&gt;&lt;b&gt;Standby&lt;/b&gt;"]
+    NET["Internet"]
+
+    LAN --- R1
+    LAN --- R2
+    R1 -- "❌ panne" --- NET
+    R2 --- NET</code></pre>
+<p>R1 fonctionne toujours et son interface LAN est active. Il reste donc <strong>Active</strong>, alors que sa liaison vers Internet est coupée. La VIP est disponible, mais le service attendu ne l'est plus.</p>
+<h3 id="suivre-la-liaison-vers-internet">Suivre la liaison vers Internet<a class="headerlink" href="#suivre-la-liaison-vers-internet" title="Permanent link">¶</a></h3>
+<p>Une solution simple consiste à suivre l'état de l'interface WAN :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a> standby 1 track GigabitEthernet0/1 20
+</span></code></pre></div>
+<p>Si <code>GigabitEthernet0/1</code> tombe, la priorité de R1 diminue de <code>20</code> :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a>110 - 20 = 90
+</span></code></pre></div>
+<p>R2 possède une priorité de <code>100</code>. Avec <code>preempt</code>, R2 devient alors Active.</p>
+<div class="admonition warning">
+<p class="admonition-title">Une interface active ne prouve pas qu'Internet fonctionne</p>
+<p>Le câble entre R1 et l'équipement opérateur peut être actif alors qu'une panne existe plus loin. Pour tester réellement un chemin, on peut utiliser <strong>IP SLA</strong>, puis associer son résultat à un objet suivi avec <code>track</code>.</p>
+</div>
+<hr/>
+<h3 id="glbp-repartition-de-charge-et-redondance">GLBP : répartition de charge et redondance<a class="headerlink" href="#glbp-repartition-de-charge-et-redondance" title="Permanent link">¶</a></h3>
+<p><strong>GLBP</strong> (<em>Gateway Load Balancing Protocol</em>) est également un protocole propriétaire Cisco. Les postes utilisent une seule IP virtuelle, mais plusieurs routeurs peuvent transmettre simultanément.</p>
+<p>GLBP distingue deux rôles :</p>
+<ul>
+<li><strong>AVG</strong> (<em>Active Virtual Gateway</em>) : répond aux requêtes ARP pour la VIP et attribue les adresses MAC virtuelles ;</li>
+<li><strong>AVF</strong> (<em>Active Virtual Forwarder</em>) : transmet les paquets associés à son adresse MAC virtuelle.</li>
+</ul>
+<pre class="mermaid"><code>flowchart TD
+    VIP["VIP unique&lt;br/&gt;&lt;b&gt;172.28.x.254&lt;/b&gt;"]
+
+    VIP --&gt;|"Réponse ARP"| MAC1["MAC-V1"]
+    VIP --&gt;|"Réponse ARP"| MAC2["MAC-V2"]
+
+    MAC1 --&gt; R1["R1&lt;br/&gt;&lt;b&gt;transmet&lt;/b&gt;"]
+    MAC2 --&gt; R2["R2&lt;br/&gt;&lt;b&gt;transmet&lt;/b&gt;"]</code></pre>
+<p>Deux postes peuvent donc posséder la même passerelle IP, tout en envoyant leurs trames à des adresses MAC virtuelles différentes. R1 et R2 participent alors simultanément au transfert.</p>
+<p>GLBP apporte :</p>
+<ul>
+<li>de la <strong>répartition de charge</strong> en fonctionnement normal ;</li>
+<li>du <strong>failover</strong> si un forwarder devient indisponible.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">La répartition n'est pas paquet par paquet</p>
+<p>Avec la méthode courante <em>round-robin</em>, l'AVG alterne les adresses MAC dans ses réponses ARP. Un même poste conserve ensuite l'adresse MAC apprise dans son cache ARP pendant un certain temps.</p>
+</div>
+<h4 id="configuration-glbp-minimale">Configuration GLBP minimale<a class="headerlink" href="#configuration-glbp-minimale" title="Permanent link">¶</a></h4>
+<h5 id="r1_1">R1<a class="headerlink" href="#r1_1" title="Permanent link">¶</a></h5>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a> ip address 172.28.x.251 255.255.255.0
+</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a> glbp 1 ip 172.28.x.254
+</span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a> glbp 1 priority 110
+</span><span id="__span-7-5"><a href="#__codelineno-7-5" id="__codelineno-7-5" name="__codelineno-7-5"></a> glbp 1 preempt
+</span></code></pre></div>
+<h5 id="r2_1">R2<a class="headerlink" href="#r2_1" title="Permanent link">¶</a></h5>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a> ip address 172.28.x.252 255.255.255.0
+</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a> glbp 1 ip 172.28.x.254
+</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a> glbp 1 priority 100
+</span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a> glbp 1 preempt
+</span></code></pre></div>
+<h4 id="verification_1">Vérification<a class="headerlink" href="#verification_1" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a>show glbp brief
+</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a>show glbp
+</span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a>show arp
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Ne pas mélanger les protocoles</p>
+<p>On choisit HSRP <strong>ou</strong> GLBP pour un même service de passerelle virtuelle. Remplacer seulement quelques commandes <code>standby</code> par des commandes <code>glbp</code> ne constitue pas une configuration valide.</p>
+</div>
+<hr/>
+<h3 id="comparaison-synthetique">Comparaison synthétique<a class="headerlink" href="#comparaison-synthetique" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Critère</th>
+<th>HSRP</th>
+<th>GLBP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Constructeur</td>
+<td>Cisco</td>
+<td>Cisco</td>
+</tr>
+<tr>
+<td>Objectif principal</td>
+<td>redondance</td>
+<td>répartition de charge et redondance</td>
+</tr>
+<tr>
+<td>Passerelle IP vue par les postes</td>
+<td>une VIP</td>
+<td>une VIP</td>
+</tr>
+<tr>
+<td>Transfert normal pour un groupe</td>
+<td>un Active</td>
+<td>plusieurs AVF possibles</td>
+</tr>
+<tr>
+<td>Routeur de secours</td>
+<td>Standby</td>
+<td>autre AVG/AVF capable de reprendre</td>
+</tr>
+<tr>
+<td>Répartition native dans un groupe</td>
+<td>non</td>
+<td>oui</td>
+</tr>
+<tr>
+<td>Complexité</td>
+<td>plus faible</td>
+<td>plus élevée</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="verifier-sa-comprehension-concepts-avances">Vérifier sa compréhension — Concepts avancés<a class="headerlink" href="#verifier-sa-comprehension-concepts-avances" title="Permanent link">¶</a></h3>
+<hr/>
+<p>Essayez de répondre <strong>avant</strong> de valider. Lisez la correction : l'objectif est de comprendre le mécanisme, pas seulement de trouver la bonne réponse.</p>
+<hr/>
+<h4 id="quiz-4-la-fausse-haute-disponibilite">Quiz 4 — La fausse haute disponibilité<a class="headerlink" href="#quiz-4-la-fausse-haute-disponibilite" title="Permanent link">¶</a></h4>
+<p>R1 reste allumé et son interface LAN est active. Sa liaison WAN est coupée.</p>
+<p>Aucun suivi d'interface ni IP SLA n'est configuré.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+HSRP bascule-t-il nécessairement vers R2 ?
+
+- [ ] Oui, HSRP vérifie automatiquement l'accès à Internet.
+- [ ] Oui, toute perte d'une interface de R1 déclenche automatiquement le basculement.
+- [x] Non, R1 peut rester Active car HSRP fonctionne toujours sur le LAN.
+- [ ] Non, HSRP ne peut basculer qu'après l'arrêt complet du routeur.
+> **Explication :** HSRP peut continuer à fonctionner normalement sur le LAN alors que R1 a perdu sa sortie Internet. Il faut mettre en place un **suivi adapté**, par exemple le suivi de l'interface WAN ou un test IP SLA.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-6">
+<a class="quiz-header-link" href="#quiz-6">#</a>
+<div class="quiz-question" id="quiz-6-question">
+<p>HSRP bascule-t-il nécessairement vers R2 ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-6-question"><div><input id="quiz-6-0" name="answer" type="radio" value="0"/><label for="quiz-6-0">Oui, HSRP vérifie automatiquement l'accès à Internet.</label></div><div><input id="quiz-6-1" name="answer" type="radio" value="1"/><label for="quiz-6-1">Oui, toute perte d'une interface de R1 déclenche automatiquement le basculement.</label></div><div><input data-correct="true" id="quiz-6-2" name="answer" type="radio" value="2"/><label for="quiz-6-2">Non, R1 peut rester Active car HSRP fonctionne toujours sur le LAN.</label></div><div><input id="quiz-6-3" name="answer" type="radio" value="3"/><label for="quiz-6-3">Non, HSRP ne peut basculer qu'après l'arrêt complet du routeur.</label><div class="answer-feedback hidden"><strong>Explication :</strong> HSRP peut continuer à fonctionner normalement sur le LAN alors que R1 a perdu sa sortie Internet. Il faut mettre en place un <strong>suivi adapté</strong>, par exemple le suivi de l'interface WAN ou un test IP SLA.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-5-calcul-de-priorite">Quiz 5 — Calcul de priorité<a class="headerlink" href="#quiz-5-calcul-de-priorite" title="Permanent link">¶</a></h4>
+<p>R1 possède une priorité de <code>115</code>.</p>
+<p>Le suivi de son accès Internet prévoit un décrément de <code>10</code>.</p>
+<p>R2 possède une priorité de <code>100</code>.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+La panne suivie suffit-elle à faire basculer le groupe vers R2 ?
+
+- [ ] Oui, car toute diminution de priorité provoque un basculement.
+- [ ] Oui, car la priorité de R1 devient `95`.
+- [x] Non, car la priorité de R1 devient `105` et reste supérieure à celle de R2.
+- [ ] Non, car une priorité HSRP ne peut pas être modifiée dynamiquement.
+> **Explication :** `115 - 10 = 105`. R1 conserve donc une priorité supérieure à celle de R2 (`100`). Le décrément doit rendre la priorité de R1 inférieure à celle de R2.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-7">
+<a class="quiz-header-link" href="#quiz-7">#</a>
+<div class="quiz-question" id="quiz-7-question">
+<p>La panne suivie suffit-elle à faire basculer le groupe vers R2 ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-7-question"><div><input id="quiz-7-0" name="answer" type="radio" value="0"/><label for="quiz-7-0">Oui, car toute diminution de priorité provoque un basculement.</label></div><div><input id="quiz-7-1" name="answer" type="radio" value="1"/><label for="quiz-7-1">Oui, car la priorité de R1 devient <code>95</code>.</label></div><div><input data-correct="true" id="quiz-7-2" name="answer" type="radio" value="2"/><label for="quiz-7-2">Non, car la priorité de R1 devient <code>105</code> et reste supérieure à celle de R2.</label></div><div><input id="quiz-7-3" name="answer" type="radio" value="3"/><label for="quiz-7-3">Non, car une priorité HSRP ne peut pas être modifiée dynamiquement.</label><div class="answer-feedback hidden"><strong>Explication :</strong> <code>115 - 10 = 105</code>. R1 conserve donc une priorité supérieure à celle de R2 (<code>100</code>). Le décrément doit rendre la priorité de R1 inférieure à celle de R2.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-6-hsrp-ou-glbp">Quiz 6 — HSRP ou GLBP ?<a class="headerlink" href="#quiz-6-hsrp-ou-glbp" title="Permanent link">¶</a></h4>
+<p>L'administrateur veut que R1 et R2 transmettent <strong>tous les deux du trafic</strong> pour les postes d'un même VLAN, tout en présentant une seule adresse IP de passerelle.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Quel protocole répond directement à ce besoin ?
+
+- [ ] HSRP, car les routeurs Active et Standby transmettent simultanément.
+- [x] GLBP, car plusieurs routeurs peuvent transmettre derrière une même VIP.
+- [ ] HSRP, à condition d'activer `preempt`.
+- [ ] VRRP, car le routeur Backup transmet une partie du trafic.
+> **Explication :** GLBP permet à plusieurs **AVF** (*Active Virtual Forwarders*) de transmettre simultanément derrière une même VIP. Dans un groupe HSRP classique, un seul routeur Active transmet pour la passerelle virtuelle.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-8">
+<a class="quiz-header-link" href="#quiz-8">#</a>
+<div class="quiz-question" id="quiz-8-question">
+<p>Quel protocole répond directement à ce besoin ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-8-question"><div><input id="quiz-8-0" name="answer" type="radio" value="0"/><label for="quiz-8-0">HSRP, car les routeurs Active et Standby transmettent simultanément.</label></div><div><input data-correct="true" id="quiz-8-1" name="answer" type="radio" value="1"/><label for="quiz-8-1">GLBP, car plusieurs routeurs peuvent transmettre derrière une même VIP.</label></div><div><input id="quiz-8-2" name="answer" type="radio" value="2"/><label for="quiz-8-2">HSRP, à condition d'activer <code>preempt</code>.</label></div><div><input id="quiz-8-3" name="answer" type="radio" value="3"/><label for="quiz-8-3">VRRP, car le routeur Backup transmet une partie du trafic.</label><div class="answer-feedback hidden"><strong>Explication :</strong> GLBP permet à plusieurs <strong>AVF</strong> (<em>Active Virtual Forwarders</em>) de transmettre simultanément derrière une même VIP. Dans un groupe HSRP classique, un seul routeur Active transmet pour la passerelle virtuelle.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h4 id="quiz-7-une-ip-plusieurs-mac">Quiz 7 — Une IP, plusieurs MAC<a class="headerlink" href="#quiz-7-une-ip-plusieurs-mac" title="Permanent link">¶</a></h4>
+<p>Deux postes utilisent la même passerelle <code>172.28.x.254</code>, mais leur cache ARP associe cette IP à deux adresses MAC virtuelles différentes.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Ce résultat est-il cohérent avec HSRP ou avec GLBP ?
+
+- [ ] HSRP, car Active et Standby possèdent chacun une MAC virtuelle utilisée simultanément.
+- [x] GLBP, car une même VIP peut être associée à plusieurs MAC virtuelles.
+- [ ] HSRP, mais uniquement lorsque `preempt` est activé.
+- [ ] Aucun des deux, car une adresse IP ne peut jamais être associée à plusieurs adresses MAC.
+> **Explication :** avec GLBP, l'**AVG** (*Active Virtual Gateway*) peut répondre aux requêtes ARP avec différentes adresses MAC virtuelles. Les postes peuvent ainsi envoyer leur trafic vers différents **AVF**.
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-9">
+<a class="quiz-header-link" href="#quiz-9">#</a>
+<div class="quiz-question" id="quiz-9-question">
+<p>Ce résultat est-il cohérent avec HSRP ou avec GLBP ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-9-question"><div><input id="quiz-9-0" name="answer" type="radio" value="0"/><label for="quiz-9-0">HSRP, car Active et Standby possèdent chacun une MAC virtuelle utilisée simultanément.</label></div><div><input data-correct="true" id="quiz-9-1" name="answer" type="radio" value="1"/><label for="quiz-9-1">GLBP, car une même VIP peut être associée à plusieurs MAC virtuelles.</label></div><div><input id="quiz-9-2" name="answer" type="radio" value="2"/><label for="quiz-9-2">HSRP, mais uniquement lorsque <code>preempt</code> est activé.</label></div><div><input id="quiz-9-3" name="answer" type="radio" value="3"/><label for="quiz-9-3">Aucun des deux, car une adresse IP ne peut jamais être associée à plusieurs adresses MAC.</label><div class="answer-feedback hidden"><strong>Explication :</strong> avec GLBP, l'<strong>AVG</strong> (<em>Active Virtual Gateway</em>) peut répondre aux requêtes ARP avec différentes adresses MAC virtuelles. Les postes peuvent ainsi envoyer leur trafic vers différents <strong>AVF</strong>.</div></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h2 id="expertise">Expertise<a class="headerlink" href="#expertise" title="Permanent link">¶</a></h2>
+<hr/>
+<h3 id="du-suivi-dinterface-a-ip-sla">Du suivi d'interface à IP SLA<a class="headerlink" href="#du-suivi-dinterface-a-ip-sla" title="Permanent link">¶</a></h3>
+<p>HSRP sait détecter la disparition du routeur Active ou la perte de son interface LAN. En revanche, il ne vérifie pas naturellement que le chemin utilisé pour sortir vers Internet fonctionne réellement.</p>
+<p>Il faut donc distinguer trois mécanismes :</p>
+<table>
+<thead>
+<tr>
+<th>Mécanisme</th>
+<th>Ce qu'il surveille</th>
+<th>Limite</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HSRP seul</td>
+<td>présence des membres du groupe sur le LAN</td>
+<td>ne teste pas l'accès à Internet</td>
+</tr>
+<tr>
+<td>suivi d'interface</td>
+<td>état local d'une interface</td>
+<td>ne détecte pas une panne située plus loin</td>
+</tr>
+<tr>
+<td>IP SLA avec <code>track</code></td>
+<td>résultat d'un test actif vers une cible</td>
+<td>dépend du choix de la cible et du test</td>
+</tr>
+</tbody>
+</table>
+<h4 id="suivre-directement-linterface-wan">Suivre directement l'interface WAN<a class="headerlink" href="#suivre-directement-linterface-wan" title="Permanent link">¶</a></h4>
+<p>Une première solution consiste à diminuer la priorité HSRP lorsque l'interface WAN de R1 tombe :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a> standby 1 track GigabitEthernet0/1 20
+</span></code></pre></div>
+<p>Dans cet exemple :</p>
+<ul>
+<li><code>GigabitEthernet0/0</code> est l'interface LAN qui porte HSRP ;</li>
+<li><code>GigabitEthernet0/1</code> est l'interface WAN suivie ;</li>
+<li><code>20</code> est le décrément appliqué à la priorité de R1 lorsque l'interface suivie devient indisponible.</li>
+</ul>
+<p>Si R1 possède initialement une priorité de <code>110</code> :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a>110 - 20 = 90
+</span></code></pre></div>
+<p>R2 possède une priorité de <code>100</code>. Sa priorité devient donc supérieure à celle de R1. Si <code>preempt</code> est configuré sur R2, il peut reprendre le rôle Active.</p>
+<h4 id="comprendre-la-limite-du-suivi-dinterface">Comprendre la limite du suivi d'interface<a class="headerlink" href="#comprendre-la-limite-du-suivi-dinterface" title="Permanent link">¶</a></h4>
+<p>Le suivi d'interface ne contrôle que l'état local de celle-ci.</p>
+<pre class="mermaid"><code>flowchart LR
+    R1["R1&lt;br/&gt;interface WAN active"]
+    OP["Équipement opérateur"]
+    PANNE["Panne plus loin"]
+    NET["Internet"]
+
+    R1 --- OP
+    OP --- PANNE
+    PANNE -.- NET</code></pre>
+<p>Le câble entre R1 et l'équipement opérateur peut rester connecté et l'interface conserver l'état <code>up/up</code>, alors qu'une panne empêche toute communication au-delà de cet équipement.</p>
+<p>Dans cette situation, le simple suivi de <code>GigabitEthernet0/1</code> considère toujours le WAN comme disponible. R1 conserve sa priorité et peut rester Active alors qu'il ne fournit plus le service attendu.</p>
+<h4 id="tester-reellement-le-chemin-avec-ip-sla">Tester réellement le chemin avec IP SLA<a class="headerlink" href="#tester-reellement-le-chemin-avec-ip-sla" title="Permanent link">¶</a></h4>
+<p><strong>IP SLA</strong> (<em>IP Service Level Agreements</em>) permet au routeur d'exécuter périodiquement un test actif. Ici, R1 envoie une requête ICMP vers une adresse située au-delà de sa liaison WAN :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a>ip sla 10
+</span><span id="__span-12-2"><a href="#__codelineno-12-2" id="__codelineno-12-2" name="__codelineno-12-2"></a> icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
+</span><span id="__span-12-3"><a href="#__codelineno-12-3" id="__codelineno-12-3" name="__codelineno-12-3"></a> frequency 5
+</span></code></pre></div>
+<p>Cette configuration signifie :</p>
+<ul>
+<li><code>10</code> identifie l'opération IP SLA ;</li>
+<li><code>icmp-echo 203.0.113.1</code> définit la cible du test ;</li>
+<li><code>source-interface GigabitEthernet0/1</code> impose l'interface source utilisée ;</li>
+<li><code>frequency 5</code> relance le test toutes les cinq secondes.</li>
+</ul>
+<p>L'opération doit ensuite être planifiée :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a>ip sla schedule 10 life forever start-time now
+</span></code></pre></div>
+<ul>
+<li><code>life forever</code> maintient l'opération active sans limite de durée ;</li>
+<li><code>start-time now</code> la démarre immédiatement.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Créer une opération ne suffit pas</p>
+<p>Une opération IP SLA produit un résultat, mais elle ne modifie pas directement le comportement de HSRP. Il faut relier ce résultat à un objet de suivi avec <code>track</code>.</p>
+</div>
+<h4 id="associer-ip-sla-a-un-objet-track">Associer IP SLA à un objet <code>track</code><a class="headerlink" href="#associer-ip-sla-a-un-objet-track" title="Permanent link">¶</a></h4>
+<p>L'objet <code>track 10</code> surveille le résultat de l'opération IP SLA <code>10</code> :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a>track 10 ip sla 10 reachability
+</span></code></pre></div>
+<p>Le mot-clé <code>reachability</code> indique que l'objet doit être considéré :</p>
+<ul>
+<li><strong>Up</strong> lorsque la cible répond au test ;</li>
+<li><strong>Down</strong> lorsque la cible n'est plus joignable.</li>
+</ul>
+<p>On associe ensuite cet objet à HSRP sur l'interface LAN :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a> standby 1 track 10 decrement 20
+</span></code></pre></div>
+<p>La chaîne de décision complète devient alors :</p>
+<pre class="mermaid"><code>flowchart LR
+    SLA["IP SLA&lt;br/&gt;teste la cible"]
+    TRACK["Objet track 10&lt;br/&gt;Up ou Down"]
+    PRIORITE["Priorité HSRP&lt;br/&gt;110 ou 90"]
+    ROLE["Rôle HSRP&lt;br/&gt;Active ou Standby"]
+
+    SLA --&gt; TRACK --&gt; PRIORITE --&gt; ROLE</code></pre>
+<p>Lorsque la cible ne répond plus :</p>
+<ol>
+<li>l'opération IP SLA échoue ;</li>
+<li>l'objet <code>track 10</code> passe à l'état <strong>Down</strong> ;</li>
+<li>la priorité HSRP de R1 passe de <code>110</code> à <code>90</code> ;</li>
+<li>R2, dont la priorité est <code>100</code>, devient plus prioritaire ;</li>
+<li>avec <code>preempt</code>, R2 prend le rôle Active.</li>
+</ol>
+<p>Lorsque le chemin redevient disponible, l'objet suivi repasse à l'état <strong>Up</strong>. R1 retrouve sa priorité de <code>110</code> et peut reprendre le rôle Active grâce à <code>preempt</code>.</p>
+<h4 id="configuration-complete-sur-r1">Configuration complète sur R1<a class="headerlink" href="#configuration-complete-sur-r1" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a>ip sla 10
+</span><span id="__span-16-2"><a href="#__codelineno-16-2" id="__codelineno-16-2" name="__codelineno-16-2"></a> icmp-echo 203.0.113.1 source-interface GigabitEthernet0/1
+</span><span id="__span-16-3"><a href="#__codelineno-16-3" id="__codelineno-16-3" name="__codelineno-16-3"></a> frequency 5
+</span><span id="__span-16-4"><a href="#__codelineno-16-4" id="__codelineno-16-4" name="__codelineno-16-4"></a>ip sla schedule 10 life forever start-time now
+</span><span id="__span-16-5"><a href="#__codelineno-16-5" id="__codelineno-16-5" name="__codelineno-16-5"></a>
+</span><span id="__span-16-6"><a href="#__codelineno-16-6" id="__codelineno-16-6" name="__codelineno-16-6"></a>track 10 ip sla 10 reachability
+</span><span id="__span-16-7"><a href="#__codelineno-16-7" id="__codelineno-16-7" name="__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a href="#__codelineno-16-8" id="__codelineno-16-8" name="__codelineno-16-8"></a>interface GigabitEthernet0/0
+</span><span id="__span-16-9"><a href="#__codelineno-16-9" id="__codelineno-16-9" name="__codelineno-16-9"></a> description LAN
+</span><span id="__span-16-10"><a href="#__codelineno-16-10" id="__codelineno-16-10" name="__codelineno-16-10"></a> ip address 172.28.x.251 255.255.255.0
+</span><span id="__span-16-11"><a href="#__codelineno-16-11" id="__codelineno-16-11" name="__codelineno-16-11"></a> standby 1 ip 172.28.x.254
+</span><span id="__span-16-12"><a href="#__codelineno-16-12" id="__codelineno-16-12" name="__codelineno-16-12"></a> standby 1 priority 110
+</span><span id="__span-16-13"><a href="#__codelineno-16-13" id="__codelineno-16-13" name="__codelineno-16-13"></a> standby 1 preempt
+</span><span id="__span-16-14"><a href="#__codelineno-16-14" id="__codelineno-16-14" name="__codelineno-16-14"></a> standby 1 track 10 decrement 20
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Pour une véritable redondance des deux chemins</p>
+<p>Dans une architecture complète, chaque routeur peut exécuter son propre test IP SLA et suivre son propre accès WAN. Il faut utiliser des numéros d'opérations et d'objets cohérents sur chaque équipement, sans supposer que les deux routeurs empruntent nécessairement le même chemin.</p>
+</div>
+<h4 id="choisir-correctement-la-cible">Choisir correctement la cible<a class="headerlink" href="#choisir-correctement-la-cible" title="Permanent link">¶</a></h4>
+<p>La cible doit représenter le chemin ou le service que l'on souhaite réellement surveiller.</p>
+<p>Une mauvaise cible peut provoquer de mauvaises décisions :</p>
+<ul>
+<li>une adresse située sur le lien directement connecté ne détecte pas une panne plus éloignée ;</li>
+<li>une adresse qui bloque volontairement ICMP peut être considérée à tort comme indisponible ;</li>
+<li>une cible instable peut provoquer des basculements inutiles ;</li>
+<li>une cible accessible par un autre chemin peut masquer la panne que l'on cherche à détecter.</li>
+</ul>
+<p>Il faut donc choisir une cible fiable, stable et située suffisamment loin pour valider le chemin attendu.</p>
+<div class="admonition warning">
+<p class="admonition-title">L'adresse utilisée dans l'exemple est documentaire</p>
+<p><code>203.0.113.1</code> appartient à un préfixe réservé à la documentation. Dans votre infrastructure, remplacez-la par une adresse réellement joignable et pertinente pour le test.</p>
+</div>
+<h4 id="verifier-ip-sla-lobjet-track-et-hsrp">Vérifier IP SLA, l'objet track et HSRP<a class="headerlink" href="#verifier-ip-sla-lobjet-track-et-hsrp" title="Permanent link">¶</a></h4>
+<p>Les trois niveaux doivent être vérifiés séparément :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a href="#__codelineno-17-1" id="__codelineno-17-1" name="__codelineno-17-1"></a>show ip sla configuration 10
+</span><span id="__span-17-2"><a href="#__codelineno-17-2" id="__codelineno-17-2" name="__codelineno-17-2"></a>show ip sla statistics 10
+</span><span id="__span-17-3"><a href="#__codelineno-17-3" id="__codelineno-17-3" name="__codelineno-17-3"></a>show track 10
+</span><span id="__span-17-4"><a href="#__codelineno-17-4" id="__codelineno-17-4" name="__codelineno-17-4"></a>show standby brief
+</span><span id="__span-17-5"><a href="#__codelineno-17-5" id="__codelineno-17-5" name="__codelineno-17-5"></a>show standby
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Commande</th>
+<th>Vérification attendue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>show ip sla configuration 10</code></td>
+<td>paramètres et planification de l'opération</td>
+</tr>
+<tr>
+<td><code>show ip sla statistics 10</code></td>
+<td>succès, échecs et temps de réponse du test</td>
+</tr>
+<tr>
+<td><code>show track 10</code></td>
+<td>état <code>Up</code> ou <code>Down</code> de l'objet suivi</td>
+</tr>
+<tr>
+<td><code>show standby brief</code></td>
+<td>rôle et priorité HSRP après application du décrément</td>
+</tr>
+<tr>
+<td><code>show standby</code></td>
+<td>détail du groupe, de <code>preempt</code> et des objets suivis</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tester-les-scenarios-de-panne">Tester les scénarios de panne<a class="headerlink" href="#tester-les-scenarios-de-panne" title="Permanent link">¶</a></h4>
+<p>Une configuration n'est validée qu'après observation de son comportement réel.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Suivi d'interface</th>
+<th>IP SLA avec <code>track</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arrêt complet de R1</td>
+<td>basculement</td>
+<td>basculement</td>
+</tr>
+<tr>
+<td>coupure de l'interface LAN de R1</td>
+<td>basculement</td>
+<td>basculement</td>
+</tr>
+<tr>
+<td>coupure physique de l'interface WAN suivie</td>
+<td>basculement</td>
+<td>basculement</td>
+</tr>
+<tr>
+<td>panne située au-delà de l'interface WAN</td>
+<td>généralement non détectée</td>
+<td>détectée si la cible devient injoignable</td>
+</tr>
+<tr>
+<td>retour du chemin de R1</td>
+<td>priorité restaurée</td>
+<td>priorité restaurée après réussite du test</td>
+</tr>
+</tbody>
+</table>
+<p>Le basculement n'est pas nécessairement instantané : il dépend notamment de la fréquence du test, de son délai d'expiration et des mécanismes de convergence de HSRP.</p>
+<hr/>
+<h3 id="elargir-la-haute-disponibilite-au-dela-de-la-passerelle">Élargir la haute disponibilité au-delà de la passerelle<a class="headerlink" href="#elargir-la-haute-disponibilite-au-dela-de-la-passerelle" title="Permanent link">¶</a></h3>
+<div class="admonition info">
+<p class="admonition-title">D'autres solutions de haute disponibilité</p>
+<p><strong>VRRP</strong> est un protocole normalisé de redondance de passerelle. <br/>
+<strong>CARP</strong> est notamment utilisé dans l'univers BSD et par des pare-feux comme pfSense ou OPNsense.</p>
+<p>Sous Linux, <strong>Keepalived</strong> utilise notamment VRRP pour assurer la redondance d'adresses IP.</p>
+<p>D'autres outils permettent d'aller plus loin dans la haute disponibilité :</p>
+<ul>
+<li><strong>Heartbeat</strong> permet de détecter la disponibilité des nœuds et a historiquement été utilisé pour mettre en place des clusters HA ;</li>
+<li><strong>Pacemaker</strong> est un gestionnaire de ressources de cluster : il peut décider sur quel nœud doivent fonctionner une adresse IP, un serveur web, une base de données ou un autre service.</li>
+</ul>
+<p>Ces solutions ne se limitent donc pas à la redondance d'une passerelle : elles permettent d'assurer la <strong>haute disponibilité de services</strong>.</p>
+</div>
+<hr/>
+<h3 id="activite-predire-verifier-expliquer">Activité : prédire, vérifier, expliquer<a class="headerlink" href="#activite-predire-verifier-expliquer" title="Permanent link">¶</a></h3>
+<h4 id="situation-initiale">Situation initiale<a class="headerlink" href="#situation-initiale" title="Permanent link">¶</a></h4>
+<ul>
+<li>R1 : <code>172.28.x.251</code>, priorité HSRP <code>110</code>, <code>preempt</code> actif ;</li>
+<li>R2 : <code>172.28.x.252</code>, priorité HSRP <code>100</code>, <code>preempt</code> actif ;</li>
+<li>VIP : <code>172.28.x.254</code> ;</li>
+<li>un poste envoie un ping continu vers une adresse située au-delà des routeurs.</li>
+</ul>
+<p>Pour chaque test, complétez le tableau <strong>avant</strong> de manipuler.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Prédiction</th>
+<th>Observation</th>
+<th>Explication technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arrêt complet de R1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>coupure de l'interface LAN de R1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>coupure du WAN de R1 sans suivi</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>coupure du WAN de R1 avec suivi</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>redémarrage de R1 sans <code>preempt</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>redémarrage de R1 avec <code>preempt</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition important">
+<p class="admonition-title">Production attendue</p>
+<p>Une capture d'écran de commandes n'est pas une explication. Pour chaque test, indiquez :</p>
+<ul>
+<li>l'état de R1 et R2 avant et après la panne ;</li>
+<li>l'évolution éventuelle des priorités ;</li>
+<li>l'équipement qui transmet réellement ;</li>
+<li>l'impact observé sur le ping ;</li>
+<li>la raison technique de ce comportement.</li>
+</ul>
+</div>
+<hr/>
+<h3 id="diagnostic-final">Diagnostic final<a class="headerlink" href="#diagnostic-final" title="Permanent link">¶</a></h3>
+<p>Un groupe a réalisé la configuration suivante :</p>
+<h4 id="r1_2">R1<a class="headerlink" href="#r1_2" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-18-2"><a href="#__codelineno-18-2" id="__codelineno-18-2" name="__codelineno-18-2"></a> ip address 172.28.x.251 255.255.255.0
+</span><span id="__span-18-3"><a href="#__codelineno-18-3" id="__codelineno-18-3" name="__codelineno-18-3"></a> standby 1 ip 172.28.x.254
+</span><span id="__span-18-4"><a href="#__codelineno-18-4" id="__codelineno-18-4" name="__codelineno-18-4"></a> standby 1 priority 110
+</span></code></pre></div>
+<h4 id="r2_2">R2<a class="headerlink" href="#r2_2" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a>interface GigabitEthernet0/0
+</span><span id="__span-19-2"><a href="#__codelineno-19-2" id="__codelineno-19-2" name="__codelineno-19-2"></a> ip address 172.28.x.252 255.255.255.0
+</span><span id="__span-19-3"><a href="#__codelineno-19-3" id="__codelineno-19-3" name="__codelineno-19-3"></a> standby 2 ip 172.28.x.254
+</span><span id="__span-19-4"><a href="#__codelineno-19-4" id="__codelineno-19-4" name="__codelineno-19-4"></a> standby 2 priority 100
+</span><span id="__span-19-5"><a href="#__codelineno-19-5" id="__codelineno-19-5" name="__codelineno-19-5"></a> standby 2 preempt
+</span></code></pre></div>
+<p>Les postes utilisent <code>172.28.x.251</code> comme passerelle. Aucun suivi du WAN n'est configuré.</p>
+<h4 id="travail-demande">Travail demandé<a class="headerlink" href="#travail-demande" title="Permanent link">¶</a></h4>
+<p>Identifiez au moins <strong>trois défauts</strong>, puis expliquez pour chacun :</p>
+<ol>
+<li>le symptôme possible ;</li>
+<li>la cause ;</li>
+<li>la correction ;</li>
+<li>la commande ou le test permettant de vérifier la correction.</li>
+</ol>
+<details class="question">
+<summary>Afficher les éléments de correction</summary>
+<ul>
+<li>Les deux routeurs n'utilisent pas le même numéro de groupe HSRP (<code>1</code> et <code>2</code>) : ils ne forment pas le même groupe logique.</li>
+<li>Les postes utilisent l'adresse réelle de R1 au lieu de la VIP : ils ne bénéficient pas du basculement.</li>
+<li><code>preempt</code> manque sur R1 : après son retour, il ne reprendra pas automatiquement le rôle Active.</li>
+<li>Aucun suivi du WAN ou test IP SLA n'est prévu : R1 peut rester Active malgré la perte de sa sortie Internet.</li>
+<li>Il faut encore vérifier les routes par défaut et le routage retour : HSRP ne les crée pas.</li>
+</ul>
+</details>
+<hr/>
+<h2 id="a-retenir">À retenir<a class="headerlink" href="#a-retenir" title="Permanent link">¶</a></h2>
+<ul>
+<li>Une <strong>VIP</strong> fournit une passerelle stable aux postes.</li>
+<li>HSRP assure principalement un <strong>failover</strong> : un Active transmet, un Standby attend.</li>
+<li><code>preempt</code> permet au routeur le plus prioritaire de reprendre le rôle Active.</li>
+<li>Une panne située au-delà du LAN nécessite un mécanisme de <strong>suivi</strong> adapté.</li>
+<li>GLBP permet à plusieurs routeurs de transmettre derrière une même VIP : il combine <strong>load balancing</strong> et <strong>failover</strong>.</li>
+<li>La haute disponibilité doit être <strong>testée par des pannes réelles ou simulées</strong>, pas déduite de la seule présence de deux équipements.</li>
+</ul><div aria-label="Quiz Progress" id="quiz-progress-sidebar" style="display: none;">
+<!-- mkdocs-quiz progress sidebar (desktop) -->
+<label class="md-nav__title">
+<span class="md-nav__icon md-icon"></span>
+    Quiz Progress
+  </label>
+<ul class="md-nav__list" data-md-component="quiz-progress">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<span class="md-ellipsis">
+          Answered: <span class="quiz-progress-answered">0</span> / <span class="quiz-progress-total">0</span> (<span class="quiz-progress-answered-percentage">0%</span>)
+        </span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<div class="quiz-progress-bar">
+<div class="quiz-progress-bar-incorrect" style="width: 0%"></div>
+<div class="quiz-progress-bar-correct" style="width: 0%"></div>
+</div>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link quiz-correct-reset">
+<span class="md-ellipsis">
+          Correct: <span class="quiz-progress-score">0</span> / <span class="quiz-progress-score-total">0</span> (<span class="quiz-progress-score-percentage">0%</span>)
+        </span>
+<a class="quiz-reset-all-link" href="#" style="color: var(--md-primary-fg-color); text-decoration: none;">
+          Reset
+        </a>
+</div>
+</li>
+</ul>
+</div>
+<nav aria-label="Quiz Progress" class="quiz-progress-mobile md-nav" id="quiz-progress-mobile" style="display: none;">
+<!-- mkdocs-quiz progress sidebar (mobile) -->
+<div class="quiz-progress-bar">
+<div class="quiz-progress-bar-incorrect" style="width: 0%"></div>
+<div class="quiz-progress-bar-correct" style="width: 0%"></div>
+</div>
+<div data-md-component="quiz-progress">
+<div class="quiz-correct-reset">
+<span class="md-ellipsis">
+        Answered: <span class="quiz-progress-answered">0</span> / <span class="quiz-progress-total">0</span>
+</span>
+<span class="md-ellipsis">
+        Correct: <span class="quiz-progress-score">0</span> / <span class="quiz-progress-score-total">0</span>
+</span>
+<a class="quiz-reset-all-link" href="#" style="color: var(--md-primary-fg-color); text-decoration: none;">
+        Reset
+      </a>
+</div>
+</div>
+</nav><style type="text/css">.quiz {
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 1rem 0;
+  position: relative;
+}
+/* Set margin-top of first quiz child (skip the header link) */
+.quiz > .quiz-question:first-of-type {
+  margin-top: 0;
+}
+/* Remove top margin from first element inside quiz-question */
+.quiz-question > *:first-child {
+  margin-top: 0;
+}
+.quiz .hidden {
+  display: none;
+}
+
+.quiz form button {
+  background-color: var(--md-primary-fg-color);
+  border: none;
+  color: var(--md-primary-bg-color);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
+}
+
+.quiz form button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.quiz form button:disabled {
+  background-color: var(--md-default-fg-color--lighter, #ccc);
+  color: var(--md-default-fg-color--light, #666);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.wrong label,
+.wrong label * {
+  color: #dc3545;
+  text-decoration: line-through;
+}
+.correct label,
+.correct label * {
+  color: #198754;
+  font-weight: bold;
+}
+
+fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+fieldset input {
+  margin: 0 10px;
+}
+fieldset label {
+  margin: 0 10px;
+}
+
+input[type="radio"].correct {
+  accent-color: #198754;
+}
+input[type="radio"].wrong {
+  accent-color: #dc3545;
+}
+.content {
+  margin: 10px;
+}
+
+/* Quiz feedback container */
+.quiz-feedback {
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Individual feedback box (one per answer) */
+.quiz-feedback-item {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.quiz-feedback-item.correct {
+  background-color: #d1e7dd;
+  border: 1px solid #a3cfbb;
+  color: #198754;
+}
+
+.quiz-feedback-item.incorrect {
+  background-color: #f8d7da;
+  border: 1px solid #f1aeb5;
+  color: #dc3545;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.correct {
+  background-color: #051b11;
+  border: 1px solid #0f5132;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.incorrect {
+  background-color: #2c0b0e;
+  border: 1px solid #842029;
+}
+
+/* Answer label badge overlapping top-left of feedback box */
+.quiz-feedback-badge {
+  position: absolute;
+  top: -0.55rem;
+  left: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quiz-feedback-item.correct .quiz-feedback-badge {
+  background-color: #a3cfbb;
+  color: #0f5132;
+}
+
+.quiz-feedback-item.incorrect .quiz-feedback-badge {
+  background-color: #f1aeb5;
+  color: #842029;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.correct .quiz-feedback-badge {
+  background-color: #0f5132;
+  color: #a3cfbb;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.incorrect .quiz-feedback-badge {
+  background-color: #842029;
+  color: #f1aeb5;
+}
+
+/* When badge is present, add top padding to prevent content overlap */
+.quiz-feedback-badge + .quiz-feedback-item-content {
+  margin-top: 0.25rem;
+}
+
+/* Quiz header link styling - positioned in top right corner */
+.quiz-header-link {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0;
+  font-size: 1rem;
+  text-decoration: none;
+  color: var(--md-default-fg-color--light, #888);
+  transition: opacity 0.2s;
+  padding: 0.25rem 0.5rem;
+}
+.quiz:hover .quiz-header-link,
+.quiz-header-link:focus-visible {
+  opacity: 1;
+}
+
+/* Focus indicators for keyboard navigation */
+.quiz input:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color, #448aff);
+  outline-offset: 2px;
+}
+
+/* Quiz number header styling */
+.quiz-number {
+  margin-top: 0 !important;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* Quiz Progress Sidebar - Progress bar styling */
+/* Most styling comes from Material's .md-nav classes */
+#quiz-progress-sidebar {
+  margin-top: 1.5rem;
+}
+/* if config progress_sidebar_position is top, need top padding instead of bottom */
+.md-nav--secondary > #quiz-progress-sidebar:first-child {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+@media screen and (min-width: 59.9375em) {
+  #quiz-progress-sidebar .md-nav__list {
+    border-left: 3px solid var(--md-default-fg-color--lightest);
+  }
+}
+
+.quiz-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.07));
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0.2rem 0;
+  display: flex;
+}
+
+.quiz-progress-bar-incorrect {
+  height: 100%;
+  background: rgba(244, 67, 54, 0.8);
+  transition: width 0.3s ease;
+}
+
+.quiz-progress-bar-correct {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.quiz-correct-reset {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Mobile Quiz Progress Tracker */
+/* Shows under navbar on mobile, hidden on desktop */
+.quiz-progress-mobile {
+  display: none; /* Hidden by default on desktop */
+  background-color: var(--md-default-bg-color);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.07));
+  padding: 0.8rem;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: sticky;
+  top: 48px;
+  z-index: 3; /* Below Material header (z-index: 4) but above page content */
+}
+
+/* Show the mobile tracker only when the secondary sidebar (and its progress
+   widget) is hidden. Material reveals .md-sidebar--secondary at min-width: 60em,
+   so the mobile tracker must stop at 60em - 1px to avoid showing both at once. */
+@media screen and (max-width: 59.9375em) {
+  .quiz-progress-mobile {
+    display: block;
+  }
+}
+
+/* Mobile tracker styling adjustments */
+.quiz-progress-mobile .md-nav__list {
+  padding: 0;
+  margin: 0;
+  max-width: 61rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.quiz-progress-mobile .md-nav__item {
+  margin: 0.3rem 0;
+}
+
+.quiz-progress-mobile .md-nav__link {
+  padding: 0.2rem 0;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quiz-progress-mobile .quiz-progress-bar {
+  margin: 0.3rem 0;
+}
+
+.quiz-progress-mobile .md-ellipsis {
+  flex: 1;
+}
+
+/* Quiz Intro */
+.quiz-intro {
+  margin: 1rem 0;
+}
+
+.quiz-intro p {
+  margin: 0 0 0.5rem 0;
+}
+
+/* Quiz Results End Screen */
+.quiz-results {
+  border: 1px solid black;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  background-color: var(--md-default-bg-color);
+  transition: all 0.3s ease;
+}
+
+/* Progress state - subtle styling */
+.quiz-results-progress {
+  text-align: center;
+  color: var(--md-default-fg-color--light);
+}
+
+.quiz-results-progress h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+}
+
+.quiz-results-stats,
+.quiz-results-correct-stats {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.quiz-results-answered,
+.quiz-results-correct,
+.quiz-results-total,
+.quiz-results-percentage {
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+}
+
+/* Complete state - bold and prominent styling */
+.quiz-results-complete {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.quiz-results-complete.hidden {
+  display: none;
+}
+
+.quiz-results-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: var(--md-default-fg-color);
+}
+
+.quiz-results-score-display {
+  margin: 1.5rem 0;
+}
+
+.quiz-results-score-value {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+/* Score color coding */
+.quiz-results-score-excellent {
+  color: #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.quiz-results-score-good {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.quiz-results-score-average {
+  color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.quiz-results-score-poor {
+  color: #fd7e14;
+  background-color: rgba(253, 126, 20, 0.1);
+}
+
+.quiz-results-score-fail {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.quiz-results-message {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 1rem 0 2rem 0;
+  color: var(--md-default-fg-color);
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .quiz-results-score-excellent {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-good {
+  color: #66bb6a;
+  background-color: rgba(102, 187, 106, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-average {
+  color: #ffeb3b;
+  background-color: rgba(255, 235, 59, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-poor {
+  color: #ff9800;
+  background-color: rgba(255, 152, 0, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-fail {
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.15);
+}
+
+/* Fill-in-the-blank quiz styles */
+.quiz-blank-input {
+  border: none;
+  border-bottom: 2px solid var(--md-default-fg-color--light, #999);
+  background-color: transparent;
+  padding: 0.2rem 0.5rem;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--md-default-fg-color);
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+  /* min-width is set via inline style based on answer length */
+}
+
+.quiz-blank-input:focus {
+  border-bottom-color: var(--md-primary-fg-color, #1976d2);
+  background-color: var(--md-default-bg-color--light, rgba(0, 0, 0, 0.02));
+}
+
+.quiz-blank-input.correct {
+  border-bottom-color: #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+  color: #198754;
+}
+
+.quiz-blank-input.wrong {
+  border-bottom-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.quiz-blank-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Dark mode adjustments for fill-in-the-blank */
+[data-md-color-scheme="slate"] .quiz-blank-input {
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input.correct {
+  border-bottom-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input.wrong {
+  border-bottom-color: #f44336;
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+</style><script type="text/javascript">var JSConfetti=function(){"use strict";function t(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function e(t,e){for(var i=0;i<e.length;i++){var n=e[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}function i(t,i,n){return i&&e(t.prototype,i),n&&e(t,n),t}function n(t){return+t.replace(/px/,"")}function s(t,e){var i=arguments.length>2&&void 0!==arguments[2]?arguments[2]:0,n=Math.random()*(e-t)+t;return Math.floor(n*Math.pow(10,i))/Math.pow(10,i)}function o(t){return t[s(0,t.length)]}var a=["#fcf403","#62fc03","#f4fc03","#03e7fc","#03fca5","#a503fc","#fc03ad","#fc03c2"];function r(t){return Math.log(t)/Math.log(1920)}var h=function(){function e(i){t(this,e);var n=i.initialPosition,a=i.direction,h=i.confettiRadius,c=i.confettiColors,u=i.emojis,l=i.emojiSize,d=i.canvasWidth,f=s(.9,1.7,3)*r(d);this.confettiSpeed={x:f,y:f},this.finalConfettiSpeedX=s(.2,.6,3),this.rotationSpeed=u.length?.01:s(.03,.07,3)*r(d),this.dragForceCoefficient=s(5e-4,9e-4,6),this.radius={x:h,y:h},this.initialRadius=h,this.rotationAngle="left"===a?s(0,.2,3):s(-.2,0,3),this.emojiSize=l,this.emojiRotationAngle=s(0,2*Math.PI),this.radiusYUpdateDirection="down";var m="left"===a?s(82,15)*Math.PI/180:s(-15,-82)*Math.PI/180;this.absCos=Math.abs(Math.cos(m)),this.absSin=Math.abs(Math.sin(m));var v=s(-150,0),p={x:n.x+("left"===a?-v:v)*this.absCos,y:n.y-v*this.absSin};this.currentPosition=Object.assign({},p),this.initialPosition=Object.assign({},p),this.color=u.length?null:o(c),this.emoji=u.length?o(u):null,this.createdAt=(new Date).getTime(),this.direction=a}return i(e,[{key:"draw",value:function(t){var e=this.currentPosition,i=this.radius,n=this.color,s=this.emoji,o=this.rotationAngle,a=this.emojiRotationAngle,r=this.emojiSize,h=window.devicePixelRatio;n?(t.fillStyle=n,t.beginPath(),t.ellipse(e.x*h,e.y*h,i.x*h,i.y*h,o,0,2*Math.PI),t.fill()):s&&(t.font="".concat(r,"px serif"),t.save(),t.translate(h*e.x,h*e.y),t.rotate(a),t.textAlign="center",t.fillText(s,0,0),t.restore())}},{key:"updatePosition",value:function(t,e){var i=this.confettiSpeed,n=this.dragForceCoefficient,s=this.finalConfettiSpeedX,o=this.radiusYUpdateDirection,a=this.rotationSpeed,r=this.createdAt,h=this.direction,c=e-r;i.x>s&&(this.confettiSpeed.x-=n*t),this.currentPosition.x+=i.x*("left"===h?-this.absCos:this.absCos)*t,this.currentPosition.y=this.initialPosition.y-i.y*this.absSin*c+.00125*Math.pow(c,2)/2,this.rotationSpeed-=this.emoji?1e-4:1e-5*t,this.rotationSpeed<0&&(this.rotationSpeed=0),this.emoji?this.emojiRotationAngle+=this.rotationSpeed*t%(2*Math.PI):"down"===o?(this.radius.y-=t*a,this.radius.y<=0&&(this.radius.y=0,this.radiusYUpdateDirection="up")):(this.radius.y+=t*a,this.radius.y>=this.initialRadius&&(this.radius.y=this.initialRadius,this.radiusYUpdateDirection="down"))}},{key:"getIsVisibleOnCanvas",value:function(t){return this.currentPosition.y<t+100}}]),e}();function c(){var t=document.createElement("canvas");return t.style.position="fixed",t.style.width="100%",t.style.height="100%",t.style.top="0",t.style.left="0",t.style.zIndex="1000",t.style.pointerEvents="none",document.body.appendChild(t),t}function u(t){var e=t.confettiRadius,i=void 0===e?6:e,n=t.confettiNumber,s=void 0===n?t.confettiesNumber||(t.emojis?40:250):n,o=t.confettiColors,r=void 0===o?a:o,h=t.emojis,c=void 0===h?t.emojies||[]:h,u=t.emojiSize,l=void 0===u?80:u;return t.emojies&&console.error("emojies argument is deprecated, please use emojis instead"),t.confettiesNumber&&console.error("confettiesNumber argument is deprecated, please use confettiNumber instead"),{confettiRadius:i,confettiNumber:s,confettiColors:r,emojis:c,emojiSize:l}}var l=function(){function e(i){var n=this;t(this,e),this.canvasContext=i,this.shapes=[],this.promise=new Promise((function(t){return n.resolvePromise=t}))}return i(e,[{key:"getBatchCompletePromise",value:function(){return this.promise}},{key:"addShapes",value:function(){var t;(t=this.shapes).push.apply(t,arguments)}},{key:"complete",value:function(){var t;return!this.shapes.length&&(null===(t=this.resolvePromise)||void 0===t||t.call(this),!0)}},{key:"processShapes",value:function(t,e,i){var n=this,s=t.timeDelta,o=t.currentTime;this.shapes=this.shapes.filter((function(t){return t.updatePosition(s,o),t.draw(n.canvasContext),!i||t.getIsVisibleOnCanvas(e)}))}}]),e}();return function(){function e(){var i=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};t(this,e),this.activeConfettiBatches=[],this.canvas=i.canvas||c(),this.canvasContext=this.canvas.getContext("2d"),this.requestAnimationFrameRequested=!1,this.lastUpdated=(new Date).getTime(),this.iterationIndex=0,this.loop=this.loop.bind(this),requestAnimationFrame(this.loop)}return i(e,[{key:"loop",value:function(){var t,e,i,s,o;this.requestAnimationFrameRequested=!1,t=this.canvas,e=window.devicePixelRatio,i=getComputedStyle(t),s=n(i.getPropertyValue("width")),o=n(i.getPropertyValue("height")),t.setAttribute("width",(s*e).toString()),t.setAttribute("height",(o*e).toString());var a=(new Date).getTime(),r=a-this.lastUpdated,h=this.canvas.offsetHeight,c=this.iterationIndex%10==0;this.activeConfettiBatches=this.activeConfettiBatches.filter((function(t){return t.processShapes({timeDelta:r,currentTime:a},h,c),!c||!t.complete()})),this.iterationIndex++,this.queueAnimationFrameIfNeeded(a)}},{key:"queueAnimationFrameIfNeeded",value:function(t){this.requestAnimationFrameRequested||this.activeConfettiBatches.length<1||(this.requestAnimationFrameRequested=!0,this.lastUpdated=t||(new Date).getTime(),requestAnimationFrame(this.loop))}},{key:"addConfetti",value:function(){for(var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},e=u(t),i=e.confettiRadius,n=e.confettiNumber,s=e.confettiColors,o=e.emojis,a=e.emojiSize,r=this.canvas.getBoundingClientRect(),c=r.width,d=r.height,f=5*d/7,m={x:0,y:f},v={x:c,y:f},p=new l(this.canvasContext),y=0;y<n/2;y++){var g=new h({initialPosition:m,direction:"right",confettiRadius:i,confettiColors:s,confettiNumber:n,emojis:o,emojiSize:a,canvasWidth:c}),C=new h({initialPosition:v,direction:"left",confettiRadius:i,confettiColors:s,confettiNumber:n,emojis:o,emojiSize:a,canvasWidth:c});p.addShapes(g,C)}return this.activeConfettiBatches.push(p),this.queueAnimationFrameIfNeeded(),p.getBatchCompletePromise()}},{key:"clearCanvas",value:function(){this.activeConfettiBatches=[]}},{key:"destroyCanvas",value:function(){this.canvas.remove()}}]),e}()}();
+</script><script type="text/javascript">
+window.mkdocsQuizTranslations = {};
+</script><script type="text/javascript">
+window.mkdocsQuizConfig = {
+  confetti: true,
+  showProgress: true,
+  progressSidebarPosition: "top"
+};
+</script><script defer="" type="text/javascript">// Wrap everything in an IIFE to avoid variable redeclaration issues
+// when Material theme instant navigation reloads the page
+(function () {
+  // Constants
+  const STORAGE_KEY_PREFIX = "quiz_progress_";
+
+  // Translation helper function
+  function t(key, params = {}) {
+    let text = window.mkdocsQuizTranslations?.[key] || key;
+    // Simple template replacement for {n} and {key} style placeholders
+    return text.replace(/{(\w+)}/g, (_, k) => (params[k] !== undefined ? params[k] : `{${k}}`));
+  }
+
+  // Confetti instance (will be initialized if enabled)
+  let jsConfetti = null;
+
+  // Store event listeners for cleanup
+  let eventListeners = [];
+
+  // Initialize confetti if enabled
+  if (window.mkdocsQuizConfig && window.mkdocsQuizConfig.confetti) {
+    if (typeof JSConfetti !== "undefined") {
+      jsConfetti = new JSConfetti();
+    }
+  }
+
+  // Function to move quiz progress sidebar into TOC sidebar
+  // This needs to run on every page load for Material instant navigation
+  function repositionSidebar() {
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      const sidebar = document.getElementById("quiz-progress-sidebar");
+      const tocSidebar = document.querySelector(".md-sidebar--secondary .md-sidebar__inner .md-nav--secondary");
+
+      if (sidebar && tocSidebar) {
+        // Check if sidebar is already in the correct position
+        // by seeing if it's already a child of tocSidebar
+        if (!tocSidebar.contains(sidebar)) {
+          // Get position from config (default: "top")
+          const position =
+            window.mkdocsQuizConfig && window.mkdocsQuizConfig.progressSidebarPosition
+              ? window.mkdocsQuizConfig.progressSidebarPosition
+              : "top";
+
+          // Move sidebar based on configured position
+          if (position === "bottom") {
+            // Append to the end (below TOC)
+            tocSidebar.appendChild(sidebar);
+          } else {
+            // Default: insert at the top (above TOC)
+            if (tocSidebar.firstChild) {
+              tocSidebar.insertBefore(sidebar, tocSidebar.firstChild);
+            } else {
+              tocSidebar.appendChild(sidebar);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Cleanup function to remove event listeners and prevent memory leaks
+  function cleanup() {
+    eventListeners.forEach(({ element, event, handler }) => {
+      element.removeEventListener(event, handler);
+    });
+    eventListeners = [];
+  }
+
+  // Helper function to add tracked event listeners
+  function addTrackedEventListener(element, event, handler) {
+    element.addEventListener(event, handler);
+    eventListeners.push({ element, event, handler });
+  }
+
+  // Global quiz tracker
+  const quizTracker = {
+    quizzes: {},
+    totalQuizzes: 0,
+    answeredQuizzes: 0,
+    correctQuizzes: 0,
+
+    init: function () {
+      this.totalQuizzes = document.querySelectorAll(".quiz").length;
+      this.loadFromStorage();
+      // Initialize wasCompleted based on restored state to prevent confetti on page load
+      // Only fire confetti when completing quizzes in the current session, not from localStorage
+      const progress = this.getProgress();
+      this.wasCompleted = progress.answered === progress.total && progress.total > 0;
+      this.updateDisplay();
+    },
+
+    markQuiz: function (quizId, isCorrect, selectedValues = []) {
+      const wasAnswered = !!this.quizzes[quizId];
+      const wasCorrect = this.wasPreviouslyCorrect(quizId);
+
+      if (!wasAnswered) {
+        this.answeredQuizzes++;
+      }
+
+      this.quizzes[quizId] = {
+        answered: true,
+        correct: isCorrect,
+        selectedValues: selectedValues,
+      };
+
+      if (isCorrect && !wasCorrect) {
+        this.correctQuizzes++;
+      } else if (!isCorrect && wasCorrect) {
+        this.correctQuizzes--;
+      }
+
+      this.saveToStorage();
+      this.updateDisplay();
+    },
+
+    wasPreviouslyCorrect: function (quizId) {
+      return this.quizzes[quizId] && this.quizzes[quizId].correct;
+    },
+
+    resetQuiz: function (quizId) {
+      if (this.quizzes[quizId]) {
+        if (this.quizzes[quizId].correct) {
+          this.correctQuizzes--;
+        }
+        this.answeredQuizzes--;
+        delete this.quizzes[quizId];
+        this.saveToStorage();
+        this.updateDisplay();
+      }
+    },
+
+    resetAllQuiz: function () {
+      this.quizzes = {};
+      this.answeredQuizzes = 0;
+      this.correctQuizzes = 0;
+      this.saveToStorage();
+      this.updateDisplay();
+
+      // Reset all quiz forms on the page
+      document.querySelectorAll(".quiz").forEach((quiz) => {
+        const form = quiz.querySelector("form");
+        const fieldset = form.querySelector("fieldset");
+        const submitButton = form.querySelector('button[type="submit"]');
+        const resetButton = form.querySelector(".quiz-reset-button");
+        const feedbackDiv = form.querySelector(".quiz-feedback");
+        const section = quiz.querySelector("section");
+
+        // Clear all selections
+        const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+        allInputs.forEach((input) => {
+          input.checked = false;
+          input.disabled = false;
+        });
+
+        // Reset colors
+        resetFieldset(fieldset);
+
+        // Hide content section
+        if (section) {
+          section.classList.add("hidden");
+        }
+
+        // Hide feedback container
+        feedbackDiv.classList.add("hidden");
+        feedbackDiv.innerHTML = "";
+
+        // Show submit button, hide reset button
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove("hidden");
+        }
+        if (resetButton) {
+          resetButton.classList.add("hidden");
+        }
+      });
+    },
+
+    getProgress: function () {
+      return {
+        total: this.totalQuizzes,
+        answered: this.answeredQuizzes,
+        correct: this.correctQuizzes,
+        percentage: this.totalQuizzes > 0 ? Math.round((this.answeredQuizzes / this.totalQuizzes) * 100) : 0,
+        score: this.totalQuizzes > 0 ? Math.round((this.correctQuizzes / this.totalQuizzes) * 100) : 0,
+      };
+    },
+
+    saveToStorage: function () {
+      try {
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        const data = JSON.stringify(this.quizzes);
+
+        // Check size limit (50KB max to prevent quota issues)
+        if (data.length > 50000) {
+          console.warn("Quiz progress data exceeds size limit, not saving to localStorage");
+          this.showStorageWarning("Quiz progress is too large to save");
+          return;
+        }
+
+        localStorage.setItem(pageKey, data);
+      } catch (e) {
+        // Handle quota exceeded or localStorage disabled
+        console.error("Failed to save quiz progress:", e);
+        this.showStorageWarning(
+          "Unable to save quiz progress. Your browser may have storage disabled or quota exceeded.",
+        );
+      }
+    },
+
+    loadFromStorage: function () {
+      try {
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        const stored = localStorage.getItem(pageKey);
+
+        if (stored) {
+          // Validate size before parsing (50KB max)
+          if (stored.length > 50000) {
+            console.warn("Stored quiz data exceeds size limit, clearing corrupted data");
+            localStorage.removeItem(pageKey);
+            return;
+          }
+
+          const parsed = JSON.parse(stored);
+
+          // Validate structure: should be an object
+          if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+            console.warn("Invalid quiz data structure, clearing corrupted data");
+            localStorage.removeItem(pageKey);
+            return;
+          }
+
+          this.quizzes = parsed;
+
+          // Recalculate counts and validate quiz data structure
+          this.answeredQuizzes = 0;
+          this.correctQuizzes = 0;
+          for (let key in this.quizzes) {
+            const quiz = this.quizzes[key];
+            // Validate each quiz entry has expected structure
+            if (typeof quiz !== "object" || typeof quiz.answered !== "boolean" || typeof quiz.correct !== "boolean") {
+              console.warn("Invalid quiz entry structure, clearing corrupted data");
+              this.quizzes = {};
+              localStorage.removeItem(pageKey);
+              return;
+            }
+
+            if (quiz.answered) {
+              this.answeredQuizzes++;
+            }
+            if (quiz.correct) {
+              this.correctQuizzes++;
+            }
+          }
+        }
+      } catch (e) {
+        // Handle parsing errors or localStorage unavailable
+        console.error("Failed to load quiz progress:", e);
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        try {
+          localStorage.removeItem(pageKey); // Clear corrupted data
+        } catch (cleanupError) {
+          // localStorage might be completely unavailable
+        }
+      }
+    },
+
+    updateDisplay: function () {
+      const progress = this.getProgress();
+      const wasComplete = this.wasCompleted;
+      const isComplete = progress.answered === progress.total && progress.total > 0;
+
+      // Dispatch custom event for sidebar/other UI components
+      window.dispatchEvent(
+        new CustomEvent("quizProgressUpdate", {
+          detail: progress,
+        }),
+      );
+      // Update sidebar if it exists
+      this.updateSidebar();
+      // Update results div if it exists
+      this.updateResultsDiv(progress, isComplete, wasComplete);
+
+      // Track completion state
+      this.wasCompleted = isComplete;
+    },
+
+    updateResultsDiv: function (progress, isComplete, wasComplete) {
+      const resultsDiv = document.getElementById("quiz-results");
+      if (!resultsDiv) return;
+
+      // Update progress section
+      const answeredEl = resultsDiv.querySelector(".quiz-results-answered");
+      const totalEl = resultsDiv.querySelector(".quiz-results-total");
+      const percentageEl = resultsDiv.querySelector(".quiz-results-percentage");
+      const correctEl = resultsDiv.querySelector(".quiz-results-correct");
+
+      if (answeredEl) answeredEl.textContent = progress.answered;
+      if (totalEl) totalEl.textContent = progress.total;
+      if (percentageEl) percentageEl.textContent = progress.percentage + "%";
+      if (correctEl) correctEl.textContent = progress.correct;
+
+      // Handle completion state
+      const progressSection = resultsDiv.querySelector(".quiz-results-progress");
+      const completeSection = resultsDiv.querySelector(".quiz-results-complete");
+
+      if (isComplete) {
+        // Hide progress, show complete
+        if (progressSection) progressSection.classList.add("hidden");
+        if (completeSection) {
+          completeSection.classList.remove("hidden");
+
+          // Update score display
+          const scoreValue = resultsDiv.querySelector(".quiz-results-score-value");
+          const scoreMessage = resultsDiv.querySelector(".quiz-results-message");
+
+          if (scoreValue) {
+            scoreValue.textContent = progress.score + "%";
+
+            // Remove all score classes
+            scoreValue.classList.remove(
+              "quiz-results-score-excellent",
+              "quiz-results-score-good",
+              "quiz-results-score-average",
+              "quiz-results-score-poor",
+              "quiz-results-score-fail",
+            );
+
+            // Add appropriate score class and message
+            let message = "";
+            if (progress.score >= 90) {
+              scoreValue.classList.add("quiz-results-score-excellent");
+              message = t("Outstanding! You aced it!");
+            } else if (progress.score >= 75) {
+              scoreValue.classList.add("quiz-results-score-good");
+              message = t("Great job! You really know your stuff!");
+            } else if (progress.score >= 60) {
+              scoreValue.classList.add("quiz-results-score-average");
+              message = t("Good effort! Keep learning!");
+            } else if (progress.score >= 40) {
+              scoreValue.classList.add("quiz-results-score-poor");
+              message = t("Not bad, but there's room for improvement!");
+            } else {
+              scoreValue.classList.add("quiz-results-score-fail");
+              message = t("Better luck next time! Keep trying!");
+            }
+
+            if (scoreMessage) scoreMessage.textContent = message;
+          }
+
+          // Trigger confetti and scroll on first completion
+          if (!wasComplete) {
+            // Scroll to results div
+            resultsDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Fire confetti if enabled and score is good
+            if (jsConfetti && progress.score >= 10) {
+              setTimeout(() => {
+                jsConfetti.addConfetti();
+              }, 500);
+            }
+          }
+        }
+      } else {
+        // Show progress, hide complete
+        if (progressSection) progressSection.classList.remove("hidden");
+        if (completeSection) completeSection.classList.add("hidden");
+      }
+    },
+
+    updateSidebar: function () {
+      // Update both desktop and mobile sidebars
+      const sidebars = [
+        document.getElementById("quiz-progress-sidebar"),
+        document.getElementById("quiz-progress-mobile"),
+      ];
+
+      sidebars.forEach((sidebar) => {
+        if (sidebar) {
+          const progress = this.getProgress();
+
+          // Update answered count
+          const answeredEl = sidebar.querySelector(".quiz-progress-answered");
+          if (answeredEl) {
+            answeredEl.textContent = progress.answered;
+          }
+
+          // Update answered percentage - desktop only
+          const answeredPercentageEl = sidebar.querySelector(".quiz-progress-answered-percentage");
+          if (answeredPercentageEl && sidebar.id == "quiz-progress-sidebar") {
+            answeredPercentageEl.textContent = progress.percentage + "%";
+          }
+
+          // Update all .quiz-progress-total elements
+          const totalElements = sidebar.querySelectorAll(".quiz-progress-total");
+          totalElements.forEach((el) => {
+            el.textContent = progress.total;
+          });
+
+          // Update correct count
+          const scoreEl = sidebar.querySelector(".quiz-progress-score");
+          if (scoreEl) {
+            scoreEl.textContent = progress.correct;
+          }
+
+          // Update correct denominator (answered count)
+          const scoreTotalEl = sidebar.querySelector(".quiz-progress-score-total");
+          if (scoreTotalEl) {
+            scoreTotalEl.textContent = progress.answered;
+          }
+
+          // Update correct percentage (based on answered quizzes, not total) - desktop only
+          const scorePercentageEl = sidebar.querySelector(".quiz-progress-score-percentage");
+          if (scorePercentageEl && sidebar.id == "quiz-progress-sidebar") {
+            const scorePercentage =
+              progress.answered > 0 ? Math.round((progress.correct / progress.answered) * 100) : 0;
+            scorePercentageEl.textContent = scorePercentage + "%";
+          }
+
+          // Update progress bars (incorrect and correct)
+          const correctBar = sidebar.querySelector(".quiz-progress-bar-correct");
+          const incorrectBar = sidebar.querySelector(".quiz-progress-bar-incorrect");
+
+          if (correctBar && incorrectBar) {
+            const incorrectCount = progress.answered - progress.correct;
+            const correctPercentage = progress.total > 0 ? (progress.correct / progress.total) * 100 : 0;
+            const incorrectPercentage = progress.total > 0 ? (incorrectCount / progress.total) * 100 : 0;
+
+            incorrectBar.style.width = incorrectPercentage + "%";
+            correctBar.style.width = correctPercentage + "%";
+          }
+        }
+      });
+    },
+
+    createSidebar: function () {
+      // Check if progress tracking is enabled
+      const showProgress = window.mkdocsQuizConfig && window.mkdocsQuizConfig.showProgress !== false;
+
+      // Only show sidebar if progress tracking is enabled and there are quizzes
+      if (!showProgress || this.totalQuizzes === 0) {
+        return;
+      }
+
+      // Show both desktop and mobile sidebars
+      const desktopSidebar = document.getElementById("quiz-progress-sidebar");
+      const mobileSidebar = document.getElementById("quiz-progress-mobile");
+
+      if (desktopSidebar) {
+        desktopSidebar.style.display = "";
+      }
+      if (mobileSidebar) {
+        mobileSidebar.style.display = "";
+      }
+
+      // Initialize reset button event listeners
+      const resetLinks = document.querySelectorAll(".quiz-reset-all-link");
+      resetLinks.forEach((resetLink) => {
+        const handler = (e) => {
+          e.preventDefault();
+          if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+            quizTracker.resetAllQuiz();
+          }
+        };
+        addTrackedEventListener(resetLink, "click", handler);
+      });
+
+      // Update the sidebar with initial values
+      this.updateSidebar();
+    },
+
+    showStorageWarning: function (message) {
+      // Show a warning banner in the progress tracker if it exists
+      const progressSidebar = document.getElementById("quiz-progress-sidebar");
+      if (progressSidebar) {
+        // Check if warning already exists
+        let warningEl = progressSidebar.querySelector(".quiz-storage-warning");
+        if (!warningEl) {
+          warningEl = document.createElement("div");
+          warningEl.className = "quiz-storage-warning";
+          warningEl.style.cssText =
+            "background: #fff3cd; color: #856404; padding: 8px; margin: 8px 0; border-radius: 4px; font-size: 12px; border: 1px solid #ffeaa7;";
+          progressSidebar.insertBefore(warningEl, progressSidebar.firstChild);
+        }
+        warningEl.textContent = message;
+      }
+    },
+  };
+
+  // Truncate text to a maximum length, adding ellipsis if needed
+  function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trimEnd() + "\u2026";
+  }
+
+  // Collect feedback HTML from a NodeList of input elements.
+  // Returns an array of {label, html} objects (one per answer that has feedback).
+  function collectFeedbackFromNodeList(nodeList) {
+    var items = [];
+    nodeList.forEach(function (input) {
+      var fb = input.parentElement.querySelector(".answer-feedback");
+      if (fb && fb.innerHTML.trim()) {
+        var label = input.parentElement.querySelector("label");
+        var labelText = label ? label.textContent.trim() : "";
+        items.push({ label: labelText, html: fb.innerHTML });
+      }
+    });
+    return items;
+  }
+
+  // Try to collect feedback from selected inputs, falling back to correct inputs if configured.
+  // Returns an array of {label, html} objects.
+  function collectFeedbackForSelectedOrCorrect(fieldset, quiz) {
+    var items = collectFeedbackFromNodeList(fieldset.querySelectorAll('input[name="answer"]:checked'));
+    if (!items.length && quiz.hasAttribute("data-show-correct")) {
+      items = collectFeedbackFromNodeList(fieldset.querySelectorAll('input[name="answer"][data-correct="true"]'));
+    }
+    return items;
+  }
+
+  // Build feedback container HTML from an array of {label, html} items.
+  // Each item becomes its own styled feedback box with a badge showing the answer label.
+  function buildFeedbackHTML(items, cssClass) {
+    if (!items.length) return "";
+    var maxBadgeLen = 30;
+    var result = "";
+    items.forEach(function (item) {
+      var badge = "";
+      if (item.label) {
+        var escaped = item.label
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+        badge =
+          '<span class="quiz-feedback-badge" title="' + escaped + '">' + truncateText(escaped, maxBadgeLen) + "</span>";
+      }
+      result +=
+        '<div class="quiz-feedback-item ' +
+        cssClass +
+        '">' +
+        badge +
+        '<div class="quiz-feedback-item-content">' +
+        item.html +
+        "</div></div>";
+    });
+    return result;
+  }
+
+  // Wrap content in a single feedback item div with the given CSS class
+  function wrapFeedbackItem(cssClass, content) {
+    return (
+      '<div class="quiz-feedback-item ' +
+      cssClass +
+      '"><div class="quiz-feedback-item-content">' +
+      content +
+      "</div></div>"
+    );
+  }
+
+  // Get default feedback message based on submission correctness and retry status
+  function getDefaultFeedbackMessage(isCorrect, canRetry) {
+    if (isCorrect) return t("Correct answer!");
+    return canRetry ? t("Incorrect answer. Please try again.") : t("Incorrect answer.");
+  }
+
+  // Mark answer elements with correct/wrong classes based on selection and correctness
+  function markAnswers(selectedAnswers, correctAnswers, quiz, isCorrect) {
+    selectedAnswers.forEach((answer) => {
+      if (isCorrect) {
+        // All selected answers are correct (since it's multiple correct)
+        answer.parentElement.classList.add("correct");
+      } else {
+        // Mark selected wrong answers, keep correct ones highlighted
+        const isAnswerCorrect = answer.hasAttribute("data-correct");
+        answer.parentElement.classList.toggle("wrong", !isAnswerCorrect);
+        answer.parentElement.classList.toggle("correct", isAnswerCorrect);
+      }
+    });
+
+    // If show-correct is enabled, also highlight unselected correct answers on incorrect submission
+    if (!isCorrect && quiz.hasAttribute("data-show-correct")) {
+      correctAnswers.forEach((a) => a.parentElement.classList.add("correct"));
+    }
+  }
+
+  // Display feedback message and styling after quiz submission
+  function showFeedback(feedbackDiv, isCorrect, selectedAnswers, correctAnswers, fieldset, quiz) {
+    feedbackDiv.classList.remove("hidden");
+
+    // Collect per-answer feedback items
+    var cssClass = isCorrect ? "correct" : "incorrect";
+    var items = isCorrect
+      ? collectFeedbackForSelectedOrCorrect(fieldset, quiz)
+      : collectFeedbackFromNodeList(selectedAnswers);
+
+    var html = buildFeedbackHTML(items, cssClass);
+    if (html) {
+      feedbackDiv.innerHTML = html;
+    } else {
+      // No per-answer feedback — show a single default message box
+      var canRetry = !quiz.hasAttribute("data-disable-after-submit");
+      feedbackDiv.innerHTML = wrapFeedbackItem(cssClass, getDefaultFeedbackMessage(isCorrect, canRetry));
+    }
+  }
+
+  // Initialize results div reset button
+  function initializeResultsDiv() {
+    const resultsDiv = document.getElementById("quiz-results");
+    if (!resultsDiv) return;
+
+    const resetButton = resultsDiv.querySelector(".quiz-results-reset");
+    if (resetButton) {
+      const handler = () => {
+        if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+          quizTracker.resetAllQuiz();
+        }
+      };
+      addTrackedEventListener(resetButton, "click", handler);
+    }
+  }
+
+  // Initialize intro reset buttons
+  function initializeIntroResetButtons() {
+    const introResetButtons = document.querySelectorAll(".quiz-intro-reset");
+    introResetButtons.forEach((button) => {
+      const handler = () => {
+        if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+          quizTracker.resetAllQuiz();
+        }
+      };
+      addTrackedEventListener(button, "click", handler);
+    });
+  }
+
+  // Shuffle an array using Fisher-Yates algorithm
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Shuffle the answer elements in a fieldset
+  function shuffleAnswers(fieldset) {
+    const answerDivs = Array.from(fieldset.querySelectorAll(":scope > div"));
+    if (answerDivs.length <= 1) return;
+
+    // Shuffle the array of elements
+    shuffleArray(answerDivs);
+
+    // Re-append elements in shuffled order
+    answerDivs.forEach((div) => fieldset.appendChild(div));
+  }
+
+  // Initialize all quiz elements on the page
+  function initializeQuizzes() {
+    document.querySelectorAll(".quiz").forEach((quiz) => {
+      let form = quiz.querySelector("form");
+      let fieldset = form.querySelector("fieldset");
+      let submitButton = form.querySelector('button[type="submit"]');
+      let feedbackDiv = form.querySelector(".quiz-feedback");
+
+      // Shuffle answers if enabled (before any state restoration)
+      if (quiz.hasAttribute("data-shuffle-answers")) {
+        shuffleAnswers(fieldset);
+      }
+
+      // Get quiz ID from the quiz div itself
+      const quizId = quiz.id;
+
+      // Check if this is a fill-in-the-blank quiz
+      const isFillBlank = quiz.hasAttribute("data-quiz-type") && quiz.getAttribute("data-quiz-type") === "fill-blank";
+
+      // Prevent anchor link from triggering page navigation/reload
+      const headerLink = quiz.querySelector(".quiz-header-link");
+      if (headerLink) {
+        const handler = (e) => {
+          // Let the browser handle the anchor navigation normally
+          // This prevents Material themes from intercepting it as a page navigation
+          e.stopPropagation();
+        };
+        addTrackedEventListener(headerLink, "click", handler);
+      }
+
+      // Create reset button (initially hidden)
+      let resetButton = document.createElement("button");
+      resetButton.type = "button";
+      resetButton.className = "quiz-button quiz-reset-button hidden";
+      resetButton.textContent = t("Try Again");
+      if (submitButton) {
+        submitButton.parentNode.insertBefore(resetButton, submitButton.nextSibling);
+      } else {
+        form.appendChild(resetButton);
+      }
+
+      // Helper function to normalize answers (trim whitespace, case-insensitive)
+      function normalizeAnswer(answer) {
+        return answer.trim().toLowerCase();
+      }
+
+      // Restore quiz state from localStorage if available
+      if (quizId && quizTracker.quizzes[quizId]) {
+        const savedState = quizTracker.quizzes[quizId];
+        const section = quiz.querySelector("section");
+
+        if (isFillBlank) {
+          // Restore fill-in-the-blank quiz state
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+
+          if (savedState.answered) {
+            // Restore input values based on saved values
+            if (savedState.selectedValues && savedState.selectedValues.length > 0) {
+              blankInputs.forEach((input, index) => {
+                if (savedState.selectedValues[index] !== undefined) {
+                  input.value = savedState.selectedValues[index];
+                }
+              });
+            }
+
+            if (savedState.correct) {
+              // Show correct feedback
+              if (section) {
+                section.classList.remove("hidden");
+              }
+              feedbackDiv.classList.remove("hidden");
+              feedbackDiv.innerHTML = wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+
+              // Mark all inputs as correct
+              blankInputs.forEach((input) => {
+                input.classList.add("correct");
+              });
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                blankInputs.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            } else {
+              // Restore incorrect answer state
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Mark wrong/correct inputs
+              blankInputs.forEach((input) => {
+                const userAnswer = normalizeAnswer(input.value);
+                const correctAnswer = normalizeAnswer(input.getAttribute("data-answer"));
+
+                if (userAnswer === correctAnswer) {
+                  input.classList.add("correct");
+                } else {
+                  input.classList.add("wrong");
+                }
+              });
+
+              // Show incorrect feedback with detailed list
+              feedbackDiv.classList.remove("hidden");
+              var canRetryRestore = !quiz.hasAttribute("data-disable-after-submit");
+              var feedbackTextRestore = getDefaultFeedbackMessage(false, canRetryRestore);
+
+              // Show correct answers if show-correct is enabled
+              if (quiz.hasAttribute("data-show-correct")) {
+                var fillRestoreHTML = feedbackTextRestore + "<ul>";
+                blankInputs.forEach(function (input) {
+                  if (!input.classList.contains("correct")) {
+                    var userAnswer = input.value.trim();
+                    var correctAnswer = input.getAttribute("data-answer");
+                    fillRestoreHTML +=
+                      "<li><del>" + (userAnswer || t("(empty)")) + "</del> \u2192 " + correctAnswer + "</li>";
+                    // Also show in placeholder
+                    input.placeholder = correctAnswer;
+                  }
+                });
+                fillRestoreHTML += "</ul>";
+                feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", fillRestoreHTML);
+              } else {
+                feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", feedbackTextRestore);
+              }
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                blankInputs.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Keep submit button visible for editing and resubmission
+                resetButton.classList.remove("hidden");
+              }
+            }
+          }
+        } else {
+          // Restore multiple-choice quiz state (existing code)
+          const allAnswers = fieldset.querySelectorAll('input[name="answer"]');
+          const correctAnswers = fieldset.querySelectorAll('input[name="answer"][data-correct="true"]');
+
+          if (savedState.answered) {
+            // Restore selected answers based on saved values
+            if (savedState.selectedValues && savedState.selectedValues.length > 0) {
+              allAnswers.forEach((input) => {
+                if (savedState.selectedValues.includes(input.value)) {
+                  input.checked = true;
+                }
+              });
+            }
+
+            if (savedState.correct) {
+              // Show the content section
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Only mark the correct answers in green (don't highlight wrong answers)
+              allAnswers.forEach((input) => {
+                if (input.hasAttribute("data-correct")) {
+                  input.parentElement.classList.add("correct");
+                }
+              });
+
+              // Show correct feedback - prefer per-answer feedback if present
+              feedbackDiv.classList.remove("hidden");
+              var correctItems = collectFeedbackForSelectedOrCorrect(fieldset, quiz);
+              var correctFeedbackHTML = buildFeedbackHTML(correctItems, "correct");
+              feedbackDiv.innerHTML =
+                correctFeedbackHTML || wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                allAnswers.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Show reset button, hide submit button
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            } else {
+              // Restore incorrect answer state
+              const selectedAnswers = Array.from(allAnswers).filter((input) =>
+                savedState.selectedValues.includes(input.value),
+              );
+
+              // Show the content section for incorrect answers too
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Mark selected answers
+              selectedAnswers.forEach((input) => {
+                if (input.hasAttribute("data-correct")) {
+                  input.parentElement.classList.add("correct");
+                } else {
+                  input.parentElement.classList.add("wrong");
+                }
+              });
+
+              // Show correct answers if show-correct is enabled
+              if (quiz.hasAttribute("data-show-correct")) {
+                correctAnswers.forEach((input) => {
+                  input.parentElement.classList.add("correct");
+                });
+              }
+
+              // Show incorrect feedback - prefer per-answer feedback for selected answers
+              feedbackDiv.classList.remove("hidden");
+              var canRetry = !quiz.hasAttribute("data-disable-after-submit");
+              var incorrectItems = collectFeedbackFromNodeList(
+                fieldset.querySelectorAll('input[name="answer"]:checked'),
+              );
+              var incorrectFeedbackHTML = buildFeedbackHTML(incorrectItems, "incorrect");
+              feedbackDiv.innerHTML =
+                incorrectFeedbackHTML || wrapFeedbackItem("incorrect", getDefaultFeedbackMessage(false, canRetry));
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                allAnswers.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Show reset button, hide submit button
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Auto-submit on radio button change if enabled (not for fill-in-blank)
+      if (!isFillBlank && quiz.hasAttribute("data-auto-submit")) {
+        let radioButtons = fieldset.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach((radio) => {
+          const handler = (e) => {
+            e.preventDefault(); // Prevent page scroll to top
+            // Trigger form submission with proper event options
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+          };
+          addTrackedEventListener(radio, "change", handler);
+        });
+      }
+
+      // Reset button handler
+      const resetHandler = () => {
+        if (isFillBlank) {
+          // Clear fill-in-the-blank inputs
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+          blankInputs.forEach((input) => {
+            input.value = "";
+            input.disabled = false;
+            input.classList.remove("correct", "wrong");
+            input.placeholder = "";
+          });
+        } else {
+          // Clear all selections
+          const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+          allInputs.forEach((input) => {
+            input.checked = false;
+            input.disabled = false;
+          });
+          // Reset colors
+          resetFieldset(fieldset);
+        }
+        // Hide content section
+        let section = quiz.querySelector("section");
+        if (section) {
+          section.classList.add("hidden");
+        }
+        // Hide feedback container
+        feedbackDiv.classList.add("hidden");
+        feedbackDiv.innerHTML = "";
+        // Show submit button, hide reset button
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove("hidden");
+        }
+        resetButton.classList.add("hidden");
+        // Update tracker
+        if (quizId) {
+          quizTracker.resetQuiz(quizId);
+        }
+      };
+      addTrackedEventListener(resetButton, "click", resetHandler);
+
+      const submitHandler = (event) => {
+        event.preventDefault();
+        event.stopPropagation(); // Prevent Material themes from intercepting form submission
+        let is_correct = false;
+        let selectedValues = [];
+        let section = quiz.querySelector("section");
+
+        if (isFillBlank) {
+          // Handle fill-in-the-blank quiz
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+          is_correct = true;
+
+          // Collect user answers and validate
+          blankInputs.forEach((input) => {
+            const userAnswer = normalizeAnswer(input.value);
+            const correctAnswer = normalizeAnswer(input.getAttribute("data-answer"));
+            selectedValues.push(input.value); // Save original value, not normalized
+
+            // Remove previous classes
+            input.classList.remove("correct", "wrong");
+
+            if (userAnswer === correctAnswer) {
+              input.classList.add("correct");
+            } else {
+              input.classList.add("wrong");
+              is_correct = false;
+            }
+          });
+
+          // Always show the content section after submission
+          if (section) {
+            section.classList.remove("hidden");
+          }
+
+          if (is_correct) {
+            // Show correct feedback
+            feedbackDiv.classList.remove("hidden");
+            feedbackDiv.innerHTML = wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+          } else {
+            // Show incorrect feedback with detailed list
+            feedbackDiv.classList.remove("hidden");
+            var canRetryFill = !quiz.hasAttribute("data-disable-after-submit");
+            var feedbackTextFill = getDefaultFeedbackMessage(false, canRetryFill);
+
+            // Show correct answers if show-correct is enabled
+            if (quiz.hasAttribute("data-show-correct")) {
+              var fillHTML = feedbackTextFill + "<ul>";
+              blankInputs.forEach(function (input) {
+                if (!input.classList.contains("correct")) {
+                  var userAnswer = input.value.trim();
+                  var correctAnswer = input.getAttribute("data-answer");
+                  fillHTML += "<li><del>" + (userAnswer || "(empty)") + "</del> \u2192 " + correctAnswer + "</li>";
+                  // Also show in placeholder
+                  input.placeholder = correctAnswer;
+                }
+              });
+              fillHTML += "</ul>";
+              feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", fillHTML);
+            } else {
+              feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", feedbackTextFill);
+            }
+          }
+
+          // Disable quiz after submission if option is enabled
+          if (quiz.hasAttribute("data-disable-after-submit")) {
+            blankInputs.forEach((input) => {
+              input.disabled = true;
+            });
+            if (submitButton) {
+              submitButton.disabled = true;
+            }
+            resetButton.classList.add("hidden");
+          } else {
+            // For fill-in-blank, keep submit button visible so users can edit and resubmit
+            // Only show reset button as an alternative
+            resetButton.classList.remove("hidden");
+          }
+        } else {
+          // Handle multiple-choice quiz (existing code)
+          let selectedAnswers = form.querySelectorAll('input[name="answer"]:checked');
+          let correctAnswers = fieldset.querySelectorAll('input[name="answer"][data-correct="true"]');
+          // Check if all correct answers are selected
+          is_correct = selectedAnswers.length === correctAnswers.length;
+          Array.from(selectedAnswers).forEach((answer) => {
+            if (!answer.hasAttribute("data-correct")) {
+              is_correct = false;
+            }
+          });
+
+          // Always show the content section after submission
+          if (section) {
+            section.classList.remove("hidden");
+          }
+
+          if (is_correct) {
+            resetFieldset(fieldset);
+            markAnswers(selectedAnswers, correctAnswers, quiz, true);
+            showFeedback(feedbackDiv, true, selectedAnswers, correctAnswers, fieldset, quiz);
+          } else {
+            resetFieldset(fieldset);
+            markAnswers(selectedAnswers, correctAnswers, quiz, false);
+            showFeedback(feedbackDiv, false, selectedAnswers, correctAnswers, fieldset, quiz);
+          }
+
+          // Get selected values to save
+          selectedValues = Array.from(selectedAnswers).map((input) => input.value);
+
+          // Disable quiz after submission if option is enabled
+          if (quiz.hasAttribute("data-disable-after-submit")) {
+            const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+            allInputs.forEach((input) => {
+              input.disabled = true;
+            });
+            if (submitButton) {
+              submitButton.disabled = true;
+            }
+            // Hide reset button if disable-after-submit is enabled
+            resetButton.classList.add("hidden");
+          } else {
+            // Show reset button and hide submit button
+            resetButton.classList.remove("hidden");
+            if (submitButton) {
+              submitButton.classList.add("hidden");
+            }
+          }
+        }
+
+        // Move focus to feedback div for screen readers and keyboard users
+        if (feedbackDiv) {
+          feedbackDiv.setAttribute("tabindex", "-1");
+          feedbackDiv.focus();
+        }
+
+        // Update tracker
+        if (quizId) {
+          quizTracker.markQuiz(quizId, is_correct, selectedValues);
+        }
+      };
+      addTrackedEventListener(form, "submit", submitHandler);
+    });
+  }
+
+  function resetFieldset(fieldset) {
+    Array.from(fieldset.children).forEach((child) => {
+      child.classList.remove("wrong", "correct");
+    });
+  }
+
+  // Main initialization function that sets up everything on a page
+  function initializePage() {
+    // Initialize tracker
+    quizTracker.init();
+
+    // Reposition sidebar for Material theme TOC integration
+    repositionSidebar();
+
+    // Create sidebar
+    quizTracker.createSidebar();
+
+    // Initialize results div and intro buttons
+    initializeResultsDiv();
+    initializeIntroResetButtons();
+
+    // Initialize all quiz elements
+    initializeQuizzes();
+  }
+
+  // Run initialization when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializePage);
+  } else {
+    initializePage();
+  }
+
+  // Material theme instant navigation support
+  // Cleanup and reinitialize when navigating between pages
+  if (typeof document$ !== "undefined") {
+    // Unsubscribe from any previous subscription to prevent duplicate handlers
+    // This is needed because the script re-runs on each page navigation,
+    // which would otherwise accumulate subscriptions
+    if (window._mkdocsQuizSubscription) {
+      window._mkdocsQuizSubscription.unsubscribe();
+    }
+
+    // A Material theme with instant navigation is active
+    window._mkdocsQuizSubscription = document$.subscribe(() => {
+      cleanup(); // Remove old event listeners to prevent memory leaks
+      // Reinitialize everything for the new page
+      initializePage();
+    });
+  }
+})(); // End of IIFE
+</script>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2026-2027 MERY Ludovic &amp; Kevin Huet - Lycée Fulbert - Chartres
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+<script src="../../../javascripts/toc-deroulant.js"></script>
+</body>
+</html>

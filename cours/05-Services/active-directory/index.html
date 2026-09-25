@@ -1,0 +1,4288 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="https://lmeryfulbert.github.io/SportLudique2026-2027/cours/05-Services/active-directory/" rel="canonical"/>
+<link href="../../04-Acces-internet/router-bordure/" rel="prev"/>
+<link href="../administration/" rel="next"/>
+<link href="../../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.7" name="generator"/>
+<title>02 Active Directory, DNS et contrôleurs de domaine - SportLudique Project 2026-2027</title>
+<link href="../../../assets/stylesheets/main.ec1eaa64.min.css" rel="stylesheet"/>
+<link href="../../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../../stylesheets/toc-deroulant.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="slate" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#02-active-directory-dns-et-controleurs-de-domaine">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SportLudique Project 2026-2027" class="md-header__button md-logo" data-md-component="logo" href="../../.." title="SportLudique Project 2026-2027">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SportLudique Project 2026-2027
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              02 Active Directory, DNS et contrôleurs de domaine
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SportLudique Project 2026-2027" class="md-nav__button md-logo" data-md-component="logo" href="../../.." title="SportLudique Project 2026-2027">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SportLudique Project 2026-2027
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../..">
+<span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    00 contexte
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    00 contexte
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/01-pr%C3%A9sentation/">
+<span class="md-ellipsis">
+    
+  
+    Présentation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/02-SystemeInformation/">
+<span class="md-ellipsis">
+    
+  
+    Le système d'information
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../00-contexte/03-objectifs/">
+<span class="md-ellipsis">
+    
+  
+    Les objectifs de la DSI
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    01 infrastructure
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    01 infrastructure
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/01-introduction/">
+<span class="md-ellipsis">
+    
+  
+    Organisation de l'infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/02-serveurs/">
+<span class="md-ellipsis">
+    
+  
+    Serveurs et services
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/03-infrastructure/">
+<span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/04-volumetrie/">
+<span class="md-ellipsis">
+    
+  
+    Organisation des sites
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/05-annexes/">
+<span class="md-ellipsis">
+    
+  
+    Annexes
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/06-fiche-recette/">
+<span class="md-ellipsis">
+    
+  
+    Fiche de recette
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../01-infrastructure/07-adressage-sites-2027/">
+<span class="md-ellipsis">
+    
+  
+    Plan d'adressage inter-sites
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Cours
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Cours
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_1" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    01 documentations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_1">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    01 documentations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-documentations/git-mkdocs/">
+<span class="md-ellipsis">
+    
+  
+    Git, GitHub et MkDocs
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../01-documentations/quizz-git/">
+<span class="md-ellipsis">
+    
+  
+    Quiz — Git, GitHub et MkDocs
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    02 adressage
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    02 adressage
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../02-adressage/vlsm/">
+<span class="md-ellipsis">
+    
+  
+    VLSM - Dimensionner un plan d'adressage
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    03 hyperviseurs
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    03 hyperviseurs
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/1-virtualisation/">
+<span class="md-ellipsis">
+    
+  
+    Virtualisation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/2-quizz-virtualisation/">
+<span class="md-ellipsis">
+    
+  
+    Quiz — Virtualisation
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../03-hyperviseurs/proxmox-vm/">
+<span class="md-ellipsis">
+    
+  
+    Création d’une VM sous Proxmox
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    04 Acces internet
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    04 Acces internet
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-Acces-internet/hsrp-socle-avance-expertise/">
+<span class="md-ellipsis">
+    
+  
+    02 - Haute disponibilité de l'accès Internet
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../04-Acces-internet/router-bordure/">
+<span class="md-ellipsis">
+    
+  
+    01 - NAT/PAT sur un routeur Cisco
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_4_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    05 Services
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_4_5_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    05 Services
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    02 Active Directory, DNS et contrôleurs de domaine
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    
+  
+    02 Active Directory, DNS et contrôleurs de domaine
+  
+
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#socle-obligatoire">
+<span class="md-ellipsis">
+      
+        Socle obligatoire
+      
+    </span>
+</a>
+<nav aria-label="Socle obligatoire" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-un-domaine">
+<span class="md-ellipsis">
+      
+        Pourquoi un domaine ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#architecture-du-socle">
+<span class="md-ellipsis">
+      
+        Architecture du socle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-windows-server-core">
+<span class="md-ellipsis">
+      
+        Pourquoi Windows Server Core ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#nommage-et-conventions">
+<span class="md-ellipsis">
+      
+        Nommage et conventions
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#preparer-le-controleur-de-domaine-core">
+<span class="md-ellipsis">
+      
+        Préparer le contrôleur de domaine Core
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#installer-ad-ds-et-creer-le-domaine">
+<span class="md-ellipsis">
+      
+        Installer AD DS et créer le domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-active-directory-a-besoin-de-dns">
+<span class="md-ellipsis">
+      
+        Pourquoi Active Directory a besoin de DNS ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#joindre-la-machine-dadministration-au-domaine">
+<span class="md-ellipsis">
+      
+        Joindre la machine d’administration au domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#administrer-active-directory">
+<span class="md-ellipsis">
+      
+        Administrer Active Directory
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#utilisateurs-groupes-ordinateurs-et-ou">
+<span class="md-ellipsis">
+      
+        Utilisateurs, groupes, ordinateurs et OU
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#les-strategies-de-groupe">
+<span class="md-ellipsis">
+      
+        Les stratégies de groupe
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentification-centralisee">
+<span class="md-ellipsis">
+      
+        Authentification centralisée
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#concepts-avances">
+<span class="md-ellipsis">
+      
+        Concepts avancés
+      
+    </span>
+</a>
+<nav aria-label="Concepts avancés" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-probleme-dun-seul-controleur-de-domaine">
+<span class="md-ellipsis">
+      
+        Le problème d’un seul contrôleur de domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ajouter-un-deuxieme-controleur-de-domaine">
+<span class="md-ellipsis">
+      
+        Ajouter un deuxième contrôleur de domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#placer-les-deux-dc-sur-des-infrastructures-differentes">
+<span class="md-ellipsis">
+      
+        Placer les deux DC sur des infrastructures différentes
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#replication-nest-pas-sauvegarde">
+<span class="md-ellipsis">
+      
+        Réplication n’est pas sauvegarde
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dns-redondant">
+<span class="md-ellipsis">
+      
+        DNS redondant
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dns-integre-a-active-directory">
+<span class="md-ellipsis">
+      
+        DNS intégré à Active Directory
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-catalogue-global">
+<span class="md-ellipsis">
+      
+        Le catalogue global
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#les-roles-fsmo">
+<span class="md-ellipsis">
+      
+        Les rôles FSMO
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#organiser-les-objets-pour-les-administrer">
+<span class="md-ellipsis">
+      
+        Organiser les objets pour les administrer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#gpo-raisonner-sur-la-portee">
+<span class="md-ellipsis">
+      
+        GPO : raisonner sur la portée
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer_1">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expertise">
+<span class="md-ellipsis">
+      
+        Expertise
+      
+    </span>
+</a>
+<nav aria-label="Expertise" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#foret-arbre-domaine-et-ou">
+<span class="md-ellipsis">
+      
+        Forêt, arbre, domaine et OU
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comprendre-reellement-lauthentification">
+<span class="md-ellipsis">
+      
+        Comprendre réellement l’authentification
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-des-tickets">
+<span class="md-ellipsis">
+      
+        Pourquoi des tickets ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-kdc">
+<span class="md-ellipsis">
+      
+        Le KDC
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-tgt">
+<span class="md-ellipsis">
+      
+        Le TGT
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ticket-de-service">
+<span class="md-ellipsis">
+      
+        Ticket de service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kerberos-et-dns">
+<span class="md-ellipsis">
+      
+        Kerberos et DNS
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kerberos-et-lheure">
+<span class="md-ellipsis">
+      
+        Kerberos et l’heure
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#spn-identifier-un-service">
+<span class="md-ellipsis">
+      
+        SPN : identifier un service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ldap-et-ldaps">
+<span class="md-ellipsis">
+      
+        LDAP et LDAPS
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comptes-de-service">
+<span class="md-ellipsis">
+      
+        Comptes de service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rodc">
+<span class="md-ellipsis">
+      
+        RODC
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#diagnostiquer-plutot-que-redemarrer">
+<span class="md-ellipsis">
+      
+        Diagnostiquer plutôt que redémarrer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer_2">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#synthese">
+<span class="md-ellipsis">
+      
+        Synthèse
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../administration/">
+<span class="md-ellipsis">
+    
+  
+    01- Administration de l’infrastructure
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#socle-obligatoire">
+<span class="md-ellipsis">
+      
+        Socle obligatoire
+      
+    </span>
+</a>
+<nav aria-label="Socle obligatoire" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-un-domaine">
+<span class="md-ellipsis">
+      
+        Pourquoi un domaine ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#architecture-du-socle">
+<span class="md-ellipsis">
+      
+        Architecture du socle
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-windows-server-core">
+<span class="md-ellipsis">
+      
+        Pourquoi Windows Server Core ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#nommage-et-conventions">
+<span class="md-ellipsis">
+      
+        Nommage et conventions
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#preparer-le-controleur-de-domaine-core">
+<span class="md-ellipsis">
+      
+        Préparer le contrôleur de domaine Core
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#installer-ad-ds-et-creer-le-domaine">
+<span class="md-ellipsis">
+      
+        Installer AD DS et créer le domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-active-directory-a-besoin-de-dns">
+<span class="md-ellipsis">
+      
+        Pourquoi Active Directory a besoin de DNS ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#joindre-la-machine-dadministration-au-domaine">
+<span class="md-ellipsis">
+      
+        Joindre la machine d’administration au domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#administrer-active-directory">
+<span class="md-ellipsis">
+      
+        Administrer Active Directory
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#utilisateurs-groupes-ordinateurs-et-ou">
+<span class="md-ellipsis">
+      
+        Utilisateurs, groupes, ordinateurs et OU
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#les-strategies-de-groupe">
+<span class="md-ellipsis">
+      
+        Les stratégies de groupe
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentification-centralisee">
+<span class="md-ellipsis">
+      
+        Authentification centralisée
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#concepts-avances">
+<span class="md-ellipsis">
+      
+        Concepts avancés
+      
+    </span>
+</a>
+<nav aria-label="Concepts avancés" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-probleme-dun-seul-controleur-de-domaine">
+<span class="md-ellipsis">
+      
+        Le problème d’un seul contrôleur de domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ajouter-un-deuxieme-controleur-de-domaine">
+<span class="md-ellipsis">
+      
+        Ajouter un deuxième contrôleur de domaine
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#placer-les-deux-dc-sur-des-infrastructures-differentes">
+<span class="md-ellipsis">
+      
+        Placer les deux DC sur des infrastructures différentes
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#replication-nest-pas-sauvegarde">
+<span class="md-ellipsis">
+      
+        Réplication n’est pas sauvegarde
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dns-redondant">
+<span class="md-ellipsis">
+      
+        DNS redondant
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dns-integre-a-active-directory">
+<span class="md-ellipsis">
+      
+        DNS intégré à Active Directory
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-catalogue-global">
+<span class="md-ellipsis">
+      
+        Le catalogue global
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#les-roles-fsmo">
+<span class="md-ellipsis">
+      
+        Les rôles FSMO
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#organiser-les-objets-pour-les-administrer">
+<span class="md-ellipsis">
+      
+        Organiser les objets pour les administrer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#gpo-raisonner-sur-la-portee">
+<span class="md-ellipsis">
+      
+        GPO : raisonner sur la portée
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer_1">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expertise">
+<span class="md-ellipsis">
+      
+        Expertise
+      
+    </span>
+</a>
+<nav aria-label="Expertise" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#foret-arbre-domaine-et-ou">
+<span class="md-ellipsis">
+      
+        Forêt, arbre, domaine et OU
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comprendre-reellement-lauthentification">
+<span class="md-ellipsis">
+      
+        Comprendre réellement l’authentification
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#pourquoi-des-tickets">
+<span class="md-ellipsis">
+      
+        Pourquoi des tickets ?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-kdc">
+<span class="md-ellipsis">
+      
+        Le KDC
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#le-tgt">
+<span class="md-ellipsis">
+      
+        Le TGT
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ticket-de-service">
+<span class="md-ellipsis">
+      
+        Ticket de service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kerberos-et-dns">
+<span class="md-ellipsis">
+      
+        Kerberos et DNS
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kerberos-et-lheure">
+<span class="md-ellipsis">
+      
+        Kerberos et l’heure
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#spn-identifier-un-service">
+<span class="md-ellipsis">
+      
+        SPN : identifier un service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ldap-et-ldaps">
+<span class="md-ellipsis">
+      
+        LDAP et LDAPS
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#comptes-de-service">
+<span class="md-ellipsis">
+      
+        Comptes de service
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rodc">
+<span class="md-ellipsis">
+      
+        RODC
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#diagnostiquer-plutot-que-redemarrer">
+<span class="md-ellipsis">
+      
+        Diagnostiquer plutôt que redémarrer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ce-que-vous-devez-etre-capables-dexpliquer_2">
+<span class="md-ellipsis">
+      
+        Ce que vous devez être capables d’expliquer
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#synthese">
+<span class="md-ellipsis">
+      
+        Synthèse
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="02-active-directory-dns-et-controleurs-de-domaine">02 Active Directory, DNS et contrôleurs de domaine<a class="headerlink" href="#02-active-directory-dns-et-controleurs-de-domaine" title="Permanent link">¶</a></h1>
+<p>L’objectif de cette partie est de mettre en place le <strong>domaine Active Directory du site</strong> et de comprendre les services qui permettent son fonctionnement.</p>
+<p>L’installation d’Active Directory ne consiste pas simplement à ajouter le rôle <strong>AD DS</strong> puis à cliquer sur « promouvoir ce serveur en contrôleur de domaine ».</p>
+<p>Avant toute installation, vous devez être capables de répondre à plusieurs questions :</p>
+<ul>
+<li>quel sera le <strong>nom du domaine</strong> ?</li>
+<li>quel serveur assurera le rôle de <strong>contrôleur de domaine</strong> ?</li>
+<li>quel sera le rôle de <strong>DNS</strong> ?</li>
+<li>comment les postes retrouveront-ils le contrôleur de domaine ?</li>
+<li>comment le contrôleur de domaine sera-t-il <strong>administré à distance</strong> ?</li>
+<li>que se passera-t-il si le contrôleur de domaine devient indisponible ?</li>
+</ul>
+<hr/>
+<h2 id="socle-obligatoire">Socle obligatoire<a class="headerlink" href="#socle-obligatoire" title="Permanent link">¶</a></h2>
+<p>Le parcours de référence utilise un <strong>contrôleur de domaine Windows Server Core</strong> administré depuis une <strong>machine Windows Server avec interface graphique</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Parcours accompagné</p>
+<p>Pour les groupes qui ne sont pas encore suffisamment autonomes avec <strong>Windows Server Core</strong>, le contrôleur de domaine pourra être installé sous <strong>Windows Server 2022 avec interface graphique (Desktop Experience)</strong>.</p>
+<p>Les exigences restent les mêmes : nommage, adressage, DNS, domaine et objets Active Directory.</p>
+<p><strong>Aucune procédure graphique détaillée n’est fournie dans ce support.</strong></p>
+</div>
+<hr/>
+<h3 id="pourquoi-un-domaine">Pourquoi un domaine ?<a class="headerlink" href="#pourquoi-un-domaine" title="Permanent link">¶</a></h3>
+<p>Sans annuaire centralisé, chaque machine possède sa propre base de comptes :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>PC01 ── utilisateurs locaux
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>PC02 ── utilisateurs locaux
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>SRV1 ── utilisateurs locaux
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>SRV2 ── utilisateurs locaux
+</span></code></pre></div>
+<p>Active Directory permet notamment de centraliser :</p>
+<ul>
+<li>les utilisateurs ;</li>
+<li>les groupes ;</li>
+<li>les ordinateurs ;</li>
+<li>les règles appliquées aux machines et aux utilisateurs ;</li>
+<li>l’authentification au sein du domaine.</li>
+</ul>
+<p><strong>Active Directory Domain Services (AD DS)</strong> est le rôle Windows Server qui fournit cet annuaire.</p>
+<p>Un serveur sur lequel AD DS est installé puis promu devient un <strong>contrôleur de domaine</strong> (<em>Domain Controller</em>, DC).</p>
+<p>Dans le projet, le premier DC assure également le rôle <strong>DNS</strong>, indispensable au fonctionnement du domaine.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Quel est l’un des principaux intérêts d’un domaine Active Directory ?
+
+- [ ] Donner automatiquement un accès Internet aux postes
+- [x] Centraliser la gestion des identités et des machines du domaine
+- [ ] Remplacer le pare-feu
+- [ ] Fournir une adresse IP publique aux serveurs
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-0">
+<a class="quiz-header-link" href="#quiz-0">#</a>
+<div class="quiz-question" id="quiz-0-question">
+<p>Quel est l’un des principaux intérêts d’un domaine Active Directory ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-0-question"><div><input id="quiz-0-0" name="answer" type="radio" value="0"/><label for="quiz-0-0">Donner automatiquement un accès Internet aux postes</label></div><div><input data-correct="true" id="quiz-0-1" name="answer" type="radio" value="1"/><label for="quiz-0-1">Centraliser la gestion des identités et des machines du domaine</label></div><div><input id="quiz-0-2" name="answer" type="radio" value="2"/><label for="quiz-0-2">Remplacer le pare-feu</label></div><div><input id="quiz-0-3" name="answer" type="radio" value="3"/><label for="quiz-0-3">Fournir une adresse IP publique aux serveurs</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="architecture-du-socle">Architecture du socle<a class="headerlink" href="#architecture-du-socle" title="Permanent link">¶</a></h3>
+<p>Le premier contrôleur de domaine est installé sous <strong>Windows Server Core</strong>.</p>
+<p>Il possède <strong>une seule interface réseau</strong>, dans le <strong>VLAN Serveurs</strong>.</p>
+<p>La machine d’administration Windows GUI possède deux interfaces :</p>
+<ul>
+<li>une interface dans le <strong>VLAN Management</strong>, utilisée pour recevoir la connexion RDP ;</li>
+<li>une interface dans le <strong>VLAN Serveurs</strong>, utilisée pour administrer les serveurs.</li>
+</ul>
+<p><img alt="Architecture d’administration Active Directory" src="../../../medias/cours/administration/architecture-administration-ad_v2.png"/></p>
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th style="text-align: center;">VLAN Management</th>
+<th style="text-align: center;">VLAN Serveurs</th>
+<th>Fonction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Machine d’administration Windows GUI</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td>Administration</td>
+</tr>
+<tr>
+<td><code>PRF-DC01</code> Server Core</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+<td>AD DS + DNS</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition important">
+<p class="admonition-title">Le point essentiel</p>
+<p>Le contrôleur de domaine <strong>n’a pas besoin d’une interface dans le VLAN Management</strong>.</p>
+<p>La machine d’administration possède les deux interfaces, mais <strong>elle ne route pas</strong> le trafic entre les VLAN.</p>
+</div>
+<p>Le déroulement d’une administration est le suivant :</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant PC as Poste administrateur
+    participant ADM as Machine administration
+    participant DC as Contrôleur de domaine
+
+    PC-&gt;&gt;ADM: Connexion RDP
+    Note over ADM: L’administrateur travaille&lt;br/&gt;sur la machine d’administration
+    ADM-&gt;&gt;DC: Consoles d’administration / PowerShell
+    DC--&gt;&gt;ADM: Réponse</code></pre>
+<p>La connexion RDP <strong>s’arrête sur la machine d’administration</strong>. Les outils exécutés sur celle-ci établissent ensuite leurs propres communications avec le DC depuis le VLAN Serveurs.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Comment le DC Core est-il administré ?
+
+- [ ] Il possède une deuxième interface dans le VLAN Management
+- [ ] La machine d’administration route la connexion RDP jusqu’au DC
+- [x] L’administrateur travaille sur la machine d’administration, dont les outils communiquent ensuite avec le DC
+- [ ] Le DC est déplacé temporairement dans le VLAN Management
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-1">
+<a class="quiz-header-link" href="#quiz-1">#</a>
+<div class="quiz-question" id="quiz-1-question">
+<p>Comment le DC Core est-il administré ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-1-question"><div><input id="quiz-1-0" name="answer" type="radio" value="0"/><label for="quiz-1-0">Il possède une deuxième interface dans le VLAN Management</label></div><div><input id="quiz-1-1" name="answer" type="radio" value="1"/><label for="quiz-1-1">La machine d’administration route la connexion RDP jusqu’au DC</label></div><div><input data-correct="true" id="quiz-1-2" name="answer" type="radio" value="2"/><label for="quiz-1-2">L’administrateur travaille sur la machine d’administration, dont les outils communiquent ensuite avec le DC</label></div><div><input id="quiz-1-3" name="answer" type="radio" value="3"/><label for="quiz-1-3">Le DC est déplacé temporairement dans le VLAN Management</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="pourquoi-windows-server-core">Pourquoi Windows Server Core ?<a class="headerlink" href="#pourquoi-windows-server-core" title="Permanent link">¶</a></h3>
+<p>Le contrôleur de domaine fournit un <strong>service d’infrastructure</strong>. Il n’a pas besoin d’un environnement graphique complet.</p>
+<p>Cette architecture permet de distinguer :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>serveur qui fournit le service
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>            ≠
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>machine depuis laquelle on l’administre
+</span></code></pre></div>
+<p>Sur <code>PRF-DC01</code>, on installe les <strong>rôles serveur</strong> :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a>PRF-DC01
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a>├── AD DS
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a>└── DNS
+</span></code></pre></div>
+<p>Sur la machine Windows GUI, on installe les <strong>fonctionnalités et outils d’administration</strong> nécessaires.</p>
+<p>Cette machine doit ensuite être <strong>membre du domaine</strong>.</p>
+<p>L’administrateur y utilise principalement :</p>
+<ul>
+<li>les outils graphiques Windows pour Active Directory ;</li>
+<li>la gestion DNS ;</li>
+<li>la gestion des stratégies de groupe ;</li>
+<li>PowerShell.</li>
+</ul>
+<details class="info">
+<summary>RSAT</summary>
+<p>Windows regroupe plusieurs outils d’administration distante sous le nom <strong>RSAT</strong> (<em>Remote Server Administration Tools</em>).</p>
+<p>Ce terme n’est pas à mémoriser ici. Retenez surtout : <strong>les rôles sont sur les serveurs ; les outils d’administration sont sur la machine GUI</strong>.</p>
+</details>
+<details class="info">
+<summary>Proxmox : VirtIO et QEMU Guest Agent</summary>
+<p>Avec Windows Server 2022 sous Proxmox, des pilotes <strong>VirtIO</strong> peuvent être nécessaires pour certains périphériques virtualisés.</p>
+<p>Avec Windows Server 2025, certains pilotes peuvent être directement reconnus, mais il faut toujours vérifier les périphériques réellement disponibles.</p>
+<p>Le <strong>QEMU Guest Agent</strong> reste utile pour les échanges avec l’hyperviseur et la remontée de certaines informations.</p>
+<p>Ce point concerne l’intégration de la VM dans Proxmox, pas Active Directory lui-même.</p>
+</details>
+<hr/>
+<h3 id="nommage-et-conventions">Nommage et conventions<a class="headerlink" href="#nommage-et-conventions" title="Permanent link">¶</a></h3>
+<p><strong>Les noms doivent être définis avant toute installation ou promotion du domaine.</strong></p>
+<p>Utilisez le préfixe prévu pour votre infrastructure. Dans les exemples du support, on utilise :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a>PRF
+</span></code></pre></div>
+<p>Exemples de noms de machines :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a>PRF-DC01     → premier contrôleur de domaine
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>PRF-DC02     → deuxième contrôleur de domaine
+</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a>PRF-ADM01    → machine d’administration
+</span></code></pre></div>
+<p>Le domaine Active Directory utilise le <strong>nom DNS prévu dans la documentation du projet</strong>.</p>
+<p>Le nom NetBIOS du domaine reprend le préfixe :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a>Nom DNS du domaine : &lt;nom défini dans la documentation&gt;
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a>Nom NetBIOS        : PRF
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Pas de domaine en <code>.local</code></p>
+<p>N’inventez pas un domaine tel que :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a>prf.local
+</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a>entreprise.local
+</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a>ad.local
+</span></code></pre></div>
+<p>Utilisez le <strong>nom de domaine prévu dans la documentation</strong>.</p>
+<p>Le suffixe <code>.local</code> est notamment utilisé par <strong>mDNS</strong> et n’est pas conforme à l’architecture demandée.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Vérifiez avant la promotion</p>
+<p>Une erreur sur le nom d’une VM se corrige facilement.</p>
+<p>Une erreur sur le <strong>nom du domaine Active Directory</strong> au moment de créer la forêt est d’une autre nature.</p>
+<p>Vérifiez donc avant la promotion :</p>
+<ul>
+<li>le nom du serveur ;</li>
+<li>le nom DNS du domaine ;</li>
+<li>le nom NetBIOS ;</li>
+<li>l’adressage IPv4 ;</li>
+<li>le VLAN ;</li>
+<li>la passerelle ;</li>
+<li>la configuration DNS.</li>
+</ul>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+Quel nom de domaine devez-vous utiliser ?
+
+- [ ] `prf.local`
+- [ ] Un nom choisi librement au moment de l’installation
+- [x] Le nom DNS prévu dans la documentation du projet
+- [ ] Le nom du VLAN Serveurs
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-2">
+<a class="quiz-header-link" href="#quiz-2">#</a>
+<div class="quiz-question" id="quiz-2-question">
+<p>Quel nom de domaine devez-vous utiliser ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-2-question"><div><input id="quiz-2-0" name="answer" type="radio" value="0"/><label for="quiz-2-0"><code>prf.local</code></label></div><div><input id="quiz-2-1" name="answer" type="radio" value="1"/><label for="quiz-2-1">Un nom choisi librement au moment de l’installation</label></div><div><input data-correct="true" id="quiz-2-2" name="answer" type="radio" value="2"/><label for="quiz-2-2">Le nom DNS prévu dans la documentation du projet</label></div><div><input id="quiz-2-3" name="answer" type="radio" value="3"/><label for="quiz-2-3">Le nom du VLAN Serveurs</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="preparer-le-controleur-de-domaine-core">Préparer le contrôleur de domaine Core<a class="headerlink" href="#preparer-le-controleur-de-domaine-core" title="Permanent link">¶</a></h3>
+<p>La configuration de base de Windows Server Core a déjà été vue l’année dernière.</p>
+<p>Utilisez <strong>SConfig</strong> :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="n">SConfig</span>
+</span></code></pre></div>
+<p>Configurez et vérifiez :</p>
+<ul>
+<li>le nom du serveur ;</li>
+<li>l’adresse IPv4 statique ;</li>
+<li>le préfixe réseau ;</li>
+<li>la passerelle ;</li>
+<li>le DNS ;</li>
+<li>la date et l’heure ;</li>
+<li>les paramètres nécessaires à l’administration distante.</li>
+</ul>
+<hr/>
+<h3 id="installer-ad-ds-et-creer-le-domaine">Installer AD DS et créer le domaine<a class="headerlink" href="#installer-ad-ds-et-creer-le-domaine" title="Permanent link">¶</a></h3>
+<p>Installez le rôle <strong>Active Directory Domain Services</strong> :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="nb">Install-WindowsFeature</span> <span class="n">AD-Domain-Services</span> <span class="n">-IncludeManagementTools</span>
+</span></code></pre></div>
+<p>Vérifiez l’installation :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nb">Get-WindowsFeature</span> <span class="n">AD-Domain-Services</span>
+</span></code></pre></div>
+<p>Le premier contrôleur de domaine crée la <strong>première forêt</strong> et son <strong>premier domaine</strong> :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="nb">Install-ADDSForest</span> <span class="p">`</span>
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a>    <span class="n">-DomainName</span> <span class="s2">"&lt;nom-du-domaine&gt;"</span> <span class="p">`</span>
+</span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a>    <span class="n">-DomainNetbiosName</span> <span class="s2">"PRF"</span> <span class="p">`</span>
+</span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a>    <span class="n">-InstallDNS</span>
+</span></code></pre></div>
+<p>Remplacez <code>&lt;nom-du-domaine&gt;</code> par le nom défini dans la documentation.</p>
+<p>La commande demande notamment le mot de passe <strong>DSRM</strong> (<em>Directory Services Restore Mode</em>), puis le serveur redémarre après la promotion.</p>
+<p>Après redémarrage :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="nb">Get-ADDomain</span>
+</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="nb">Get-ADForest</span>
+</span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="nb">Get-ADDomainController</span> <span class="n">-Filter</span> <span class="p">*</span>
+</span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="nb">Get-Service</span> <span class="n">DNS</span>
+</span></code></pre></div>
+<!-- mkdocs-quiz-source
+<quiz>
+Quelle commande crée la première forêt Active Directory ?
+
+- [ ] `New-ADUser`
+- [ ] `Install-WindowsFeature DNS`
+- [x] `Install-ADDSForest`
+- [ ] `Get-ADForest`
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-3">
+<a class="quiz-header-link" href="#quiz-3">#</a>
+<div class="quiz-question" id="quiz-3-question">
+<p>Quelle commande crée la première forêt Active Directory ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-3-question"><div><input id="quiz-3-0" name="answer" type="radio" value="0"/><label for="quiz-3-0"><code>New-ADUser</code></label></div><div><input id="quiz-3-1" name="answer" type="radio" value="1"/><label for="quiz-3-1"><code>Install-WindowsFeature DNS</code></label></div><div><input data-correct="true" id="quiz-3-2" name="answer" type="radio" value="2"/><label for="quiz-3-2"><code>Install-ADDSForest</code></label></div><div><input id="quiz-3-3" name="answer" type="radio" value="3"/><label for="quiz-3-3"><code>Get-ADForest</code></label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="pourquoi-active-directory-a-besoin-de-dns">Pourquoi Active Directory a besoin de DNS ?<a class="headerlink" href="#pourquoi-active-directory-a-besoin-de-dns" title="Permanent link">¶</a></h3>
+<p>DNS est une brique fondamentale d’Active Directory.</p>
+<p>Un poste ne doit pas seulement connaître l’adresse IP d’un contrôleur de domaine : il doit pouvoir <strong>localiser les services du domaine</strong>.</p>
+<pre class="mermaid"><code>flowchart LR
+    CLIENT["Poste client"]
+    DNS["DNS du domaine"]
+    DC["Contrôleur de domaine"]
+
+    CLIENT --&gt;|"1. Recherche du service"| DNS
+    DNS --&gt;|"2. Informations DNS"| CLIENT
+    CLIENT --&gt;|"3. Contact du DC"| DC</code></pre>
+<p>Active Directory publie notamment des enregistrements <strong>SRV</strong> permettant aux clients de localiser ses services.</p>
+<div class="admonition important">
+<p class="admonition-title">DNS des membres du domaine</p>
+<p>Les machines membres du domaine doivent utiliser le <strong>DNS Active Directory</strong>.</p>
+<p>Un DNS public comme <code>8.8.8.8</code> ou <code>1.1.1.1</code> ne connaît pas les informations privées du domaine.</p>
+</div>
+<p>L’architecture attendue est :</p>
+<pre class="mermaid"><code>flowchart LR
+    CLIENT["Machine du domaine"]
+    DNSAD["DNS Active Directory"]
+    EXT["DNS externe"]
+
+    CLIENT --&gt;|"Requêtes DNS"| DNSAD
+    DNSAD --&gt;|"Redirecteur si nécessaire"| EXT</code></pre>
+<p>Le DNS AD répond pour les zones qu’il connaît et peut utiliser un <strong>redirecteur</strong> pour les autres requêtes.</p>
+<div class="admonition danger">
+<p class="admonition-title">Un DNS public n’est pas un DNS de secours pour AD</p>
+<p>Si un deuxième DNS est configuré sur un membre du domaine, il doit lui aussi être capable de résoudre correctement le domaine Active Directory.</p>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+Pourquoi une machine membre du domaine doit-elle utiliser le DNS Active Directory ?
+
+- [ ] Uniquement pour accéder à Internet
+- [x] Pour pouvoir notamment localiser les services du domaine
+- [ ] Pour recevoir son adresse MAC
+- [ ] Pour remplacer DHCP
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-4">
+<a class="quiz-header-link" href="#quiz-4">#</a>
+<div class="quiz-question" id="quiz-4-question">
+<p>Pourquoi une machine membre du domaine doit-elle utiliser le DNS Active Directory ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-4-question"><div><input id="quiz-4-0" name="answer" type="radio" value="0"/><label for="quiz-4-0">Uniquement pour accéder à Internet</label></div><div><input data-correct="true" id="quiz-4-1" name="answer" type="radio" value="1"/><label for="quiz-4-1">Pour pouvoir notamment localiser les services du domaine</label></div><div><input id="quiz-4-2" name="answer" type="radio" value="2"/><label for="quiz-4-2">Pour recevoir son adresse MAC</label></div><div><input id="quiz-4-3" name="answer" type="radio" value="3"/><label for="quiz-4-3">Pour remplacer DHCP</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="joindre-la-machine-dadministration-au-domaine">Joindre la machine d’administration au domaine<a class="headerlink" href="#joindre-la-machine-dadministration-au-domaine" title="Permanent link">¶</a></h3>
+<p>Une fois le domaine et DNS fonctionnels, la <strong>machine d’administration Windows GUI</strong> peut rejoindre le domaine.</p>
+<p>Avant la jonction, vérifiez :</p>
+<ul>
+<li>son nom : par exemple <code>PRF-ADM01</code> ;</li>
+<li>son adressage ;</li>
+<li>son accès au VLAN Serveurs ;</li>
+<li>sa configuration DNS : elle doit utiliser le <strong>DNS Active Directory</strong> ;</li>
+<li>la résolution du nom du domaine ;</li>
+<li>la cohérence de l’heure.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Le ping n'est pas un test suffisant</p>
+<p>Dans l'architecture SportLudique, le <strong>pare-feu interne bloque par défaut
+les requêtes ICMP Echo</strong>.</p>
+<p>L'absence de réponse à un <code>ping</code> vers le contrôleur de domaine ne signifie
+donc pas nécessairement que celui-ci est inaccessible ou en panne.</p>
+<p>Pour faciliter la mise en place et le diagnostic, les requêtes
+<strong>ICMP Echo pourront être autorisées temporairement</strong> entre la machine
+d'administration et le VLAN Serveurs.</p>
+<p>Cette autorisation devra être supprimée lorsque les tests seront terminés.</p>
+<p>Pour rejoindre le domaine, il faut surtout vérifier que la machine :</p>
+<ul>
+<li>utilise le <strong>DNS Active Directory</strong> ;</li>
+<li>résout correctement le nom du domaine ;</li>
+<li>peut joindre les <strong>services Active Directory nécessaires</strong> à travers le pare-feu ;</li>
+<li>possède une heure cohérente avec le domaine.</li>
+</ul>
+</div>
+<p>Une fois membre du domaine, cette machine devient le <strong>poste de travail d’administration Windows</strong> de l’infrastructure.</p>
+<hr/>
+<h3 id="administrer-active-directory">Administrer Active Directory<a class="headerlink" href="#administrer-active-directory" title="Permanent link">¶</a></h3>
+<p>L’administrateur se connecte en <strong>RDP</strong> sur la machine d’administration Windows GUI.</p>
+<p>Depuis cette interface graphique, il peut gérer notamment :</p>
+<ul>
+<li>les utilisateurs et les groupes ;</li>
+<li>les ordinateurs ;</li>
+<li>les unités d’organisation ;</li>
+<li>DNS ;</li>
+<li>les stratégies de groupe.</li>
+</ul>
+<p>Les rôles <strong>AD DS et DNS restent sur le contrôleur de domaine Core</strong>. La machine d’administration ne fait qu’héberger les outils permettant de les gérer.</p>
+<p>Pour certaines opérations, PowerShell peut également être utilisé.</p>
+<p>Par exemple, pour ouvrir une session PowerShell distante sur le DC :</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="nb">Enter-PSSession</span> <span class="n">PRF-DC01</span>
+</span></code></pre></div>
+<p>PowerShell Remoting s’appuie notamment sur <strong>WinRM</strong> :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a>TCP 5985 → WinRM HTTP
+</span><span id="__span-13-2"><a href="#__codelineno-13-2" id="__codelineno-13-2" name="__codelineno-13-2"></a>TCP 5986 → WinRM HTTPS
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">WinRM ne résume pas toute l’administration Windows</p>
+<p>Les outils graphiques d’administration peuvent utiliser d’autres protocoles.</p>
+<p>Ne retenez donc pas : « <code>5985/5986</code> sont ouverts, toute l’administration Windows fonctionnera ».</p>
+</div>
+<hr/>
+<h3 id="utilisateurs-groupes-ordinateurs-et-ou">Utilisateurs, groupes, ordinateurs et OU<a class="headerlink" href="#utilisateurs-groupes-ordinateurs-et-ou" title="Permanent link">¶</a></h3>
+<p>Active Directory stocke différents types d’objets :</p>
+<ul>
+<li><strong>utilisateurs</strong> : identités des personnes ;</li>
+<li><strong>groupes</strong> : regroupement d’identités pour faciliter l’attribution des droits ;</li>
+<li><strong>ordinateurs</strong> : machines membres du domaine ;</li>
+<li><strong>OU</strong> (<em>Organizational Units</em>) : organisation administrative des objets.</li>
+</ul>
+<p>Exemple :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a>Domaine
+</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a>├── Utilisateurs
+</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a>│   ├── Direction
+</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a>│   ├── Informatique
+</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a>│   └── Employés
+</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a>├── Postes
+</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a>├── Serveurs
+</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a>└── Groupes
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Une OU n’est pas un dossier décoratif</p>
+<p>L’organisation des OU doit répondre à des besoins d’administration.</p>
+<p>Il ne s’agit pas de reproduire mécaniquement tout l’organigramme de l’entreprise.</p>
+</div>
+<p>Une bonne pratique consiste à attribuer les permissions à des <strong>groupes</strong> plutôt que directement à chaque utilisateur.</p>
+<pre class="mermaid"><code>flowchart LR
+    U1["Alice"]
+    U2["Bob"]
+    G["Groupe Support"]
+    R["Ressource"]
+
+    U1 --&gt; G
+    U2 --&gt; G
+    G --&gt;|"Permission"| R</code></pre>
+<hr/>
+<h3 id="les-strategies-de-groupe">Les stratégies de groupe<a class="headerlink" href="#les-strategies-de-groupe" title="Permanent link">¶</a></h3>
+<p>Les <strong>GPO</strong> (<em>Group Policy Objects</em>) permettent d’appliquer des paramètres aux utilisateurs et aux ordinateurs du domaine.</p>
+<pre class="mermaid"><code>flowchart LR
+    GPO["GPO"]
+    OU["OU"]
+    PC1["PC01"]
+    PC2["PC02"]
+
+    GPO --&gt; OU
+    OU --&gt; PC1
+    OU --&gt; PC2</code></pre>
+<p>Au niveau Socle, retenez surtout que le domaine permet une <strong>Gestion des Configurations (ITIL)</strong> des configurations.</p>
+<hr/>
+<h3 id="authentification-centralisee">Authentification centralisée<a class="headerlink" href="#authentification-centralisee" title="Permanent link">¶</a></h3>
+<p>Lorsqu’un utilisateur utilise un compte du domaine, son identité est vérifiée par l’infrastructure Active Directory.</p>
+<pre class="mermaid"><code>flowchart LR
+    USER["Utilisateur"]
+    PC["Poste membre"]
+    DC["Contrôleur de domaine"]
+
+    USER --&gt;|"Identifiants"| PC
+    PC --&gt;|"Authentification"| DC
+    DC --&gt;|"Résultat"| PC</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Pas encore les tickets</p>
+<p>Au niveau Socle, vous devez comprendre <strong>qui authentifie qui</strong>.</p>
+<p>Le fonctionnement détaillé de Kerberos et des tickets est étudié au niveau <strong>Expertise</strong>.</p>
+</div>
+<hr/>
+<h3 id="ce-que-vous-devez-etre-capables-dexpliquer">Ce que vous devez être capables d’expliquer<a class="headerlink" href="#ce-que-vous-devez-etre-capables-dexpliquer" title="Permanent link">¶</a></h3>
+<p>À la fin du Socle, vous devez être capables d’expliquer :</p>
+<ul>
+<li>le rôle d’<strong>AD DS</strong>, du <strong>contrôleur de domaine</strong> et de <strong>DNS</strong> ;</li>
+<li>pourquoi le DC Core possède <strong>une seule interface dans le VLAN Serveurs</strong> ;</li>
+<li>le rôle de la <strong>machine d’administration Windows GUI</strong> ;</li>
+<li>pourquoi cette machine doit être <strong>membre du domaine</strong> ;</li>
+<li>la différence entre <strong>rôle serveur</strong> et <strong>outil d’administration</strong> ;</li>
+<li>pourquoi le nom du domaine doit être défini <strong>avant sa création</strong> ;</li>
+<li>pourquoi les membres du domaine utilisent le <strong>DNS Active Directory</strong> ;</li>
+<li>le rôle des utilisateurs, groupes, ordinateurs, OU et GPO ;</li>
+<li>le principe général de l’authentification centralisée.</li>
+</ul>
+<hr/>
+<h2 id="concepts-avances">Concepts avancés<a class="headerlink" href="#concepts-avances" title="Permanent link">¶</a></h2>
+<h3 id="le-probleme-dun-seul-controleur-de-domaine">Le problème d’un seul contrôleur de domaine<a class="headerlink" href="#le-probleme-dun-seul-controleur-de-domaine" title="Permanent link">¶</a></h3>
+<p>Le socle commence volontairement avec un seul DC.</p>
+<p>Cela permet de mettre en place et de comprendre l’infrastructure avant d’ajouter de la redondance.</p>
+<p>Mais l’architecture possède alors une faiblesse évidente :</p>
+<pre class="mermaid"><code>flowchart LR
+    CLIENTS["Postes / serveurs"]
+    DC1["DC01&lt;br/&gt;AD DS + DNS"]
+    FAIL["Panne"]
+
+    CLIENTS --&gt; DC1
+    FAIL -.-&gt; DC1</code></pre>
+<p>Si ce serveur ou son hyperviseur devient indisponible, les services Active Directory et DNS qu’il fournit sont affectés.</p>
+<hr/>
+<h3 id="ajouter-un-deuxieme-controleur-de-domaine">Ajouter un deuxième contrôleur de domaine<a class="headerlink" href="#ajouter-un-deuxieme-controleur-de-domaine" title="Permanent link">¶</a></h3>
+<p>Le niveau avancé consiste à ajouter un <strong>deuxième contrôleur de domaine</strong>.</p>
+<pre class="mermaid"><code>flowchart LR
+    DC1["DC01&lt;br/&gt;AD DS + DNS"]
+    DC2["DC02&lt;br/&gt;AD DS + DNS"]
+
+    DC1 &lt;--&gt;|"Réplication"| DC2</code></pre>
+<p>Les contrôleurs de domaine répliquent les informations de l’annuaire.</p>
+<div class="admonition warning">
+<p class="admonition-title">Pas « principal / secondaire »</p>
+<p>Active Directory fonctionne en <strong>multi-maître pour la majorité des modifications</strong>.</p>
+<p>Il ne faut donc pas réduire l’architecture à l’ancien modèle :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a>serveur principal
+</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a>serveur secondaire
+</span></code></pre></div>
+</div>
+<hr/>
+<h3 id="placer-les-deux-dc-sur-des-infrastructures-differentes">Placer les deux DC sur des infrastructures différentes<a class="headerlink" href="#placer-les-deux-dc-sur-des-infrastructures-differentes" title="Permanent link">¶</a></h3>
+<p>Deux VM contrôleurs de domaine placées sur le <strong>même hyperviseur</strong> restent dépendantes de cet hyperviseur.</p>
+<pre class="mermaid"><code>flowchart TB
+    PVE["Hyperviseur unique"]
+    DC1["DC01"]
+    DC2["DC02"]
+
+    PVE --&gt; DC1
+    PVE --&gt; DC2</code></pre>
+<p>Une panne de l’hyperviseur peut alors rendre les deux DC indisponibles simultanément.</p>
+<p>Dans SportLudique, le deuxième contrôleur de domaine doit donc être hébergé sur <strong>l’hyperviseur administré par les étudiants</strong>.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph PVE1["Infrastructure de virtualisation 1"]
+        DC1["DC01&lt;br/&gt;AD DS + DNS"]
+    end
+
+    subgraph PVE2["Hyperviseur étudiants"]
+        DC2["DC02&lt;br/&gt;AD DS + DNS"]
+    end
+
+    DC1 &lt;--&gt;|"Réplication AD / DNS"| DC2</code></pre>
+<!-- mkdocs-quiz-source
+<quiz>
+Deux contrôleurs de domaine sont installés sous forme de VM sur le même hyperviseur physique. Quelle limite subsiste ?
+
+- [ ] Les deux DC ne peuvent pas répliquer
+- [ ] DNS ne peut fonctionner que sur un seul DC
+- [x] La panne de l’hyperviseur peut rendre les deux DC indisponibles
+- [ ] Active Directory interdit deux DC virtualisés
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-5">
+<a class="quiz-header-link" href="#quiz-5">#</a>
+<div class="quiz-question" id="quiz-5-question">
+<p>Deux contrôleurs de domaine sont installés sous forme de VM sur le même hyperviseur physique. Quelle limite subsiste ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-5-question"><div><input id="quiz-5-0" name="answer" type="radio" value="0"/><label for="quiz-5-0">Les deux DC ne peuvent pas répliquer</label></div><div><input id="quiz-5-1" name="answer" type="radio" value="1"/><label for="quiz-5-1">DNS ne peut fonctionner que sur un seul DC</label></div><div><input data-correct="true" id="quiz-5-2" name="answer" type="radio" value="2"/><label for="quiz-5-2">La panne de l’hyperviseur peut rendre les deux DC indisponibles</label></div><div><input id="quiz-5-3" name="answer" type="radio" value="3"/><label for="quiz-5-3">Active Directory interdit deux DC virtualisés</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="replication-nest-pas-sauvegarde">Réplication n’est pas sauvegarde<a class="headerlink" href="#replication-nest-pas-sauvegarde" title="Permanent link">¶</a></h3>
+<p>La présence de deux contrôleurs de domaine améliore la disponibilité.</p>
+<p>Elle ne remplace pas une stratégie de sauvegarde.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a>Modification correcte ──► réplication
+</span><span id="__span-16-2"><a href="#__codelineno-16-2" id="__codelineno-16-2" name="__codelineno-16-2"></a>Suppression accidentelle ──► réplication également
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>Réplication ≠ sauvegarde</strong></p>
+<p>Une donnée supprimée ou modifiée par erreur peut être répliquée sur les autres contrôleurs de domaine.</p>
+</div>
+<hr/>
+<h3 id="dns-redondant">DNS redondant<a class="headerlink" href="#dns-redondant" title="Permanent link">¶</a></h3>
+<p>Lorsque les deux contrôleurs de domaine assurent également DNS, les clients disposent de plusieurs serveurs DNS capables de résoudre le domaine.</p>
+<pre class="mermaid"><code>flowchart LR
+    CLIENT["Poste membre"]
+    DNS1["DC01&lt;br/&gt;DNS"]
+    DNS2["DC02&lt;br/&gt;DNS"]
+
+    CLIENT --&gt; DNS1
+    CLIENT --&gt; DNS2
+    DNS1 &lt;--&gt;|"Réplication"| DNS2</code></pre>
+<p>Cette architecture est très différente de :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a href="#__codelineno-17-1" id="__codelineno-17-1" name="__codelineno-17-1"></a>DNS 1 : DC01
+</span><span id="__span-17-2"><a href="#__codelineno-17-2" id="__codelineno-17-2" name="__codelineno-17-2"></a>DNS 2 : 8.8.8.8
+</span></code></pre></div>
+<p>Le deuxième serveur DNS doit lui aussi connaître le domaine Active Directory.</p>
+<hr/>
+<h3 id="dns-integre-a-active-directory">DNS intégré à Active Directory<a class="headerlink" href="#dns-integre-a-active-directory" title="Permanent link">¶</a></h3>
+<p>Les zones DNS utilisées par Active Directory peuvent être <strong>intégrées à l’annuaire</strong>.</p>
+<p>Les informations DNS concernées peuvent alors bénéficier du mécanisme de réplication Active Directory.</p>
+<p>Cela permet d’éviter de gérer séparément une copie primaire et des copies secondaires traditionnelles pour ces zones.</p>
+<pre class="mermaid"><code>flowchart LR
+    DC1["DC01&lt;br/&gt;AD DS + DNS"]
+    DC2["DC02&lt;br/&gt;AD DS + DNS"]
+
+    DC1 &lt;--&gt;|"Réplication AD&lt;br/&gt;incluant les données DNS intégrées"| DC2</code></pre>
+<hr/>
+<h3 id="le-catalogue-global">Le catalogue global<a class="headerlink" href="#le-catalogue-global" title="Permanent link">¶</a></h3>
+<p>Un contrôleur de domaine peut également assurer le rôle de <strong>Global Catalog</strong>.</p>
+<p>Le catalogue global contient des informations permettant notamment de rechercher des objets dans une forêt Active Directory.</p>
+<p>Dans une infrastructure simple ne contenant qu’un domaine, cette notion peut sembler peu visible.</p>
+<p>Elle devient plus importante lorsque l’architecture Active Directory grandit.</p>
+<hr/>
+<h3 id="les-roles-fsmo">Les rôles FSMO<a class="headerlink" href="#les-roles-fsmo" title="Permanent link">¶</a></h3>
+<p>Active Directory fonctionne majoritairement selon un modèle multi-maître.</p>
+<p>Certaines opérations doivent cependant rester associées à un contrôleur de domaine particulier.</p>
+<p>Ces fonctions sont appelées <strong>rôles FSMO</strong> (<em>Flexible Single Master Operations</em>).</p>
+<p>Il existe cinq rôles FSMO.</p>
+<details class="info">
+<summary>Les cinq rôles FSMO</summary>
+<p>Au niveau de la forêt :</p>
+<ul>
+<li><strong>Schema Master</strong> ;</li>
+<li><strong>Domain Naming Master</strong>.</li>
+</ul>
+<p>Au niveau du domaine :</p>
+<ul>
+<li><strong>RID Master</strong> ;</li>
+<li><strong>PDC Emulator</strong> ;</li>
+<li><strong>Infrastructure Master</strong>.</li>
+</ul>
+</details>
+<p>Au niveau avancé, l’objectif n’est pas de mémoriser mécaniquement les cinq noms.</p>
+<p>Vous devez surtout comprendre pourquoi :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a>Active Directory multi-maître
+</span><span id="__span-18-2"><a href="#__codelineno-18-2" id="__codelineno-18-2" name="__codelineno-18-2"></a>              ≠
+</span><span id="__span-18-3"><a href="#__codelineno-18-3" id="__codelineno-18-3" name="__codelineno-18-3"></a>absolument toutes les opérations multi-maîtres
+</span></code></pre></div>
+<hr/>
+<h3 id="organiser-les-objets-pour-les-administrer">Organiser les objets pour les administrer<a class="headerlink" href="#organiser-les-objets-pour-les-administrer" title="Permanent link">¶</a></h3>
+<p>Les OU et les groupes doivent être conçus en fonction des besoins d’administration.</p>
+<p>Une arborescence simple et justifiable est préférable à une structure complexe impossible à maintenir.</p>
+<p>Exemple :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a>Domaine
+</span><span id="__span-19-2"><a href="#__codelineno-19-2" id="__codelineno-19-2" name="__codelineno-19-2"></a>├── Utilisateurs
+</span><span id="__span-19-3"><a href="#__codelineno-19-3" id="__codelineno-19-3" name="__codelineno-19-3"></a>│   ├── Direction
+</span><span id="__span-19-4"><a href="#__codelineno-19-4" id="__codelineno-19-4" name="__codelineno-19-4"></a>│   ├── Informatique
+</span><span id="__span-19-5"><a href="#__codelineno-19-5" id="__codelineno-19-5" name="__codelineno-19-5"></a>│   └── Employés
+</span><span id="__span-19-6"><a href="#__codelineno-19-6" id="__codelineno-19-6" name="__codelineno-19-6"></a>├── Postes
+</span><span id="__span-19-7"><a href="#__codelineno-19-7" id="__codelineno-19-7" name="__codelineno-19-7"></a>├── Serveurs
+</span><span id="__span-19-8"><a href="#__codelineno-19-8" id="__codelineno-19-8" name="__codelineno-19-8"></a>└── Groupes
+</span></code></pre></div>
+<p>Le choix réel dépendra des besoins de l’organisation et des stratégies à appliquer.</p>
+<hr/>
+<h3 id="gpo-raisonner-sur-la-portee">GPO : raisonner sur la portée<a class="headerlink" href="#gpo-raisonner-sur-la-portee" title="Permanent link">¶</a></h3>
+<p>Une GPO n’est utile que si l’on comprend <strong>à quels objets elle s’applique</strong>.</p>
+<p>Avant de créer une GPO, il faut pouvoir répondre à :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a href="#__codelineno-20-1" id="__codelineno-20-1" name="__codelineno-20-1"></a>Quel paramètre ?
+</span><span id="__span-20-2"><a href="#__codelineno-20-2" id="__codelineno-20-2" name="__codelineno-20-2"></a>      ↓
+</span><span id="__span-20-3"><a href="#__codelineno-20-3" id="__codelineno-20-3" name="__codelineno-20-3"></a>Pour quels objets ?
+</span><span id="__span-20-4"><a href="#__codelineno-20-4" id="__codelineno-20-4" name="__codelineno-20-4"></a>      ↓
+</span><span id="__span-20-5"><a href="#__codelineno-20-5" id="__codelineno-20-5" name="__codelineno-20-5"></a>À quel niveau ?
+</span><span id="__span-20-6"><a href="#__codelineno-20-6" id="__codelineno-20-6" name="__codelineno-20-6"></a>      ↓
+</span><span id="__span-20-7"><a href="#__codelineno-20-7" id="__codelineno-20-7" name="__codelineno-20-7"></a>Pourquoi ?
+</span></code></pre></div>
+<p>L’objectif n’est pas de multiplier les GPO, mais d’obtenir une configuration compréhensible et maintenable.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Une GPO doit configurer uniquement les serveurs du domaine. Quelle démarche est la plus cohérente ?
+
+- [ ] Lier systématiquement toutes les GPO à la racine du domaine
+- [x] Organiser les objets afin de pouvoir cibler les machines concernées
+- [ ] Créer un domaine Active Directory supplémentaire
+- [ ] Modifier manuellement chaque serveur
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-6">
+<a class="quiz-header-link" href="#quiz-6">#</a>
+<div class="quiz-question" id="quiz-6-question">
+<p>Une GPO doit configurer uniquement les serveurs du domaine. Quelle démarche est la plus cohérente ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-6-question"><div><input id="quiz-6-0" name="answer" type="radio" value="0"/><label for="quiz-6-0">Lier systématiquement toutes les GPO à la racine du domaine</label></div><div><input data-correct="true" id="quiz-6-1" name="answer" type="radio" value="1"/><label for="quiz-6-1">Organiser les objets afin de pouvoir cibler les machines concernées</label></div><div><input id="quiz-6-2" name="answer" type="radio" value="2"/><label for="quiz-6-2">Créer un domaine Active Directory supplémentaire</label></div><div><input id="quiz-6-3" name="answer" type="radio" value="3"/><label for="quiz-6-3">Modifier manuellement chaque serveur</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="ce-que-vous-devez-etre-capables-dexpliquer_1">Ce que vous devez être capables d’expliquer<a class="headerlink" href="#ce-que-vous-devez-etre-capables-dexpliquer_1" title="Permanent link">¶</a></h3>
+<p>À la fin du niveau avancé, vous devez être capables d’expliquer :</p>
+<ul>
+<li>pourquoi un seul DC constitue une dépendance importante ;</li>
+<li>l’intérêt d’un deuxième contrôleur de domaine ;</li>
+<li>pourquoi les deux DC doivent idéalement dépendre d’infrastructures différentes ;</li>
+<li>le principe de réplication Active Directory ;</li>
+<li>pourquoi réplication et sauvegarde sont deux notions différentes ;</li>
+<li>comment obtenir une meilleure disponibilité DNS ;</li>
+<li>le principe d’une zone DNS intégrée à Active Directory ;</li>
+<li>ce qu’est le Global Catalog ;</li>
+<li>pourquoi des rôles FSMO existent malgré le fonctionnement multi-maître ;</li>
+<li>pourquoi la structure des OU doit être pensée en fonction de l’administration ;</li>
+<li>comment raisonner sur la portée d’une GPO.</li>
+</ul>
+<hr/>
+<h2 id="expertise">Expertise<a class="headerlink" href="#expertise" title="Permanent link">¶</a></h2>
+<h3 id="foret-arbre-domaine-et-ou">Forêt, arbre, domaine et OU<a class="headerlink" href="#foret-arbre-domaine-et-ou" title="Permanent link">¶</a></h3>
+<p>Jusqu'ici, nous avons principalement travaillé avec <strong>un domaine</strong>. Une architecture Active Directory plus importante nécessite de distinguer plusieurs niveaux logiques.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a href="#__codelineno-21-1" id="__codelineno-21-1" name="__codelineno-21-1"></a>Forêt
+</span><span id="__span-21-2"><a href="#__codelineno-21-2" id="__codelineno-21-2" name="__codelineno-21-2"></a>└── Arbre
+</span><span id="__span-21-3"><a href="#__codelineno-21-3" id="__codelineno-21-3" name="__codelineno-21-3"></a>    └── Domaine
+</span><span id="__span-21-4"><a href="#__codelineno-21-4" id="__codelineno-21-4" name="__codelineno-21-4"></a>        ├── OU
+</span><span id="__span-21-5"><a href="#__codelineno-21-5" id="__codelineno-21-5" name="__codelineno-21-5"></a>        ├── utilisateurs
+</span><span id="__span-21-6"><a href="#__codelineno-21-6" id="__codelineno-21-6" name="__codelineno-21-6"></a>        ├── groupes
+</span><span id="__span-21-7"><a href="#__codelineno-21-7" id="__codelineno-21-7" name="__codelineno-21-7"></a>        └── ordinateurs
+</span></code></pre></div>
+<h4 id="le-domaine">Le domaine<a class="headerlink" href="#le-domaine" title="Permanent link">¶</a></h4>
+<p>Un <strong>domaine</strong> regroupe des objets Active Directory dans une même structure logique et possède un nom DNS, par exemple :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a href="#__codelineno-22-1" id="__codelineno-22-1" name="__codelineno-22-1"></a>&lt;nom-du-domaine&gt;
+</span></code></pre></div>
+<p>Plusieurs contrôleurs de domaine peuvent héberger et répliquer <strong>le même domaine</strong>.</p>
+<pre class="mermaid"><code>flowchart LR
+    D["Domaine&lt;br/&gt;&lt;nom-du-domaine&gt;"]
+    DC1["DC01"]
+    DC2["DC02"]
+    D --- DC1
+    D --- DC2
+    DC1 &lt;--&gt;|"Réplication"| DC2</code></pre>
+<h4 id="la-foret">La forêt<a class="headerlink" href="#la-foret" title="Permanent link">¶</a></h4>
+<p>La <strong>forêt</strong> est la structure logique Active Directory de plus haut niveau.</p>
+<p>Lorsque le premier DC est créé avec <code>Install-ADDSForest</code>, on crée simultanément :</p>
+<ul>
+<li>une nouvelle forêt ;</li>
+<li>son premier domaine.</li>
+</ul>
+<p>Une forêt peut ne contenir qu'un seul domaine.</p>
+<h4 id="larbre">L'arbre<a class="headerlink" href="#larbre" title="Permanent link">¶</a></h4>
+<p>Un <strong>arbre de domaines</strong> correspond à des domaines partageant un espace de noms DNS hiérarchique continu.</p>
+<p>Exemple théorique :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a href="#__codelineno-23-1" id="__codelineno-23-1" name="__codelineno-23-1"></a>exemple.fr
+</span><span id="__span-23-2"><a href="#__codelineno-23-2" id="__codelineno-23-2" name="__codelineno-23-2"></a>├── france.exemple.fr
+</span><span id="__span-23-3"><a href="#__codelineno-23-3" id="__codelineno-23-3" name="__codelineno-23-3"></a>└── europe.exemple.fr
+</span></code></pre></div>
+<p>Comprendre cette notion ne signifie pas qu'il faut multiplier les domaines dans SportLudique.</p>
+<div class="admonition warning">
+<p class="admonition-title">Site physique ≠ domaine</p>
+<p>Un nouveau bâtiment, un nouveau VLAN ou une nouvelle ville ne justifie pas automatiquement la création d'un nouveau domaine.</p>
+<p>La <strong>topologie réseau</strong>, les <strong>sites physiques</strong> et la <strong>structure logique Active Directory</strong> sont des notions différentes.</p>
+</div>
+<h4 id="une-ou-nest-pas-un-domaine">Une OU n'est pas un domaine<a class="headerlink" href="#une-ou-nest-pas-un-domaine" title="Permanent link">¶</a></h4>
+<p>Les <strong>OU</strong> servent à organiser et administrer les objets <strong>à l'intérieur d'un domaine</strong>.</p>
+<pre class="mermaid"><code>flowchart TB
+    F["Forêt"]
+    D["Domaine"]
+    U1["OU Utilisateurs"]
+    U2["OU Postes"]
+    U3["OU Serveurs"]
+    F --&gt; D
+    D --&gt; U1
+    D --&gt; U2
+    D --&gt; U3</code></pre>
+<p>Créer une OU portant le nom d’un site ne crée pas un nouveau domaine.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Une entreprise ouvre un nouveau site physique. Faut-il automatiquement créer un nouveau domaine Active Directory ?
+
+- [ ] Oui, un domaine est obligatoire par ville
+- [ ] Oui, un domaine est obligatoire par VLAN
+- [x] Non, un domaine supplémentaire doit répondre à un besoin logique ou administratif réel
+- [ ] Oui, sinon DNS ne fonctionne pas
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-7">
+<a class="quiz-header-link" href="#quiz-7">#</a>
+<div class="quiz-question" id="quiz-7-question">
+<p>Une entreprise ouvre un nouveau site physique. Faut-il automatiquement créer un nouveau domaine Active Directory ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-7-question"><div><input id="quiz-7-0" name="answer" type="radio" value="0"/><label for="quiz-7-0">Oui, un domaine est obligatoire par ville</label></div><div><input id="quiz-7-1" name="answer" type="radio" value="1"/><label for="quiz-7-1">Oui, un domaine est obligatoire par VLAN</label></div><div><input data-correct="true" id="quiz-7-2" name="answer" type="radio" value="2"/><label for="quiz-7-2">Non, un domaine supplémentaire doit répondre à un besoin logique ou administratif réel</label></div><div><input id="quiz-7-3" name="answer" type="radio" value="3"/><label for="quiz-7-3">Oui, sinon DNS ne fonctionne pas</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+Quelle structure constitue le niveau logique le plus élevé ?
+
+- [ ] Une OU
+- [ ] Un domaine
+- [x] Une forêt
+- [ ] Un groupe
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-8">
+<a class="quiz-header-link" href="#quiz-8">#</a>
+<div class="quiz-question" id="quiz-8-question">
+<p>Quelle structure constitue le niveau logique le plus élevé ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-8-question"><div><input id="quiz-8-0" name="answer" type="radio" value="0"/><label for="quiz-8-0">Une OU</label></div><div><input id="quiz-8-1" name="answer" type="radio" value="1"/><label for="quiz-8-1">Un domaine</label></div><div><input data-correct="true" id="quiz-8-2" name="answer" type="radio" value="2"/><label for="quiz-8-2">Une forêt</label></div><div><input id="quiz-8-3" name="answer" type="radio" value="3"/><label for="quiz-8-3">Un groupe</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="comprendre-reellement-lauthentification">Comprendre réellement l’authentification<a class="headerlink" href="#comprendre-reellement-lauthentification" title="Permanent link">¶</a></h3>
+<p>Au niveau Socle, nous avons résumé l’authentification ainsi :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a href="#__codelineno-24-1" id="__codelineno-24-1" name="__codelineno-24-1"></a>Utilisateur → poste → contrôleur de domaine
+</span></code></pre></div>
+<p>Cette représentation est suffisante pour comprendre le rôle général du DC, mais elle masque le mécanisme utilisé.</p>
+<p>Dans un domaine Active Directory moderne, <strong>Kerberos</strong> joue un rôle central dans l’authentification.</p>
+<p>Pour comprendre Kerberos, il faut introduire la notion de <strong>ticket</strong>.</p>
+<hr/>
+<h3 id="pourquoi-des-tickets">Pourquoi des tickets ?<a class="headerlink" href="#pourquoi-des-tickets" title="Permanent link">¶</a></h3>
+<p>Une mauvaise représentation serait d’imaginer que le mot de passe de l’utilisateur est envoyé à chaque serveur auquel il souhaite accéder.</p>
+<p>Kerberos utilise au contraire un mécanisme permettant à l’utilisateur authentifié d’obtenir des éléments qu’il pourra présenter pour accéder aux services.</p>
+<p>L’idée générale devient :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a href="#__codelineno-25-1" id="__codelineno-25-1" name="__codelineno-25-1"></a>Je prouve mon identité
+</span><span id="__span-25-2"><a href="#__codelineno-25-2" id="__codelineno-25-2" name="__codelineno-25-2"></a>        │
+</span><span id="__span-25-3"><a href="#__codelineno-25-3" id="__codelineno-25-3" name="__codelineno-25-3"></a>        ▼
+</span><span id="__span-25-4"><a href="#__codelineno-25-4" id="__codelineno-25-4" name="__codelineno-25-4"></a>J’obtiens un moyen de demander
+</span><span id="__span-25-5"><a href="#__codelineno-25-5" id="__codelineno-25-5" name="__codelineno-25-5"></a>des accès à des services
+</span><span id="__span-25-6"><a href="#__codelineno-25-6" id="__codelineno-25-6" name="__codelineno-25-6"></a>        │
+</span><span id="__span-25-7"><a href="#__codelineno-25-7" id="__codelineno-25-7" name="__codelineno-25-7"></a>        ▼
+</span><span id="__span-25-8"><a href="#__codelineno-25-8" id="__codelineno-25-8" name="__codelineno-25-8"></a>J’obtiens un ticket pour
+</span><span id="__span-25-9"><a href="#__codelineno-25-9" id="__codelineno-25-9" name="__codelineno-25-9"></a>un service particulier
+</span><span id="__span-25-10"><a href="#__codelineno-25-10" id="__codelineno-25-10" name="__codelineno-25-10"></a>        │
+</span><span id="__span-25-11"><a href="#__codelineno-25-11" id="__codelineno-25-11" name="__codelineno-25-11"></a>        ▼
+</span><span id="__span-25-12"><a href="#__codelineno-25-12" id="__codelineno-25-12" name="__codelineno-25-12"></a>Je présente ce ticket au service
+</span></code></pre></div>
+<hr/>
+<h3 id="le-kdc">Le KDC<a class="headerlink" href="#le-kdc" title="Permanent link">¶</a></h3>
+<p>Le <strong>KDC</strong> (<em>Key Distribution Center</em>) est le service Kerberos chargé de délivrer les tickets.</p>
+<p>Dans Active Directory, ce service est assuré par les contrôleurs de domaine.</p>
+<p>On distingue notamment deux fonctions :</p>
+<ul>
+<li><strong>AS</strong> : <em>Authentication Service</em> ;</li>
+<li><strong>TGS</strong> : <em>Ticket Granting Service</em>.</li>
+</ul>
+<pre class="mermaid"><code>flowchart TB
+    KDC["KDC sur le contrôleur de domaine"]
+    AS["Authentication Service"]
+    TGS["Ticket Granting Service"]
+
+    KDC --&gt; AS
+    KDC --&gt; TGS</code></pre>
+<hr/>
+<h3 id="le-tgt">Le TGT<a class="headerlink" href="#le-tgt" title="Permanent link">¶</a></h3>
+<p>Après l’authentification initiale, l’utilisateur peut obtenir un <strong>TGT</strong> (<em>Ticket Granting Ticket</em>).</p>
+<p>Ce ticket ne donne pas directement accès à tous les serveurs.</p>
+<p>Il permet de demander au KDC des tickets pour des services particuliers.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant C as Client
+    participant K as KDC
+    participant S as Service
+
+    C-&gt;&gt;K: Authentification initiale
+    K--&gt;&gt;C: TGT
+    C-&gt;&gt;K: TGT + demande d’accès au service
+    K--&gt;&gt;C: Ticket de service
+    C-&gt;&gt;S: Ticket de service
+    S--&gt;&gt;C: Accès selon les droits</code></pre>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Le TGT n’est pas « le ticket qui ouvre toutes les portes ».</p>
+<p>Il sert à obtenir auprès du KDC les tickets nécessaires pour des services précis.</p>
+</div>
+<hr/>
+<h3 id="ticket-de-service">Ticket de service<a class="headerlink" href="#ticket-de-service" title="Permanent link">¶</a></h3>
+<p>Lorsqu’un utilisateur souhaite accéder à un service, son poste demande un ticket correspondant à ce service.</p>
+<p>Le client présente ensuite ce ticket au serveur concerné.</p>
+<p>On obtient donc trois acteurs essentiels :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a href="#__codelineno-26-1" id="__codelineno-26-1" name="__codelineno-26-1"></a>Client
+</span><span id="__span-26-2"><a href="#__codelineno-26-2" id="__codelineno-26-2" name="__codelineno-26-2"></a>  │
+</span><span id="__span-26-3"><a href="#__codelineno-26-3" id="__codelineno-26-3" name="__codelineno-26-3"></a>  ├──── KDC : obtenir les tickets
+</span><span id="__span-26-4"><a href="#__codelineno-26-4" id="__codelineno-26-4" name="__codelineno-26-4"></a>  │
+</span><span id="__span-26-5"><a href="#__codelineno-26-5" id="__codelineno-26-5" name="__codelineno-26-5"></a>  └──── Service : présenter le ticket
+</span></code></pre></div>
+<p>Cette architecture permet notamment de ne pas transmettre le mot de passe de l’utilisateur à chaque service utilisé.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+À quoi sert principalement le TGT dans Kerberos ?
+
+- [ ] À remplacer le serveur DNS
+- [ ] À donner directement accès à tous les fichiers du domaine
+- [x] À permettre au client de demander des tickets pour différents services
+- [ ] À attribuer une adresse IP au client
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-9">
+<a class="quiz-header-link" href="#quiz-9">#</a>
+<div class="quiz-question" id="quiz-9-question">
+<p>À quoi sert principalement le TGT dans Kerberos ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-9-question"><div><input id="quiz-9-0" name="answer" type="radio" value="0"/><label for="quiz-9-0">À remplacer le serveur DNS</label></div><div><input id="quiz-9-1" name="answer" type="radio" value="1"/><label for="quiz-9-1">À donner directement accès à tous les fichiers du domaine</label></div><div><input data-correct="true" id="quiz-9-2" name="answer" type="radio" value="2"/><label for="quiz-9-2">À permettre au client de demander des tickets pour différents services</label></div><div><input id="quiz-9-3" name="answer" type="radio" value="3"/><label for="quiz-9-3">À attribuer une adresse IP au client</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="kerberos-et-dns">Kerberos et DNS<a class="headerlink" href="#kerberos-et-dns" title="Permanent link">¶</a></h3>
+<p>Kerberos et Active Directory dépendent fortement d’une résolution DNS correcte.</p>
+<p>Avant de contacter les services nécessaires, le client doit être capable de les localiser.</p>
+<p>On retrouve donc la chaîne étudiée depuis le Socle :</p>
+<pre class="mermaid"><code>flowchart LR
+    CLIENT["Client"]
+    DNS["DNS Active Directory"]
+    DC["DC / KDC"]
+    SERVICE["Service"]
+
+    CLIENT --&gt;|"Localisation"| DNS
+    DNS --&gt;|"Informations"| CLIENT
+    CLIENT --&gt;|"Kerberos"| DC
+    CLIENT --&gt;|"Ticket"| SERVICE</code></pre>
+<p>Une mauvaise configuration DNS peut donc produire des symptômes qui ressemblent à des problèmes d’authentification.</p>
+<hr/>
+<h3 id="kerberos-et-lheure">Kerberos et l’heure<a class="headerlink" href="#kerberos-et-lheure" title="Permanent link">¶</a></h3>
+<p>Kerberos utilise également la notion de temps dans ses mécanismes de sécurité.</p>
+<p>Les machines du domaine doivent donc disposer d’horloges correctement synchronisées.</p>
+<p>Cela explique pourquoi la synchronisation de l’heure n’est pas un simple détail d’exploitation.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a href="#__codelineno-27-1" id="__codelineno-27-1" name="__codelineno-27-1"></a>DNS correct
+</span><span id="__span-27-2"><a href="#__codelineno-27-2" id="__codelineno-27-2" name="__codelineno-27-2"></a>    +
+</span><span id="__span-27-3"><a href="#__codelineno-27-3" id="__codelineno-27-3" name="__codelineno-27-3"></a>heure cohérente
+</span><span id="__span-27-4"><a href="#__codelineno-27-4" id="__codelineno-27-4" name="__codelineno-27-4"></a>    +
+</span><span id="__span-27-5"><a href="#__codelineno-27-5" id="__codelineno-27-5" name="__codelineno-27-5"></a>services AD disponibles
+</span><span id="__span-27-6"><a href="#__codelineno-27-6" id="__codelineno-27-6" name="__codelineno-27-6"></a>    ↓
+</span><span id="__span-27-7"><a href="#__codelineno-27-7" id="__codelineno-27-7" name="__codelineno-27-7"></a>conditions nécessaires au bon fonctionnement
+</span><span id="__span-27-8"><a href="#__codelineno-27-8" id="__codelineno-27-8" name="__codelineno-27-8"></a>de l’authentification du domaine
+</span></code></pre></div>
+<hr/>
+<h3 id="spn-identifier-un-service">SPN : identifier un service<a class="headerlink" href="#spn-identifier-un-service" title="Permanent link">¶</a></h3>
+<p>Kerberos doit pouvoir identifier le service pour lequel un ticket est demandé.</p>
+<p>Les <strong>SPN</strong> (<em>Service Principal Names</em>) permettent d’identifier des instances de services associées à des comptes Active Directory.</p>
+<p>La notion devient importante lorsqu’on cherche à comprendre pourquoi Kerberos fonctionne pour un service mais échoue pour un autre.</p>
+<details class="info">
+<summary>À retenir sur les SPN</summary>
+<p>Au niveau Expertise, retenez surtout :</p>
+<ul>
+<li>un ticket Kerberos est demandé pour un <strong>service identifié</strong> ;</li>
+<li>ce service est associé à un <strong>SPN</strong> ;</li>
+<li>une configuration incorrecte ou dupliquée des SPN peut provoquer des problèmes d’authentification.</li>
+</ul>
+</details>
+<hr/>
+<h3 id="ldap-et-ldaps">LDAP et LDAPS<a class="headerlink" href="#ldap-et-ldaps" title="Permanent link">¶</a></h3>
+<p>Active Directory est un <strong>service d’annuaire</strong>. Les applications peuvent interroger cet annuaire avec <strong>LDAP</strong> (<em>Lightweight Directory Access Protocol</em>).</p>
+<p>LDAP peut notamment servir à :</p>
+<ul>
+<li>rechercher un utilisateur ;</li>
+<li>rechercher un groupe ;</li>
+<li>lire certains attributs de l’annuaire ;</li>
+<li>permettre à une application de s’appuyer sur Active Directory pour l’identification ou l’autorisation.</li>
+</ul>
+<p>On rencontre notamment :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a href="#__codelineno-28-1" id="__codelineno-28-1" name="__codelineno-28-1"></a>LDAP   → TCP 389
+</span><span id="__span-28-2"><a href="#__codelineno-28-2" id="__codelineno-28-2" name="__codelineno-28-2"></a>LDAPS  → TCP 636
+</span></code></pre></div>
+<p>Mais il faut distinguer plusieurs notions :</p>
+<table>
+<thead>
+<tr>
+<th>Mécanisme</th>
+<th>Idée générale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LDAP</td>
+<td>protocole d’accès à l’annuaire</td>
+</tr>
+<tr>
+<td>LDAPS</td>
+<td>LDAP protégé par TLS dès l’établissement de la connexion</td>
+</tr>
+<tr>
+<td>LDAP + mécanismes de signature/chiffrement</td>
+<td>sécurisation possible d’une session LDAP sans simplement raisonner « port 389 = non sécurisé »</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Ne pas retenir une règle trop simpliste</p>
+<p><code>389 = dangereux</code> et <code>636 = sécurisé</code> serait une mauvaise conclusion.</p>
+<p>Il faut s’intéresser au <strong>mécanisme d’authentification</strong>, à la <strong>signature</strong>, au <strong>chiffrement</strong> et à la validation du certificat lorsqu’un canal TLS est utilisé.</p>
+</div>
+<h4 id="pourquoi-cette-question-devient-importante-avec-windows-server-2025">Pourquoi cette question devient importante avec Windows Server 2025 ?<a class="headerlink" href="#pourquoi-cette-question-devient-importante-avec-windows-server-2025" title="Permanent link">¶</a></h4>
+<p>Les versions récentes de Windows Server renforcent progressivement les exigences de sécurité autour des communications LDAP.</p>
+<p>Avec <strong>Windows Server 2025</strong>, il devient particulièrement pertinent de vérifier les applications ou équipements qui utilisent encore des liaisons LDAP insuffisamment protégées.</p>
+<p>Avant de connecter une application à Active Directory, vous devez donc vous demander :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a href="#__codelineno-29-1" id="__codelineno-29-1" name="__codelineno-29-1"></a>Application
+</span><span id="__span-29-2"><a href="#__codelineno-29-2" id="__codelineno-29-2" name="__codelineno-29-2"></a>    │
+</span><span id="__span-29-3"><a href="#__codelineno-29-3" id="__codelineno-29-3" name="__codelineno-29-3"></a>    ├── Quel protocole utilise-t-elle ?
+</span><span id="__span-29-4"><a href="#__codelineno-29-4" id="__codelineno-29-4" name="__codelineno-29-4"></a>    ├── Comment s’authentifie-t-elle ?
+</span><span id="__span-29-5"><a href="#__codelineno-29-5" id="__codelineno-29-5" name="__codelineno-29-5"></a>    ├── La communication est-elle signée ?
+</span><span id="__span-29-6"><a href="#__codelineno-29-6" id="__codelineno-29-6" name="__codelineno-29-6"></a>    ├── Est-elle chiffrée ?
+</span><span id="__span-29-7"><a href="#__codelineno-29-7" id="__codelineno-29-7" name="__codelineno-29-7"></a>    └── Si TLS est utilisé, le certificat est-il valide ?
+</span></code></pre></div>
+<p>Cela concerne par exemple :</p>
+<ul>
+<li>une application Web utilisant l’annuaire ;</li>
+<li>GLPI ;</li>
+<li>un hyperviseur ;</li>
+<li>un pare-feu ;</li>
+<li>un NAS ;</li>
+<li>un outil de supervision ;</li>
+<li>une application métier.</li>
+</ul>
+<h4 id="ldaps-et-certificats">LDAPS et certificats<a class="headerlink" href="#ldaps-et-certificats" title="Permanent link">¶</a></h4>
+<p>Pour proposer LDAPS, le contrôleur de domaine doit disposer d’un certificat adapté.</p>
+<p>On introduit alors une nouvelle dépendance :</p>
+<pre class="mermaid"><code>flowchart LR
+    APP["Application"]
+    DNS["DNS"]
+    DC["Contrôleur de domaine&lt;br/&gt;LDAP / LDAPS"]
+    CERT["Certificat du DC"]
+    PKI["Autorité de certification"]
+
+    APP --&gt;|"Résolution"| DNS
+    APP --&gt;|"Connexion LDAP sécurisée"| DC
+    CERT --- DC
+    PKI --&gt;|"Émet / permet de valider"| CERT</code></pre>
+<p>Cela permet de faire le lien avec une future infrastructure <strong>PKI / AD CS</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Ce qu’il faut comprendre</p>
+<p>Utiliser LDAPS ne consiste pas simplement à remplacer <code>389</code> par <code>636</code>.</p>
+<p>Il faut également que le client puisse <strong>faire confiance au certificat présenté par le contrôleur de domaine</strong>.</p>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+Une application utilise LDAP pour interroger Active Directory. Quelle démarche est la plus pertinente ?
+
+- [ ] Autoriser TCP 389 depuis tous les VLAN
+- [ ] Remplacer systématiquement 389 par 636 sans autre vérification
+- [x] Identifier le mécanisme d’authentification et vérifier la protection de la communication
+- [ ] Installer un deuxième contrôleur de domaine
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-10">
+<a class="quiz-header-link" href="#quiz-10">#</a>
+<div class="quiz-question" id="quiz-10-question">
+<p>Une application utilise LDAP pour interroger Active Directory. Quelle démarche est la plus pertinente ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-10-question"><div><input id="quiz-10-0" name="answer" type="radio" value="0"/><label for="quiz-10-0">Autoriser TCP 389 depuis tous les VLAN</label></div><div><input id="quiz-10-1" name="answer" type="radio" value="1"/><label for="quiz-10-1">Remplacer systématiquement 389 par 636 sans autre vérification</label></div><div><input data-correct="true" id="quiz-10-2" name="answer" type="radio" value="2"/><label for="quiz-10-2">Identifier le mécanisme d’authentification et vérifier la protection de la communication</label></div><div><input id="quiz-10-3" name="answer" type="radio" value="3"/><label for="quiz-10-3">Installer un deuxième contrôleur de domaine</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<!-- mkdocs-quiz-source
+<quiz>
+Une application tente une connexion LDAPS vers un contrôleur de domaine mais refuse son certificat. Quel élément faut-il notamment vérifier ?
+
+- [ ] Le serveur DHCP
+- [x] La chaîne de confiance et le certificat présenté par le contrôleur de domaine
+- [ ] Le nombre d’OU du domaine
+- [ ] Le rôle FSMO RID Master
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-11">
+<a class="quiz-header-link" href="#quiz-11">#</a>
+<div class="quiz-question" id="quiz-11-question">
+<p>Une application tente une connexion LDAPS vers un contrôleur de domaine mais refuse son certificat. Quel élément faut-il notamment vérifier ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-11-question"><div><input id="quiz-11-0" name="answer" type="radio" value="0"/><label for="quiz-11-0">Le serveur DHCP</label></div><div><input data-correct="true" id="quiz-11-1" name="answer" type="radio" value="1"/><label for="quiz-11-1">La chaîne de confiance et le certificat présenté par le contrôleur de domaine</label></div><div><input id="quiz-11-2" name="answer" type="radio" value="2"/><label for="quiz-11-2">Le nombre d’OU du domaine</label></div><div><input id="quiz-11-3" name="answer" type="radio" value="3"/><label for="quiz-11-3">Le rôle FSMO RID Master</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="comptes-de-service">Comptes de service<a class="headerlink" href="#comptes-de-service" title="Permanent link">¶</a></h3>
+<p>Certaines applications et certains services doivent eux-mêmes s’exécuter avec une identité.</p>
+<p>Créer un compte utilisateur classique avec un mot de passe qui n’expire jamais est une solution simple mais peu satisfaisante.</p>
+<p>Active Directory propose des mécanismes plus adaptés aux <strong>comptes de service</strong>.</p>
+<details class="info">
+<summary>gMSA</summary>
+<p>Les <strong>gMSA</strong> (<em>Group Managed Service Accounts</em>) permettent notamment à Active Directory de gérer automatiquement certains aspects du mot de passe d’un compte de service.</p>
+<p>Cette notion est particulièrement intéressante lorsque plusieurs serveurs ou services doivent utiliser une identité gérée proprement.</p>
+</details>
+<hr/>
+<h3 id="rodc">RODC<a class="headerlink" href="#rodc" title="Permanent link">¶</a></h3>
+<p>Dans certaines architectures, un site distant peut avoir besoin d’un contrôleur de domaine local sans que l’on souhaite y placer une copie modifiable classique de l’annuaire.</p>
+<p>Un <strong>RODC</strong> (<em>Read-Only Domain Controller</em>) fournit une copie en lecture seule de l’annuaire.</p>
+<pre class="mermaid"><code>flowchart LR
+    DC["DC inscriptible&lt;br/&gt;site principal"]
+    RODC["RODC&lt;br/&gt;site distant"]
+
+    DC --&gt;|"Réplication"| RODC</code></pre>
+<p>Le RODC répond à des besoins particuliers.</p>
+<p>Il ne doit pas être ajouté simplement pour pouvoir dire que l’architecture contient « un type de DC supplémentaire ».</p>
+<hr/>
+<h3 id="diagnostiquer-plutot-que-redemarrer">Diagnostiquer plutôt que redémarrer<a class="headerlink" href="#diagnostiquer-plutot-que-redemarrer" title="Permanent link">¶</a></h3>
+<p>Au niveau Expertise, le diagnostic doit relier les différentes briques.</p>
+<p>Lorsqu’un utilisateur ne parvient pas à accéder à une ressource du domaine, on peut raisonner sur la chaîne :</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a href="#__codelineno-30-1" id="__codelineno-30-1" name="__codelineno-30-1"></a>Configuration IP
+</span><span id="__span-30-2"><a href="#__codelineno-30-2" id="__codelineno-30-2" name="__codelineno-30-2"></a>      ↓
+</span><span id="__span-30-3"><a href="#__codelineno-30-3" id="__codelineno-30-3" name="__codelineno-30-3"></a>DNS
+</span><span id="__span-30-4"><a href="#__codelineno-30-4" id="__codelineno-30-4" name="__codelineno-30-4"></a>      ↓
+</span><span id="__span-30-5"><a href="#__codelineno-30-5" id="__codelineno-30-5" name="__codelineno-30-5"></a>Localisation du domaine
+</span><span id="__span-30-6"><a href="#__codelineno-30-6" id="__codelineno-30-6" name="__codelineno-30-6"></a>      ↓
+</span><span id="__span-30-7"><a href="#__codelineno-30-7" id="__codelineno-30-7" name="__codelineno-30-7"></a>Synchronisation de l’heure
+</span><span id="__span-30-8"><a href="#__codelineno-30-8" id="__codelineno-30-8" name="__codelineno-30-8"></a>      ↓
+</span><span id="__span-30-9"><a href="#__codelineno-30-9" id="__codelineno-30-9" name="__codelineno-30-9"></a>Authentification Kerberos
+</span><span id="__span-30-10"><a href="#__codelineno-30-10" id="__codelineno-30-10" name="__codelineno-30-10"></a>      ↓
+</span><span id="__span-30-11"><a href="#__codelineno-30-11" id="__codelineno-30-11" name="__codelineno-30-11"></a>Ticket du service
+</span><span id="__span-30-12"><a href="#__codelineno-30-12" id="__codelineno-30-12" name="__codelineno-30-12"></a>      ↓
+</span><span id="__span-30-13"><a href="#__codelineno-30-13" id="__codelineno-30-13" name="__codelineno-30-13"></a>Droits sur la ressource
+</span></code></pre></div>
+<p>L’objectif est de déterminer <strong>à quelle étape le fonctionnement attendu s’interrompt</strong>.</p>
+<!-- mkdocs-quiz-source
+<quiz>
+Un utilisateur ouvre correctement sa session sur le domaine mais l’accès à un service utilisant Kerberos échoue. Quelle conclusion est la plus rigoureuse ?
+
+- [ ] Active Directory est forcément totalement en panne
+- [ ] Le mot de passe de l’utilisateur est forcément faux
+- [x] L’authentification initiale fonctionne ; il faut poursuivre le diagnostic sur la localisation, le ticket du service et les droits
+- [ ] Il faut immédiatement recréer le domaine
+</quiz>
+-->
+<div class="quiz" data-auto-submit="true" data-disable-after-submit="true" data-show-correct="true" id="quiz-12">
+<a class="quiz-header-link" href="#quiz-12">#</a>
+<div class="quiz-question" id="quiz-12-question">
+<p>Un utilisateur ouvre correctement sa session sur le domaine mais l’accès à un service utilisant Kerberos échoue. Quelle conclusion est la plus rigoureuse ?</p>
+</div>
+<form action="javascript:void(0);" onsubmit="return false;">
+<fieldset aria-labelledby="quiz-12-question"><div><input id="quiz-12-0" name="answer" type="radio" value="0"/><label for="quiz-12-0">Active Directory est forcément totalement en panne</label></div><div><input id="quiz-12-1" name="answer" type="radio" value="1"/><label for="quiz-12-1">Le mot de passe de l’utilisateur est forcément faux</label></div><div><input data-correct="true" id="quiz-12-2" name="answer" type="radio" value="2"/><label for="quiz-12-2">L’authentification initiale fonctionne ; il faut poursuivre le diagnostic sur la localisation, le ticket du service et les droits</label></div><div><input id="quiz-12-3" name="answer" type="radio" value="3"/><label for="quiz-12-3">Il faut immédiatement recréer le domaine</label></div></fieldset>
+<div class="quiz-feedback hidden"></div>
+</form>
+<section class="content hidden"></section>
+</div>
+<hr/>
+<h3 id="ce-que-vous-devez-etre-capables-dexpliquer_2">Ce que vous devez être capables d’expliquer<a class="headerlink" href="#ce-que-vous-devez-etre-capables-dexpliquer_2" title="Permanent link">¶</a></h3>
+<p>À la fin du niveau Expertise, vous devez être capables d’expliquer :</p>
+<ul>
+<li>le rôle général de Kerberos ;</li>
+<li>pourquoi Kerberos utilise des tickets ;</li>
+<li>le rôle du KDC ;</li>
+<li>la différence entre TGT et ticket de service ;</li>
+<li>pourquoi le mot de passe n’est pas envoyé à chaque service ;</li>
+<li>le lien entre DNS et Kerberos ;</li>
+<li>l’importance de la synchronisation de l’heure ;</li>
+<li>le principe d’un SPN ;</li>
+<li>le rôle de LDAP et la différence générale avec LDAPS ;</li>
+<li>pourquoi les comptes de service nécessitent une gestion particulière ;</li>
+<li>le principe d’un gMSA ;</li>
+<li>le rôle possible d’un RODC ;</li>
+<li>comment construire une démarche de diagnostic reliant DNS, Kerberos et les droits.</li>
+</ul>
+<hr/>
+<h2 id="synthese">Synthèse<a class="headerlink" href="#synthese" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    SOCLE["Socle&lt;br/&gt;AD DS + DNS&lt;br/&gt;1 DC administré à distance"]
+    ADV["Avancé&lt;br/&gt;2 DC&lt;br/&gt;réplication et résilience"]
+    EXP["Expertise&lt;br/&gt;Kerberos&lt;br/&gt;tickets et services"]
+
+    SOCLE --&gt; ADV --&gt; EXP</code></pre>
+<table>
+<thead>
+<tr>
+<th>Niveau</th>
+<th>Objectif principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Socle obligatoire</strong></td>
+<td>Comprendre et déployer un domaine AD DS/DNS administré proprement</td>
+</tr>
+<tr>
+<td><strong>Concepts avancés</strong></td>
+<td>Rendre AD/DNS plus disponible et comprendre sa réplication</td>
+</tr>
+<tr>
+<td><strong>Expertise</strong></td>
+<td>Comprendre les mécanismes d’authentification et les services avancés</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition success">
+<p class="admonition-title">Le point à retenir</p>
+<p>Un contrôleur de domaine n’a pas besoin d’être directement connecté au VLAN Management pour être administrable.</p>
+<p>Dans l’architecture SportLudique :</p>
+<p><strong>l’administrateur entre sur le serveur d’administration par le VLAN Management ; le serveur d’administration contacte ensuite le DC par le VLAN Serveurs.</strong></p>
+<p>Le DC conserve ainsi <strong>une seule interface réseau</strong>, dédiée au réseau des serveurs.</p>
+</div><div aria-label="Quiz Progress" id="quiz-progress-sidebar" style="display: none;">
+<!-- mkdocs-quiz progress sidebar (desktop) -->
+<label class="md-nav__title">
+<span class="md-nav__icon md-icon"></span>
+    Quiz Progress
+  </label>
+<ul class="md-nav__list" data-md-component="quiz-progress">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<span class="md-ellipsis">
+          Answered: <span class="quiz-progress-answered">0</span> / <span class="quiz-progress-total">0</span> (<span class="quiz-progress-answered-percentage">0%</span>)
+        </span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<div class="quiz-progress-bar">
+<div class="quiz-progress-bar-incorrect" style="width: 0%"></div>
+<div class="quiz-progress-bar-correct" style="width: 0%"></div>
+</div>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link quiz-correct-reset">
+<span class="md-ellipsis">
+          Correct: <span class="quiz-progress-score">0</span> / <span class="quiz-progress-score-total">0</span> (<span class="quiz-progress-score-percentage">0%</span>)
+        </span>
+<a class="quiz-reset-all-link" href="#" style="color: var(--md-primary-fg-color); text-decoration: none;">
+          Reset
+        </a>
+</div>
+</li>
+</ul>
+</div>
+<nav aria-label="Quiz Progress" class="quiz-progress-mobile md-nav" id="quiz-progress-mobile" style="display: none;">
+<!-- mkdocs-quiz progress sidebar (mobile) -->
+<div class="quiz-progress-bar">
+<div class="quiz-progress-bar-incorrect" style="width: 0%"></div>
+<div class="quiz-progress-bar-correct" style="width: 0%"></div>
+</div>
+<div data-md-component="quiz-progress">
+<div class="quiz-correct-reset">
+<span class="md-ellipsis">
+        Answered: <span class="quiz-progress-answered">0</span> / <span class="quiz-progress-total">0</span>
+</span>
+<span class="md-ellipsis">
+        Correct: <span class="quiz-progress-score">0</span> / <span class="quiz-progress-score-total">0</span>
+</span>
+<a class="quiz-reset-all-link" href="#" style="color: var(--md-primary-fg-color); text-decoration: none;">
+        Reset
+      </a>
+</div>
+</div>
+</nav><style type="text/css">.quiz {
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 1rem 0;
+  position: relative;
+}
+/* Set margin-top of first quiz child (skip the header link) */
+.quiz > .quiz-question:first-of-type {
+  margin-top: 0;
+}
+/* Remove top margin from first element inside quiz-question */
+.quiz-question > *:first-child {
+  margin-top: 0;
+}
+.quiz .hidden {
+  display: none;
+}
+
+.quiz form button {
+  background-color: var(--md-primary-fg-color);
+  border: none;
+  color: var(--md-primary-bg-color);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
+}
+
+.quiz form button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.quiz form button:disabled {
+  background-color: var(--md-default-fg-color--lighter, #ccc);
+  color: var(--md-default-fg-color--light, #666);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.wrong label,
+.wrong label * {
+  color: #dc3545;
+  text-decoration: line-through;
+}
+.correct label,
+.correct label * {
+  color: #198754;
+  font-weight: bold;
+}
+
+fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+}
+fieldset input {
+  margin: 0 10px;
+}
+fieldset label {
+  margin: 0 10px;
+}
+
+input[type="radio"].correct {
+  accent-color: #198754;
+}
+input[type="radio"].wrong {
+  accent-color: #dc3545;
+}
+.content {
+  margin: 10px;
+}
+
+/* Quiz feedback container */
+.quiz-feedback {
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Individual feedback box (one per answer) */
+.quiz-feedback-item {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.quiz-feedback-item.correct {
+  background-color: #d1e7dd;
+  border: 1px solid #a3cfbb;
+  color: #198754;
+}
+
+.quiz-feedback-item.incorrect {
+  background-color: #f8d7da;
+  border: 1px solid #f1aeb5;
+  color: #dc3545;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.correct {
+  background-color: #051b11;
+  border: 1px solid #0f5132;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.incorrect {
+  background-color: #2c0b0e;
+  border: 1px solid #842029;
+}
+
+/* Answer label badge overlapping top-left of feedback box */
+.quiz-feedback-badge {
+  position: absolute;
+  top: -0.55rem;
+  left: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quiz-feedback-item.correct .quiz-feedback-badge {
+  background-color: #a3cfbb;
+  color: #0f5132;
+}
+
+.quiz-feedback-item.incorrect .quiz-feedback-badge {
+  background-color: #f1aeb5;
+  color: #842029;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.correct .quiz-feedback-badge {
+  background-color: #0f5132;
+  color: #a3cfbb;
+}
+
+[data-md-color-scheme="slate"] .quiz-feedback-item.incorrect .quiz-feedback-badge {
+  background-color: #842029;
+  color: #f1aeb5;
+}
+
+/* When badge is present, add top padding to prevent content overlap */
+.quiz-feedback-badge + .quiz-feedback-item-content {
+  margin-top: 0.25rem;
+}
+
+/* Quiz header link styling - positioned in top right corner */
+.quiz-header-link {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0;
+  font-size: 1rem;
+  text-decoration: none;
+  color: var(--md-default-fg-color--light, #888);
+  transition: opacity 0.2s;
+  padding: 0.25rem 0.5rem;
+}
+.quiz:hover .quiz-header-link,
+.quiz-header-link:focus-visible {
+  opacity: 1;
+}
+
+/* Focus indicators for keyboard navigation */
+.quiz input:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color, #448aff);
+  outline-offset: 2px;
+}
+
+/* Quiz number header styling */
+.quiz-number {
+  margin-top: 0 !important;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* Quiz Progress Sidebar - Progress bar styling */
+/* Most styling comes from Material's .md-nav classes */
+#quiz-progress-sidebar {
+  margin-top: 1.5rem;
+}
+/* if config progress_sidebar_position is top, need top padding instead of bottom */
+.md-nav--secondary > #quiz-progress-sidebar:first-child {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+@media screen and (min-width: 59.9375em) {
+  #quiz-progress-sidebar .md-nav__list {
+    border-left: 3px solid var(--md-default-fg-color--lightest);
+  }
+}
+
+.quiz-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.07));
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0.2rem 0;
+  display: flex;
+}
+
+.quiz-progress-bar-incorrect {
+  height: 100%;
+  background: rgba(244, 67, 54, 0.8);
+  transition: width 0.3s ease;
+}
+
+.quiz-progress-bar-correct {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.quiz-correct-reset {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Mobile Quiz Progress Tracker */
+/* Shows under navbar on mobile, hidden on desktop */
+.quiz-progress-mobile {
+  display: none; /* Hidden by default on desktop */
+  background-color: var(--md-default-bg-color);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.07));
+  padding: 0.8rem;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: sticky;
+  top: 48px;
+  z-index: 3; /* Below Material header (z-index: 4) but above page content */
+}
+
+/* Show the mobile tracker only when the secondary sidebar (and its progress
+   widget) is hidden. Material reveals .md-sidebar--secondary at min-width: 60em,
+   so the mobile tracker must stop at 60em - 1px to avoid showing both at once. */
+@media screen and (max-width: 59.9375em) {
+  .quiz-progress-mobile {
+    display: block;
+  }
+}
+
+/* Mobile tracker styling adjustments */
+.quiz-progress-mobile .md-nav__list {
+  padding: 0;
+  margin: 0;
+  max-width: 61rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.quiz-progress-mobile .md-nav__item {
+  margin: 0.3rem 0;
+}
+
+.quiz-progress-mobile .md-nav__link {
+  padding: 0.2rem 0;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quiz-progress-mobile .quiz-progress-bar {
+  margin: 0.3rem 0;
+}
+
+.quiz-progress-mobile .md-ellipsis {
+  flex: 1;
+}
+
+/* Quiz Intro */
+.quiz-intro {
+  margin: 1rem 0;
+}
+
+.quiz-intro p {
+  margin: 0 0 0.5rem 0;
+}
+
+/* Quiz Results End Screen */
+.quiz-results {
+  border: 1px solid black;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  background-color: var(--md-default-bg-color);
+  transition: all 0.3s ease;
+}
+
+/* Progress state - subtle styling */
+.quiz-results-progress {
+  text-align: center;
+  color: var(--md-default-fg-color--light);
+}
+
+.quiz-results-progress h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+}
+
+.quiz-results-stats,
+.quiz-results-correct-stats {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.quiz-results-answered,
+.quiz-results-correct,
+.quiz-results-total,
+.quiz-results-percentage {
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+}
+
+/* Complete state - bold and prominent styling */
+.quiz-results-complete {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.quiz-results-complete.hidden {
+  display: none;
+}
+
+.quiz-results-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: var(--md-default-fg-color);
+}
+
+.quiz-results-score-display {
+  margin: 1.5rem 0;
+}
+
+.quiz-results-score-value {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+/* Score color coding */
+.quiz-results-score-excellent {
+  color: #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.quiz-results-score-good {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.quiz-results-score-average {
+  color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.quiz-results-score-poor {
+  color: #fd7e14;
+  background-color: rgba(253, 126, 20, 0.1);
+}
+
+.quiz-results-score-fail {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.quiz-results-message {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 1rem 0 2rem 0;
+  color: var(--md-default-fg-color);
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .quiz-results-score-excellent {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-good {
+  color: #66bb6a;
+  background-color: rgba(102, 187, 106, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-average {
+  color: #ffeb3b;
+  background-color: rgba(255, 235, 59, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-poor {
+  color: #ff9800;
+  background-color: rgba(255, 152, 0, 0.15);
+}
+
+[data-md-color-scheme="slate"] .quiz-results-score-fail {
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.15);
+}
+
+/* Fill-in-the-blank quiz styles */
+.quiz-blank-input {
+  border: none;
+  border-bottom: 2px solid var(--md-default-fg-color--light, #999);
+  background-color: transparent;
+  padding: 0.2rem 0.5rem;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--md-default-fg-color);
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+  /* min-width is set via inline style based on answer length */
+}
+
+.quiz-blank-input:focus {
+  border-bottom-color: var(--md-primary-fg-color, #1976d2);
+  background-color: var(--md-default-bg-color--light, rgba(0, 0, 0, 0.02));
+}
+
+.quiz-blank-input.correct {
+  border-bottom-color: #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+  color: #198754;
+}
+
+.quiz-blank-input.wrong {
+  border-bottom-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.quiz-blank-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Dark mode adjustments for fill-in-the-blank */
+[data-md-color-scheme="slate"] .quiz-blank-input {
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input.correct {
+  border-bottom-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+[data-md-color-scheme="slate"] .quiz-blank-input.wrong {
+  border-bottom-color: #f44336;
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+</style><script type="text/javascript">var JSConfetti=function(){"use strict";function t(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function e(t,e){for(var i=0;i<e.length;i++){var n=e[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}function i(t,i,n){return i&&e(t.prototype,i),n&&e(t,n),t}function n(t){return+t.replace(/px/,"")}function s(t,e){var i=arguments.length>2&&void 0!==arguments[2]?arguments[2]:0,n=Math.random()*(e-t)+t;return Math.floor(n*Math.pow(10,i))/Math.pow(10,i)}function o(t){return t[s(0,t.length)]}var a=["#fcf403","#62fc03","#f4fc03","#03e7fc","#03fca5","#a503fc","#fc03ad","#fc03c2"];function r(t){return Math.log(t)/Math.log(1920)}var h=function(){function e(i){t(this,e);var n=i.initialPosition,a=i.direction,h=i.confettiRadius,c=i.confettiColors,u=i.emojis,l=i.emojiSize,d=i.canvasWidth,f=s(.9,1.7,3)*r(d);this.confettiSpeed={x:f,y:f},this.finalConfettiSpeedX=s(.2,.6,3),this.rotationSpeed=u.length?.01:s(.03,.07,3)*r(d),this.dragForceCoefficient=s(5e-4,9e-4,6),this.radius={x:h,y:h},this.initialRadius=h,this.rotationAngle="left"===a?s(0,.2,3):s(-.2,0,3),this.emojiSize=l,this.emojiRotationAngle=s(0,2*Math.PI),this.radiusYUpdateDirection="down";var m="left"===a?s(82,15)*Math.PI/180:s(-15,-82)*Math.PI/180;this.absCos=Math.abs(Math.cos(m)),this.absSin=Math.abs(Math.sin(m));var v=s(-150,0),p={x:n.x+("left"===a?-v:v)*this.absCos,y:n.y-v*this.absSin};this.currentPosition=Object.assign({},p),this.initialPosition=Object.assign({},p),this.color=u.length?null:o(c),this.emoji=u.length?o(u):null,this.createdAt=(new Date).getTime(),this.direction=a}return i(e,[{key:"draw",value:function(t){var e=this.currentPosition,i=this.radius,n=this.color,s=this.emoji,o=this.rotationAngle,a=this.emojiRotationAngle,r=this.emojiSize,h=window.devicePixelRatio;n?(t.fillStyle=n,t.beginPath(),t.ellipse(e.x*h,e.y*h,i.x*h,i.y*h,o,0,2*Math.PI),t.fill()):s&&(t.font="".concat(r,"px serif"),t.save(),t.translate(h*e.x,h*e.y),t.rotate(a),t.textAlign="center",t.fillText(s,0,0),t.restore())}},{key:"updatePosition",value:function(t,e){var i=this.confettiSpeed,n=this.dragForceCoefficient,s=this.finalConfettiSpeedX,o=this.radiusYUpdateDirection,a=this.rotationSpeed,r=this.createdAt,h=this.direction,c=e-r;i.x>s&&(this.confettiSpeed.x-=n*t),this.currentPosition.x+=i.x*("left"===h?-this.absCos:this.absCos)*t,this.currentPosition.y=this.initialPosition.y-i.y*this.absSin*c+.00125*Math.pow(c,2)/2,this.rotationSpeed-=this.emoji?1e-4:1e-5*t,this.rotationSpeed<0&&(this.rotationSpeed=0),this.emoji?this.emojiRotationAngle+=this.rotationSpeed*t%(2*Math.PI):"down"===o?(this.radius.y-=t*a,this.radius.y<=0&&(this.radius.y=0,this.radiusYUpdateDirection="up")):(this.radius.y+=t*a,this.radius.y>=this.initialRadius&&(this.radius.y=this.initialRadius,this.radiusYUpdateDirection="down"))}},{key:"getIsVisibleOnCanvas",value:function(t){return this.currentPosition.y<t+100}}]),e}();function c(){var t=document.createElement("canvas");return t.style.position="fixed",t.style.width="100%",t.style.height="100%",t.style.top="0",t.style.left="0",t.style.zIndex="1000",t.style.pointerEvents="none",document.body.appendChild(t),t}function u(t){var e=t.confettiRadius,i=void 0===e?6:e,n=t.confettiNumber,s=void 0===n?t.confettiesNumber||(t.emojis?40:250):n,o=t.confettiColors,r=void 0===o?a:o,h=t.emojis,c=void 0===h?t.emojies||[]:h,u=t.emojiSize,l=void 0===u?80:u;return t.emojies&&console.error("emojies argument is deprecated, please use emojis instead"),t.confettiesNumber&&console.error("confettiesNumber argument is deprecated, please use confettiNumber instead"),{confettiRadius:i,confettiNumber:s,confettiColors:r,emojis:c,emojiSize:l}}var l=function(){function e(i){var n=this;t(this,e),this.canvasContext=i,this.shapes=[],this.promise=new Promise((function(t){return n.resolvePromise=t}))}return i(e,[{key:"getBatchCompletePromise",value:function(){return this.promise}},{key:"addShapes",value:function(){var t;(t=this.shapes).push.apply(t,arguments)}},{key:"complete",value:function(){var t;return!this.shapes.length&&(null===(t=this.resolvePromise)||void 0===t||t.call(this),!0)}},{key:"processShapes",value:function(t,e,i){var n=this,s=t.timeDelta,o=t.currentTime;this.shapes=this.shapes.filter((function(t){return t.updatePosition(s,o),t.draw(n.canvasContext),!i||t.getIsVisibleOnCanvas(e)}))}}]),e}();return function(){function e(){var i=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};t(this,e),this.activeConfettiBatches=[],this.canvas=i.canvas||c(),this.canvasContext=this.canvas.getContext("2d"),this.requestAnimationFrameRequested=!1,this.lastUpdated=(new Date).getTime(),this.iterationIndex=0,this.loop=this.loop.bind(this),requestAnimationFrame(this.loop)}return i(e,[{key:"loop",value:function(){var t,e,i,s,o;this.requestAnimationFrameRequested=!1,t=this.canvas,e=window.devicePixelRatio,i=getComputedStyle(t),s=n(i.getPropertyValue("width")),o=n(i.getPropertyValue("height")),t.setAttribute("width",(s*e).toString()),t.setAttribute("height",(o*e).toString());var a=(new Date).getTime(),r=a-this.lastUpdated,h=this.canvas.offsetHeight,c=this.iterationIndex%10==0;this.activeConfettiBatches=this.activeConfettiBatches.filter((function(t){return t.processShapes({timeDelta:r,currentTime:a},h,c),!c||!t.complete()})),this.iterationIndex++,this.queueAnimationFrameIfNeeded(a)}},{key:"queueAnimationFrameIfNeeded",value:function(t){this.requestAnimationFrameRequested||this.activeConfettiBatches.length<1||(this.requestAnimationFrameRequested=!0,this.lastUpdated=t||(new Date).getTime(),requestAnimationFrame(this.loop))}},{key:"addConfetti",value:function(){for(var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},e=u(t),i=e.confettiRadius,n=e.confettiNumber,s=e.confettiColors,o=e.emojis,a=e.emojiSize,r=this.canvas.getBoundingClientRect(),c=r.width,d=r.height,f=5*d/7,m={x:0,y:f},v={x:c,y:f},p=new l(this.canvasContext),y=0;y<n/2;y++){var g=new h({initialPosition:m,direction:"right",confettiRadius:i,confettiColors:s,confettiNumber:n,emojis:o,emojiSize:a,canvasWidth:c}),C=new h({initialPosition:v,direction:"left",confettiRadius:i,confettiColors:s,confettiNumber:n,emojis:o,emojiSize:a,canvasWidth:c});p.addShapes(g,C)}return this.activeConfettiBatches.push(p),this.queueAnimationFrameIfNeeded(),p.getBatchCompletePromise()}},{key:"clearCanvas",value:function(){this.activeConfettiBatches=[]}},{key:"destroyCanvas",value:function(){this.canvas.remove()}}]),e}()}();
+</script><script type="text/javascript">
+window.mkdocsQuizTranslations = {};
+</script><script type="text/javascript">
+window.mkdocsQuizConfig = {
+  confetti: true,
+  showProgress: true,
+  progressSidebarPosition: "top"
+};
+</script><script defer="" type="text/javascript">// Wrap everything in an IIFE to avoid variable redeclaration issues
+// when Material theme instant navigation reloads the page
+(function () {
+  // Constants
+  const STORAGE_KEY_PREFIX = "quiz_progress_";
+
+  // Translation helper function
+  function t(key, params = {}) {
+    let text = window.mkdocsQuizTranslations?.[key] || key;
+    // Simple template replacement for {n} and {key} style placeholders
+    return text.replace(/{(\w+)}/g, (_, k) => (params[k] !== undefined ? params[k] : `{${k}}`));
+  }
+
+  // Confetti instance (will be initialized if enabled)
+  let jsConfetti = null;
+
+  // Store event listeners for cleanup
+  let eventListeners = [];
+
+  // Initialize confetti if enabled
+  if (window.mkdocsQuizConfig && window.mkdocsQuizConfig.confetti) {
+    if (typeof JSConfetti !== "undefined") {
+      jsConfetti = new JSConfetti();
+    }
+  }
+
+  // Function to move quiz progress sidebar into TOC sidebar
+  // This needs to run on every page load for Material instant navigation
+  function repositionSidebar() {
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      const sidebar = document.getElementById("quiz-progress-sidebar");
+      const tocSidebar = document.querySelector(".md-sidebar--secondary .md-sidebar__inner .md-nav--secondary");
+
+      if (sidebar && tocSidebar) {
+        // Check if sidebar is already in the correct position
+        // by seeing if it's already a child of tocSidebar
+        if (!tocSidebar.contains(sidebar)) {
+          // Get position from config (default: "top")
+          const position =
+            window.mkdocsQuizConfig && window.mkdocsQuizConfig.progressSidebarPosition
+              ? window.mkdocsQuizConfig.progressSidebarPosition
+              : "top";
+
+          // Move sidebar based on configured position
+          if (position === "bottom") {
+            // Append to the end (below TOC)
+            tocSidebar.appendChild(sidebar);
+          } else {
+            // Default: insert at the top (above TOC)
+            if (tocSidebar.firstChild) {
+              tocSidebar.insertBefore(sidebar, tocSidebar.firstChild);
+            } else {
+              tocSidebar.appendChild(sidebar);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Cleanup function to remove event listeners and prevent memory leaks
+  function cleanup() {
+    eventListeners.forEach(({ element, event, handler }) => {
+      element.removeEventListener(event, handler);
+    });
+    eventListeners = [];
+  }
+
+  // Helper function to add tracked event listeners
+  function addTrackedEventListener(element, event, handler) {
+    element.addEventListener(event, handler);
+    eventListeners.push({ element, event, handler });
+  }
+
+  // Global quiz tracker
+  const quizTracker = {
+    quizzes: {},
+    totalQuizzes: 0,
+    answeredQuizzes: 0,
+    correctQuizzes: 0,
+
+    init: function () {
+      this.totalQuizzes = document.querySelectorAll(".quiz").length;
+      this.loadFromStorage();
+      // Initialize wasCompleted based on restored state to prevent confetti on page load
+      // Only fire confetti when completing quizzes in the current session, not from localStorage
+      const progress = this.getProgress();
+      this.wasCompleted = progress.answered === progress.total && progress.total > 0;
+      this.updateDisplay();
+    },
+
+    markQuiz: function (quizId, isCorrect, selectedValues = []) {
+      const wasAnswered = !!this.quizzes[quizId];
+      const wasCorrect = this.wasPreviouslyCorrect(quizId);
+
+      if (!wasAnswered) {
+        this.answeredQuizzes++;
+      }
+
+      this.quizzes[quizId] = {
+        answered: true,
+        correct: isCorrect,
+        selectedValues: selectedValues,
+      };
+
+      if (isCorrect && !wasCorrect) {
+        this.correctQuizzes++;
+      } else if (!isCorrect && wasCorrect) {
+        this.correctQuizzes--;
+      }
+
+      this.saveToStorage();
+      this.updateDisplay();
+    },
+
+    wasPreviouslyCorrect: function (quizId) {
+      return this.quizzes[quizId] && this.quizzes[quizId].correct;
+    },
+
+    resetQuiz: function (quizId) {
+      if (this.quizzes[quizId]) {
+        if (this.quizzes[quizId].correct) {
+          this.correctQuizzes--;
+        }
+        this.answeredQuizzes--;
+        delete this.quizzes[quizId];
+        this.saveToStorage();
+        this.updateDisplay();
+      }
+    },
+
+    resetAllQuiz: function () {
+      this.quizzes = {};
+      this.answeredQuizzes = 0;
+      this.correctQuizzes = 0;
+      this.saveToStorage();
+      this.updateDisplay();
+
+      // Reset all quiz forms on the page
+      document.querySelectorAll(".quiz").forEach((quiz) => {
+        const form = quiz.querySelector("form");
+        const fieldset = form.querySelector("fieldset");
+        const submitButton = form.querySelector('button[type="submit"]');
+        const resetButton = form.querySelector(".quiz-reset-button");
+        const feedbackDiv = form.querySelector(".quiz-feedback");
+        const section = quiz.querySelector("section");
+
+        // Clear all selections
+        const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+        allInputs.forEach((input) => {
+          input.checked = false;
+          input.disabled = false;
+        });
+
+        // Reset colors
+        resetFieldset(fieldset);
+
+        // Hide content section
+        if (section) {
+          section.classList.add("hidden");
+        }
+
+        // Hide feedback container
+        feedbackDiv.classList.add("hidden");
+        feedbackDiv.innerHTML = "";
+
+        // Show submit button, hide reset button
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove("hidden");
+        }
+        if (resetButton) {
+          resetButton.classList.add("hidden");
+        }
+      });
+    },
+
+    getProgress: function () {
+      return {
+        total: this.totalQuizzes,
+        answered: this.answeredQuizzes,
+        correct: this.correctQuizzes,
+        percentage: this.totalQuizzes > 0 ? Math.round((this.answeredQuizzes / this.totalQuizzes) * 100) : 0,
+        score: this.totalQuizzes > 0 ? Math.round((this.correctQuizzes / this.totalQuizzes) * 100) : 0,
+      };
+    },
+
+    saveToStorage: function () {
+      try {
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        const data = JSON.stringify(this.quizzes);
+
+        // Check size limit (50KB max to prevent quota issues)
+        if (data.length > 50000) {
+          console.warn("Quiz progress data exceeds size limit, not saving to localStorage");
+          this.showStorageWarning("Quiz progress is too large to save");
+          return;
+        }
+
+        localStorage.setItem(pageKey, data);
+      } catch (e) {
+        // Handle quota exceeded or localStorage disabled
+        console.error("Failed to save quiz progress:", e);
+        this.showStorageWarning(
+          "Unable to save quiz progress. Your browser may have storage disabled or quota exceeded.",
+        );
+      }
+    },
+
+    loadFromStorage: function () {
+      try {
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        const stored = localStorage.getItem(pageKey);
+
+        if (stored) {
+          // Validate size before parsing (50KB max)
+          if (stored.length > 50000) {
+            console.warn("Stored quiz data exceeds size limit, clearing corrupted data");
+            localStorage.removeItem(pageKey);
+            return;
+          }
+
+          const parsed = JSON.parse(stored);
+
+          // Validate structure: should be an object
+          if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+            console.warn("Invalid quiz data structure, clearing corrupted data");
+            localStorage.removeItem(pageKey);
+            return;
+          }
+
+          this.quizzes = parsed;
+
+          // Recalculate counts and validate quiz data structure
+          this.answeredQuizzes = 0;
+          this.correctQuizzes = 0;
+          for (let key in this.quizzes) {
+            const quiz = this.quizzes[key];
+            // Validate each quiz entry has expected structure
+            if (typeof quiz !== "object" || typeof quiz.answered !== "boolean" || typeof quiz.correct !== "boolean") {
+              console.warn("Invalid quiz entry structure, clearing corrupted data");
+              this.quizzes = {};
+              localStorage.removeItem(pageKey);
+              return;
+            }
+
+            if (quiz.answered) {
+              this.answeredQuizzes++;
+            }
+            if (quiz.correct) {
+              this.correctQuizzes++;
+            }
+          }
+        }
+      } catch (e) {
+        // Handle parsing errors or localStorage unavailable
+        console.error("Failed to load quiz progress:", e);
+        const pageKey = STORAGE_KEY_PREFIX + window.location.pathname;
+        try {
+          localStorage.removeItem(pageKey); // Clear corrupted data
+        } catch (cleanupError) {
+          // localStorage might be completely unavailable
+        }
+      }
+    },
+
+    updateDisplay: function () {
+      const progress = this.getProgress();
+      const wasComplete = this.wasCompleted;
+      const isComplete = progress.answered === progress.total && progress.total > 0;
+
+      // Dispatch custom event for sidebar/other UI components
+      window.dispatchEvent(
+        new CustomEvent("quizProgressUpdate", {
+          detail: progress,
+        }),
+      );
+      // Update sidebar if it exists
+      this.updateSidebar();
+      // Update results div if it exists
+      this.updateResultsDiv(progress, isComplete, wasComplete);
+
+      // Track completion state
+      this.wasCompleted = isComplete;
+    },
+
+    updateResultsDiv: function (progress, isComplete, wasComplete) {
+      const resultsDiv = document.getElementById("quiz-results");
+      if (!resultsDiv) return;
+
+      // Update progress section
+      const answeredEl = resultsDiv.querySelector(".quiz-results-answered");
+      const totalEl = resultsDiv.querySelector(".quiz-results-total");
+      const percentageEl = resultsDiv.querySelector(".quiz-results-percentage");
+      const correctEl = resultsDiv.querySelector(".quiz-results-correct");
+
+      if (answeredEl) answeredEl.textContent = progress.answered;
+      if (totalEl) totalEl.textContent = progress.total;
+      if (percentageEl) percentageEl.textContent = progress.percentage + "%";
+      if (correctEl) correctEl.textContent = progress.correct;
+
+      // Handle completion state
+      const progressSection = resultsDiv.querySelector(".quiz-results-progress");
+      const completeSection = resultsDiv.querySelector(".quiz-results-complete");
+
+      if (isComplete) {
+        // Hide progress, show complete
+        if (progressSection) progressSection.classList.add("hidden");
+        if (completeSection) {
+          completeSection.classList.remove("hidden");
+
+          // Update score display
+          const scoreValue = resultsDiv.querySelector(".quiz-results-score-value");
+          const scoreMessage = resultsDiv.querySelector(".quiz-results-message");
+
+          if (scoreValue) {
+            scoreValue.textContent = progress.score + "%";
+
+            // Remove all score classes
+            scoreValue.classList.remove(
+              "quiz-results-score-excellent",
+              "quiz-results-score-good",
+              "quiz-results-score-average",
+              "quiz-results-score-poor",
+              "quiz-results-score-fail",
+            );
+
+            // Add appropriate score class and message
+            let message = "";
+            if (progress.score >= 90) {
+              scoreValue.classList.add("quiz-results-score-excellent");
+              message = t("Outstanding! You aced it!");
+            } else if (progress.score >= 75) {
+              scoreValue.classList.add("quiz-results-score-good");
+              message = t("Great job! You really know your stuff!");
+            } else if (progress.score >= 60) {
+              scoreValue.classList.add("quiz-results-score-average");
+              message = t("Good effort! Keep learning!");
+            } else if (progress.score >= 40) {
+              scoreValue.classList.add("quiz-results-score-poor");
+              message = t("Not bad, but there's room for improvement!");
+            } else {
+              scoreValue.classList.add("quiz-results-score-fail");
+              message = t("Better luck next time! Keep trying!");
+            }
+
+            if (scoreMessage) scoreMessage.textContent = message;
+          }
+
+          // Trigger confetti and scroll on first completion
+          if (!wasComplete) {
+            // Scroll to results div
+            resultsDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Fire confetti if enabled and score is good
+            if (jsConfetti && progress.score >= 10) {
+              setTimeout(() => {
+                jsConfetti.addConfetti();
+              }, 500);
+            }
+          }
+        }
+      } else {
+        // Show progress, hide complete
+        if (progressSection) progressSection.classList.remove("hidden");
+        if (completeSection) completeSection.classList.add("hidden");
+      }
+    },
+
+    updateSidebar: function () {
+      // Update both desktop and mobile sidebars
+      const sidebars = [
+        document.getElementById("quiz-progress-sidebar"),
+        document.getElementById("quiz-progress-mobile"),
+      ];
+
+      sidebars.forEach((sidebar) => {
+        if (sidebar) {
+          const progress = this.getProgress();
+
+          // Update answered count
+          const answeredEl = sidebar.querySelector(".quiz-progress-answered");
+          if (answeredEl) {
+            answeredEl.textContent = progress.answered;
+          }
+
+          // Update answered percentage - desktop only
+          const answeredPercentageEl = sidebar.querySelector(".quiz-progress-answered-percentage");
+          if (answeredPercentageEl && sidebar.id == "quiz-progress-sidebar") {
+            answeredPercentageEl.textContent = progress.percentage + "%";
+          }
+
+          // Update all .quiz-progress-total elements
+          const totalElements = sidebar.querySelectorAll(".quiz-progress-total");
+          totalElements.forEach((el) => {
+            el.textContent = progress.total;
+          });
+
+          // Update correct count
+          const scoreEl = sidebar.querySelector(".quiz-progress-score");
+          if (scoreEl) {
+            scoreEl.textContent = progress.correct;
+          }
+
+          // Update correct denominator (answered count)
+          const scoreTotalEl = sidebar.querySelector(".quiz-progress-score-total");
+          if (scoreTotalEl) {
+            scoreTotalEl.textContent = progress.answered;
+          }
+
+          // Update correct percentage (based on answered quizzes, not total) - desktop only
+          const scorePercentageEl = sidebar.querySelector(".quiz-progress-score-percentage");
+          if (scorePercentageEl && sidebar.id == "quiz-progress-sidebar") {
+            const scorePercentage =
+              progress.answered > 0 ? Math.round((progress.correct / progress.answered) * 100) : 0;
+            scorePercentageEl.textContent = scorePercentage + "%";
+          }
+
+          // Update progress bars (incorrect and correct)
+          const correctBar = sidebar.querySelector(".quiz-progress-bar-correct");
+          const incorrectBar = sidebar.querySelector(".quiz-progress-bar-incorrect");
+
+          if (correctBar && incorrectBar) {
+            const incorrectCount = progress.answered - progress.correct;
+            const correctPercentage = progress.total > 0 ? (progress.correct / progress.total) * 100 : 0;
+            const incorrectPercentage = progress.total > 0 ? (incorrectCount / progress.total) * 100 : 0;
+
+            incorrectBar.style.width = incorrectPercentage + "%";
+            correctBar.style.width = correctPercentage + "%";
+          }
+        }
+      });
+    },
+
+    createSidebar: function () {
+      // Check if progress tracking is enabled
+      const showProgress = window.mkdocsQuizConfig && window.mkdocsQuizConfig.showProgress !== false;
+
+      // Only show sidebar if progress tracking is enabled and there are quizzes
+      if (!showProgress || this.totalQuizzes === 0) {
+        return;
+      }
+
+      // Show both desktop and mobile sidebars
+      const desktopSidebar = document.getElementById("quiz-progress-sidebar");
+      const mobileSidebar = document.getElementById("quiz-progress-mobile");
+
+      if (desktopSidebar) {
+        desktopSidebar.style.display = "";
+      }
+      if (mobileSidebar) {
+        mobileSidebar.style.display = "";
+      }
+
+      // Initialize reset button event listeners
+      const resetLinks = document.querySelectorAll(".quiz-reset-all-link");
+      resetLinks.forEach((resetLink) => {
+        const handler = (e) => {
+          e.preventDefault();
+          if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+            quizTracker.resetAllQuiz();
+          }
+        };
+        addTrackedEventListener(resetLink, "click", handler);
+      });
+
+      // Update the sidebar with initial values
+      this.updateSidebar();
+    },
+
+    showStorageWarning: function (message) {
+      // Show a warning banner in the progress tracker if it exists
+      const progressSidebar = document.getElementById("quiz-progress-sidebar");
+      if (progressSidebar) {
+        // Check if warning already exists
+        let warningEl = progressSidebar.querySelector(".quiz-storage-warning");
+        if (!warningEl) {
+          warningEl = document.createElement("div");
+          warningEl.className = "quiz-storage-warning";
+          warningEl.style.cssText =
+            "background: #fff3cd; color: #856404; padding: 8px; margin: 8px 0; border-radius: 4px; font-size: 12px; border: 1px solid #ffeaa7;";
+          progressSidebar.insertBefore(warningEl, progressSidebar.firstChild);
+        }
+        warningEl.textContent = message;
+      }
+    },
+  };
+
+  // Truncate text to a maximum length, adding ellipsis if needed
+  function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trimEnd() + "\u2026";
+  }
+
+  // Collect feedback HTML from a NodeList of input elements.
+  // Returns an array of {label, html} objects (one per answer that has feedback).
+  function collectFeedbackFromNodeList(nodeList) {
+    var items = [];
+    nodeList.forEach(function (input) {
+      var fb = input.parentElement.querySelector(".answer-feedback");
+      if (fb && fb.innerHTML.trim()) {
+        var label = input.parentElement.querySelector("label");
+        var labelText = label ? label.textContent.trim() : "";
+        items.push({ label: labelText, html: fb.innerHTML });
+      }
+    });
+    return items;
+  }
+
+  // Try to collect feedback from selected inputs, falling back to correct inputs if configured.
+  // Returns an array of {label, html} objects.
+  function collectFeedbackForSelectedOrCorrect(fieldset, quiz) {
+    var items = collectFeedbackFromNodeList(fieldset.querySelectorAll('input[name="answer"]:checked'));
+    if (!items.length && quiz.hasAttribute("data-show-correct")) {
+      items = collectFeedbackFromNodeList(fieldset.querySelectorAll('input[name="answer"][data-correct="true"]'));
+    }
+    return items;
+  }
+
+  // Build feedback container HTML from an array of {label, html} items.
+  // Each item becomes its own styled feedback box with a badge showing the answer label.
+  function buildFeedbackHTML(items, cssClass) {
+    if (!items.length) return "";
+    var maxBadgeLen = 30;
+    var result = "";
+    items.forEach(function (item) {
+      var badge = "";
+      if (item.label) {
+        var escaped = item.label
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+        badge =
+          '<span class="quiz-feedback-badge" title="' + escaped + '">' + truncateText(escaped, maxBadgeLen) + "</span>";
+      }
+      result +=
+        '<div class="quiz-feedback-item ' +
+        cssClass +
+        '">' +
+        badge +
+        '<div class="quiz-feedback-item-content">' +
+        item.html +
+        "</div></div>";
+    });
+    return result;
+  }
+
+  // Wrap content in a single feedback item div with the given CSS class
+  function wrapFeedbackItem(cssClass, content) {
+    return (
+      '<div class="quiz-feedback-item ' +
+      cssClass +
+      '"><div class="quiz-feedback-item-content">' +
+      content +
+      "</div></div>"
+    );
+  }
+
+  // Get default feedback message based on submission correctness and retry status
+  function getDefaultFeedbackMessage(isCorrect, canRetry) {
+    if (isCorrect) return t("Correct answer!");
+    return canRetry ? t("Incorrect answer. Please try again.") : t("Incorrect answer.");
+  }
+
+  // Mark answer elements with correct/wrong classes based on selection and correctness
+  function markAnswers(selectedAnswers, correctAnswers, quiz, isCorrect) {
+    selectedAnswers.forEach((answer) => {
+      if (isCorrect) {
+        // All selected answers are correct (since it's multiple correct)
+        answer.parentElement.classList.add("correct");
+      } else {
+        // Mark selected wrong answers, keep correct ones highlighted
+        const isAnswerCorrect = answer.hasAttribute("data-correct");
+        answer.parentElement.classList.toggle("wrong", !isAnswerCorrect);
+        answer.parentElement.classList.toggle("correct", isAnswerCorrect);
+      }
+    });
+
+    // If show-correct is enabled, also highlight unselected correct answers on incorrect submission
+    if (!isCorrect && quiz.hasAttribute("data-show-correct")) {
+      correctAnswers.forEach((a) => a.parentElement.classList.add("correct"));
+    }
+  }
+
+  // Display feedback message and styling after quiz submission
+  function showFeedback(feedbackDiv, isCorrect, selectedAnswers, correctAnswers, fieldset, quiz) {
+    feedbackDiv.classList.remove("hidden");
+
+    // Collect per-answer feedback items
+    var cssClass = isCorrect ? "correct" : "incorrect";
+    var items = isCorrect
+      ? collectFeedbackForSelectedOrCorrect(fieldset, quiz)
+      : collectFeedbackFromNodeList(selectedAnswers);
+
+    var html = buildFeedbackHTML(items, cssClass);
+    if (html) {
+      feedbackDiv.innerHTML = html;
+    } else {
+      // No per-answer feedback — show a single default message box
+      var canRetry = !quiz.hasAttribute("data-disable-after-submit");
+      feedbackDiv.innerHTML = wrapFeedbackItem(cssClass, getDefaultFeedbackMessage(isCorrect, canRetry));
+    }
+  }
+
+  // Initialize results div reset button
+  function initializeResultsDiv() {
+    const resultsDiv = document.getElementById("quiz-results");
+    if (!resultsDiv) return;
+
+    const resetButton = resultsDiv.querySelector(".quiz-results-reset");
+    if (resetButton) {
+      const handler = () => {
+        if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+          quizTracker.resetAllQuiz();
+        }
+      };
+      addTrackedEventListener(resetButton, "click", handler);
+    }
+  }
+
+  // Initialize intro reset buttons
+  function initializeIntroResetButtons() {
+    const introResetButtons = document.querySelectorAll(".quiz-intro-reset");
+    introResetButtons.forEach((button) => {
+      const handler = () => {
+        if (confirm(t("Are you sure you want to reset the quiz? This will clear your progress."))) {
+          quizTracker.resetAllQuiz();
+        }
+      };
+      addTrackedEventListener(button, "click", handler);
+    });
+  }
+
+  // Shuffle an array using Fisher-Yates algorithm
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Shuffle the answer elements in a fieldset
+  function shuffleAnswers(fieldset) {
+    const answerDivs = Array.from(fieldset.querySelectorAll(":scope > div"));
+    if (answerDivs.length <= 1) return;
+
+    // Shuffle the array of elements
+    shuffleArray(answerDivs);
+
+    // Re-append elements in shuffled order
+    answerDivs.forEach((div) => fieldset.appendChild(div));
+  }
+
+  // Initialize all quiz elements on the page
+  function initializeQuizzes() {
+    document.querySelectorAll(".quiz").forEach((quiz) => {
+      let form = quiz.querySelector("form");
+      let fieldset = form.querySelector("fieldset");
+      let submitButton = form.querySelector('button[type="submit"]');
+      let feedbackDiv = form.querySelector(".quiz-feedback");
+
+      // Shuffle answers if enabled (before any state restoration)
+      if (quiz.hasAttribute("data-shuffle-answers")) {
+        shuffleAnswers(fieldset);
+      }
+
+      // Get quiz ID from the quiz div itself
+      const quizId = quiz.id;
+
+      // Check if this is a fill-in-the-blank quiz
+      const isFillBlank = quiz.hasAttribute("data-quiz-type") && quiz.getAttribute("data-quiz-type") === "fill-blank";
+
+      // Prevent anchor link from triggering page navigation/reload
+      const headerLink = quiz.querySelector(".quiz-header-link");
+      if (headerLink) {
+        const handler = (e) => {
+          // Let the browser handle the anchor navigation normally
+          // This prevents Material themes from intercepting it as a page navigation
+          e.stopPropagation();
+        };
+        addTrackedEventListener(headerLink, "click", handler);
+      }
+
+      // Create reset button (initially hidden)
+      let resetButton = document.createElement("button");
+      resetButton.type = "button";
+      resetButton.className = "quiz-button quiz-reset-button hidden";
+      resetButton.textContent = t("Try Again");
+      if (submitButton) {
+        submitButton.parentNode.insertBefore(resetButton, submitButton.nextSibling);
+      } else {
+        form.appendChild(resetButton);
+      }
+
+      // Helper function to normalize answers (trim whitespace, case-insensitive)
+      function normalizeAnswer(answer) {
+        return answer.trim().toLowerCase();
+      }
+
+      // Restore quiz state from localStorage if available
+      if (quizId && quizTracker.quizzes[quizId]) {
+        const savedState = quizTracker.quizzes[quizId];
+        const section = quiz.querySelector("section");
+
+        if (isFillBlank) {
+          // Restore fill-in-the-blank quiz state
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+
+          if (savedState.answered) {
+            // Restore input values based on saved values
+            if (savedState.selectedValues && savedState.selectedValues.length > 0) {
+              blankInputs.forEach((input, index) => {
+                if (savedState.selectedValues[index] !== undefined) {
+                  input.value = savedState.selectedValues[index];
+                }
+              });
+            }
+
+            if (savedState.correct) {
+              // Show correct feedback
+              if (section) {
+                section.classList.remove("hidden");
+              }
+              feedbackDiv.classList.remove("hidden");
+              feedbackDiv.innerHTML = wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+
+              // Mark all inputs as correct
+              blankInputs.forEach((input) => {
+                input.classList.add("correct");
+              });
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                blankInputs.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            } else {
+              // Restore incorrect answer state
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Mark wrong/correct inputs
+              blankInputs.forEach((input) => {
+                const userAnswer = normalizeAnswer(input.value);
+                const correctAnswer = normalizeAnswer(input.getAttribute("data-answer"));
+
+                if (userAnswer === correctAnswer) {
+                  input.classList.add("correct");
+                } else {
+                  input.classList.add("wrong");
+                }
+              });
+
+              // Show incorrect feedback with detailed list
+              feedbackDiv.classList.remove("hidden");
+              var canRetryRestore = !quiz.hasAttribute("data-disable-after-submit");
+              var feedbackTextRestore = getDefaultFeedbackMessage(false, canRetryRestore);
+
+              // Show correct answers if show-correct is enabled
+              if (quiz.hasAttribute("data-show-correct")) {
+                var fillRestoreHTML = feedbackTextRestore + "<ul>";
+                blankInputs.forEach(function (input) {
+                  if (!input.classList.contains("correct")) {
+                    var userAnswer = input.value.trim();
+                    var correctAnswer = input.getAttribute("data-answer");
+                    fillRestoreHTML +=
+                      "<li><del>" + (userAnswer || t("(empty)")) + "</del> \u2192 " + correctAnswer + "</li>";
+                    // Also show in placeholder
+                    input.placeholder = correctAnswer;
+                  }
+                });
+                fillRestoreHTML += "</ul>";
+                feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", fillRestoreHTML);
+              } else {
+                feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", feedbackTextRestore);
+              }
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                blankInputs.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Keep submit button visible for editing and resubmission
+                resetButton.classList.remove("hidden");
+              }
+            }
+          }
+        } else {
+          // Restore multiple-choice quiz state (existing code)
+          const allAnswers = fieldset.querySelectorAll('input[name="answer"]');
+          const correctAnswers = fieldset.querySelectorAll('input[name="answer"][data-correct="true"]');
+
+          if (savedState.answered) {
+            // Restore selected answers based on saved values
+            if (savedState.selectedValues && savedState.selectedValues.length > 0) {
+              allAnswers.forEach((input) => {
+                if (savedState.selectedValues.includes(input.value)) {
+                  input.checked = true;
+                }
+              });
+            }
+
+            if (savedState.correct) {
+              // Show the content section
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Only mark the correct answers in green (don't highlight wrong answers)
+              allAnswers.forEach((input) => {
+                if (input.hasAttribute("data-correct")) {
+                  input.parentElement.classList.add("correct");
+                }
+              });
+
+              // Show correct feedback - prefer per-answer feedback if present
+              feedbackDiv.classList.remove("hidden");
+              var correctItems = collectFeedbackForSelectedOrCorrect(fieldset, quiz);
+              var correctFeedbackHTML = buildFeedbackHTML(correctItems, "correct");
+              feedbackDiv.innerHTML =
+                correctFeedbackHTML || wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                allAnswers.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Show reset button, hide submit button
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            } else {
+              // Restore incorrect answer state
+              const selectedAnswers = Array.from(allAnswers).filter((input) =>
+                savedState.selectedValues.includes(input.value),
+              );
+
+              // Show the content section for incorrect answers too
+              if (section) {
+                section.classList.remove("hidden");
+              }
+
+              // Mark selected answers
+              selectedAnswers.forEach((input) => {
+                if (input.hasAttribute("data-correct")) {
+                  input.parentElement.classList.add("correct");
+                } else {
+                  input.parentElement.classList.add("wrong");
+                }
+              });
+
+              // Show correct answers if show-correct is enabled
+              if (quiz.hasAttribute("data-show-correct")) {
+                correctAnswers.forEach((input) => {
+                  input.parentElement.classList.add("correct");
+                });
+              }
+
+              // Show incorrect feedback - prefer per-answer feedback for selected answers
+              feedbackDiv.classList.remove("hidden");
+              var canRetry = !quiz.hasAttribute("data-disable-after-submit");
+              var incorrectItems = collectFeedbackFromNodeList(
+                fieldset.querySelectorAll('input[name="answer"]:checked'),
+              );
+              var incorrectFeedbackHTML = buildFeedbackHTML(incorrectItems, "incorrect");
+              feedbackDiv.innerHTML =
+                incorrectFeedbackHTML || wrapFeedbackItem("incorrect", getDefaultFeedbackMessage(false, canRetry));
+
+              // Disable inputs if disable-after-submit is enabled
+              if (quiz.hasAttribute("data-disable-after-submit")) {
+                allAnswers.forEach((input) => {
+                  input.disabled = true;
+                });
+                if (submitButton) {
+                  submitButton.disabled = true;
+                }
+                resetButton.classList.add("hidden");
+              } else {
+                // Show reset button, hide submit button
+                resetButton.classList.remove("hidden");
+                if (submitButton) {
+                  submitButton.classList.add("hidden");
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Auto-submit on radio button change if enabled (not for fill-in-blank)
+      if (!isFillBlank && quiz.hasAttribute("data-auto-submit")) {
+        let radioButtons = fieldset.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach((radio) => {
+          const handler = (e) => {
+            e.preventDefault(); // Prevent page scroll to top
+            // Trigger form submission with proper event options
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+          };
+          addTrackedEventListener(radio, "change", handler);
+        });
+      }
+
+      // Reset button handler
+      const resetHandler = () => {
+        if (isFillBlank) {
+          // Clear fill-in-the-blank inputs
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+          blankInputs.forEach((input) => {
+            input.value = "";
+            input.disabled = false;
+            input.classList.remove("correct", "wrong");
+            input.placeholder = "";
+          });
+        } else {
+          // Clear all selections
+          const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+          allInputs.forEach((input) => {
+            input.checked = false;
+            input.disabled = false;
+          });
+          // Reset colors
+          resetFieldset(fieldset);
+        }
+        // Hide content section
+        let section = quiz.querySelector("section");
+        if (section) {
+          section.classList.add("hidden");
+        }
+        // Hide feedback container
+        feedbackDiv.classList.add("hidden");
+        feedbackDiv.innerHTML = "";
+        // Show submit button, hide reset button
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove("hidden");
+        }
+        resetButton.classList.add("hidden");
+        // Update tracker
+        if (quizId) {
+          quizTracker.resetQuiz(quizId);
+        }
+      };
+      addTrackedEventListener(resetButton, "click", resetHandler);
+
+      const submitHandler = (event) => {
+        event.preventDefault();
+        event.stopPropagation(); // Prevent Material themes from intercepting form submission
+        let is_correct = false;
+        let selectedValues = [];
+        let section = quiz.querySelector("section");
+
+        if (isFillBlank) {
+          // Handle fill-in-the-blank quiz
+          const blankInputs = quiz.querySelectorAll(".quiz-blank-input");
+          is_correct = true;
+
+          // Collect user answers and validate
+          blankInputs.forEach((input) => {
+            const userAnswer = normalizeAnswer(input.value);
+            const correctAnswer = normalizeAnswer(input.getAttribute("data-answer"));
+            selectedValues.push(input.value); // Save original value, not normalized
+
+            // Remove previous classes
+            input.classList.remove("correct", "wrong");
+
+            if (userAnswer === correctAnswer) {
+              input.classList.add("correct");
+            } else {
+              input.classList.add("wrong");
+              is_correct = false;
+            }
+          });
+
+          // Always show the content section after submission
+          if (section) {
+            section.classList.remove("hidden");
+          }
+
+          if (is_correct) {
+            // Show correct feedback
+            feedbackDiv.classList.remove("hidden");
+            feedbackDiv.innerHTML = wrapFeedbackItem("correct", getDefaultFeedbackMessage(true, false));
+          } else {
+            // Show incorrect feedback with detailed list
+            feedbackDiv.classList.remove("hidden");
+            var canRetryFill = !quiz.hasAttribute("data-disable-after-submit");
+            var feedbackTextFill = getDefaultFeedbackMessage(false, canRetryFill);
+
+            // Show correct answers if show-correct is enabled
+            if (quiz.hasAttribute("data-show-correct")) {
+              var fillHTML = feedbackTextFill + "<ul>";
+              blankInputs.forEach(function (input) {
+                if (!input.classList.contains("correct")) {
+                  var userAnswer = input.value.trim();
+                  var correctAnswer = input.getAttribute("data-answer");
+                  fillHTML += "<li><del>" + (userAnswer || "(empty)") + "</del> \u2192 " + correctAnswer + "</li>";
+                  // Also show in placeholder
+                  input.placeholder = correctAnswer;
+                }
+              });
+              fillHTML += "</ul>";
+              feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", fillHTML);
+            } else {
+              feedbackDiv.innerHTML = wrapFeedbackItem("incorrect", feedbackTextFill);
+            }
+          }
+
+          // Disable quiz after submission if option is enabled
+          if (quiz.hasAttribute("data-disable-after-submit")) {
+            blankInputs.forEach((input) => {
+              input.disabled = true;
+            });
+            if (submitButton) {
+              submitButton.disabled = true;
+            }
+            resetButton.classList.add("hidden");
+          } else {
+            // For fill-in-blank, keep submit button visible so users can edit and resubmit
+            // Only show reset button as an alternative
+            resetButton.classList.remove("hidden");
+          }
+        } else {
+          // Handle multiple-choice quiz (existing code)
+          let selectedAnswers = form.querySelectorAll('input[name="answer"]:checked');
+          let correctAnswers = fieldset.querySelectorAll('input[name="answer"][data-correct="true"]');
+          // Check if all correct answers are selected
+          is_correct = selectedAnswers.length === correctAnswers.length;
+          Array.from(selectedAnswers).forEach((answer) => {
+            if (!answer.hasAttribute("data-correct")) {
+              is_correct = false;
+            }
+          });
+
+          // Always show the content section after submission
+          if (section) {
+            section.classList.remove("hidden");
+          }
+
+          if (is_correct) {
+            resetFieldset(fieldset);
+            markAnswers(selectedAnswers, correctAnswers, quiz, true);
+            showFeedback(feedbackDiv, true, selectedAnswers, correctAnswers, fieldset, quiz);
+          } else {
+            resetFieldset(fieldset);
+            markAnswers(selectedAnswers, correctAnswers, quiz, false);
+            showFeedback(feedbackDiv, false, selectedAnswers, correctAnswers, fieldset, quiz);
+          }
+
+          // Get selected values to save
+          selectedValues = Array.from(selectedAnswers).map((input) => input.value);
+
+          // Disable quiz after submission if option is enabled
+          if (quiz.hasAttribute("data-disable-after-submit")) {
+            const allInputs = fieldset.querySelectorAll('input[name="answer"]');
+            allInputs.forEach((input) => {
+              input.disabled = true;
+            });
+            if (submitButton) {
+              submitButton.disabled = true;
+            }
+            // Hide reset button if disable-after-submit is enabled
+            resetButton.classList.add("hidden");
+          } else {
+            // Show reset button and hide submit button
+            resetButton.classList.remove("hidden");
+            if (submitButton) {
+              submitButton.classList.add("hidden");
+            }
+          }
+        }
+
+        // Move focus to feedback div for screen readers and keyboard users
+        if (feedbackDiv) {
+          feedbackDiv.setAttribute("tabindex", "-1");
+          feedbackDiv.focus();
+        }
+
+        // Update tracker
+        if (quizId) {
+          quizTracker.markQuiz(quizId, is_correct, selectedValues);
+        }
+      };
+      addTrackedEventListener(form, "submit", submitHandler);
+    });
+  }
+
+  function resetFieldset(fieldset) {
+    Array.from(fieldset.children).forEach((child) => {
+      child.classList.remove("wrong", "correct");
+    });
+  }
+
+  // Main initialization function that sets up everything on a page
+  function initializePage() {
+    // Initialize tracker
+    quizTracker.init();
+
+    // Reposition sidebar for Material theme TOC integration
+    repositionSidebar();
+
+    // Create sidebar
+    quizTracker.createSidebar();
+
+    // Initialize results div and intro buttons
+    initializeResultsDiv();
+    initializeIntroResetButtons();
+
+    // Initialize all quiz elements
+    initializeQuizzes();
+  }
+
+  // Run initialization when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializePage);
+  } else {
+    initializePage();
+  }
+
+  // Material theme instant navigation support
+  // Cleanup and reinitialize when navigating between pages
+  if (typeof document$ !== "undefined") {
+    // Unsubscribe from any previous subscription to prevent duplicate handlers
+    // This is needed because the script re-runs on each page navigation,
+    // which would otherwise accumulate subscriptions
+    if (window._mkdocsQuizSubscription) {
+      window._mkdocsQuizSubscription.unsubscribe();
+    }
+
+    // A Material theme with instant navigation is active
+    window._mkdocsQuizSubscription = document$.subscribe(() => {
+      cleanup(); // Remove old event listeners to prevent memory leaks
+      // Reinitialize everything for the new page
+      initializePage();
+    });
+  }
+})(); // End of IIFE
+</script>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2026-2027 MERY Ludovic &amp; Kevin Huet - Lycée Fulbert - Chartres
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+<script src="../../../javascripts/toc-deroulant.js"></script>
+</body>
+</html>
