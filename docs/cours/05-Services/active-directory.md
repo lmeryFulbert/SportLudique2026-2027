@@ -369,11 +369,27 @@ Avant la jonction, vérifiez :
 - la résolution du nom du domaine ;
 - la cohérence de l’heure.
 
-!!! warning "Le ping ne suffit pas"
+!!! warning "Le ping n'est pas un test suffisant"
 
-    Pouvoir joindre l’adresse IP du DC ne prouve pas qu’une machine est prête à rejoindre le domaine.
+    Dans l'architecture SportLudique, le **pare-feu interne bloque par défaut
+    les requêtes ICMP Echo**.
 
-    La résolution DNS du domaine doit fonctionner.
+    L'absence de réponse à un `ping` vers le contrôleur de domaine ne signifie
+    donc pas nécessairement que celui-ci est inaccessible ou en panne.
+
+    Pour faciliter la mise en place et le diagnostic, les requêtes
+    **ICMP Echo pourront être autorisées temporairement** entre la machine
+    d'administration et le VLAN Serveurs.
+
+    Cette autorisation devra être supprimée lorsque les tests seront terminés.
+
+    Pour rejoindre le domaine, il faut surtout vérifier que la machine :
+
+    - utilise le **DNS Active Directory** ;
+    - résout correctement le nom du domaine ;
+    - peut joindre les **services Active Directory nécessaires** à travers le pare-feu ;
+    - possède une heure cohérente avec le domaine.
+
 
 Une fois membre du domaine, cette machine devient le **poste de travail d’administration Windows** de l’infrastructure.
 
@@ -476,7 +492,7 @@ flowchart LR
     OU --> PC2
 ```
 
-Au niveau Socle, retenez surtout que le domaine permet une **administration centralisée** des configurations.
+Au niveau Socle, retenez surtout que le domaine permet une **Gestion des Configurations (ITIL)** des configurations.
 
 ---
 
