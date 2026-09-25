@@ -1,4 +1,4 @@
-# 02- Active Directory, DNS et contrôleurs de domaine
+# 02 Active Directory, DNS et contrôleurs de domaine
 
 L’objectif de cette partie est de mettre en place le **domaine Active Directory du site** et de comprendre les services qui permettent son fonctionnement.
 
@@ -17,23 +17,30 @@ Avant toute installation, vous devez être capables de répondre à plusieurs qu
 
 ## Socle obligatoire
 
+Le parcours de référence utilise un **contrôleur de domaine Windows Server Core** administré depuis une **machine Windows Server avec interface graphique**.
+
+!!! note "Parcours accompagné"
+
+    Pour les groupes qui ne sont pas encore suffisamment autonomes avec **Windows Server Core**, le contrôleur de domaine pourra être installé sous **Windows Server 2022 avec interface graphique (Desktop Experience)**.
+
+    Les exigences restent les mêmes : nommage, adressage, DNS, domaine et objets Active Directory.
+
+    **Aucune procédure graphique détaillée n’est fournie dans ce support.**
+
+---
+
 ### Pourquoi un domaine ?
 
-Dans une infrastructure composée de plusieurs machines, gérer séparément les utilisateurs et les droits sur chaque poste devient rapidement difficile.
-
-Sans annuaire centralisé :
+Sans annuaire centralisé, chaque machine possède sa propre base de comptes :
 
 ```text
 PC01 ── utilisateurs locaux
 PC02 ── utilisateurs locaux
-PC03 ── utilisateurs locaux
 SRV1 ── utilisateurs locaux
 SRV2 ── utilisateurs locaux
 ```
 
-Chaque machine possède alors sa propre base de comptes.
-
-Active Directory permet de centraliser notamment :
+Active Directory permet notamment de centraliser :
 
 - les utilisateurs ;
 - les groupes ;
@@ -41,25 +48,11 @@ Active Directory permet de centraliser notamment :
 - les règles appliquées aux machines et aux utilisateurs ;
 - l’authentification au sein du domaine.
 
-```mermaid
-flowchart LR
-    AD["Active Directory"]
-    U["Utilisateurs"]
-    G["Groupes"]
-    PC["Ordinateurs"]
-    SRV["Serveurs"]
+**Active Directory Domain Services (AD DS)** est le rôle Windows Server qui fournit cet annuaire.
 
-    AD --- U
-    AD --- G
-    AD --- PC
-    AD --- SRV
-```
+Un serveur sur lequel AD DS est installé puis promu devient un **contrôleur de domaine** (*Domain Controller*, DC).
 
-!!! note "Un annuaire"
-
-    Active Directory est avant tout un **service d’annuaire**.
-
-    Il permet de stocker et d’organiser des informations sur les objets du système d’information et de les utiliser pour l’authentification et l’administration.
+Dans le projet, le premier DC assure également le rôle **DNS**, indispensable au fonctionnement du domaine.
 
 <quiz>
 Quel est l’un des principaux intérêts d’un domaine Active Directory ?
@@ -72,326 +65,240 @@ Quel est l’un des principaux intérêts d’un domaine Active Directory ?
 
 ---
 
-### Active Directory Domain Services
-
-Le rôle Windows Server utilisé pour mettre en place l’annuaire est **Active Directory Domain Services**, généralement abrégé **AD DS**.
-
-Un serveur sur lequel AD DS est installé et qui a été promu devient un **contrôleur de domaine** ou **DC** (*Domain Controller*).
-
-Le contrôleur de domaine participe notamment :
-
-- au stockage de l’annuaire ;
-- à l’authentification ;
-- à l’application des mécanismes liés au domaine ;
-- à la localisation des ressources Active Directory avec l’aide du DNS.
-
-Dans le projet SportLudique, le premier contrôleur de domaine assure également le service **DNS** nécessaire au domaine.
-
----
-
 ### Architecture du socle
 
 Le premier contrôleur de domaine est installé sous **Windows Server Core**.
 
-Il possède volontairement **une seule interface réseau**, placée dans le **VLAN Serveurs**.
+Il possède **une seule interface réseau**, dans le **VLAN Serveurs**.
 
-Il n’est donc **pas directement connecté au VLAN Management**.
+La machine d’administration Windows GUI possède deux interfaces :
 
-L’administration s’appuie sur le serveur d’administration mis en place dans la partie précédente.
+- une interface dans le **VLAN Management**, utilisée pour recevoir la connexion RDP ;
+- une interface dans le **VLAN Serveurs**, utilisée pour administrer les serveurs.
 
 ![Architecture d’administration Active Directory](../../medias/cours/administration/architecture-administration-ad.png)
 
-
-*La machine d’administration possède deux interfaces réseau : une dans le VLAN Management et une dans le VLAN Serveurs. Le contrôleur de domaine possède une seule interface, dans le VLAN Serveurs.*
-
-
-Le chemin d’administration est donc :
-
-```text
-Poste administrateur
-        │
-        │ RDP
-        ▼
-Interface Management
-du serveur d’administration
-        │
-        │ même machine
-        ▼
-Interface VLAN Serveurs
-du serveur d’administration
-        │
-        │ WinRM / outils d’administration
-        ▼
-Contrôleur de domaine
-Windows Server Core
-```
+| Machine | VLAN Management | VLAN Serveurs | Fonction |
+|---|:---:|:---:|---|
+| Machine d’administration Windows GUI | ✓ | ✓ | Administration |
+| `PRF-DC01` Server Core | — | ✓ | AD DS + DNS |
 
 !!! important "Le point essentiel"
 
-    Le contrôleur de domaine **n’a pas besoin d’une deuxième carte réseau dans le VLAN Management**.
+    Le contrôleur de domaine **n’a pas besoin d’une interface dans le VLAN Management**.
 
-    C’est le **serveur d’administration** qui possède une interface dans le VLAN Management et une interface dans le VLAN Serveurs.
+    La machine d’administration possède les deux interfaces, mais **elle ne route pas** le trafic entre les VLAN.
 
-    Il reçoit la session d’administration sur son interface Management, puis ses outils d’administration communiquent avec le DC depuis son interface située dans le VLAN Serveurs.
-
----
-
-### Deux interfaces sur le serveur d’administration, une seule sur le DC
-
-Cette architecture permet de distinguer clairement les rôles.
-
-| Machine | Interface Management | Interface Serveurs |
-|---|:---:|:---:|
-| Poste administrateur | selon architecture | — |
-| Serveur Windows d’administration | ✓ | ✓ |
-| Contrôleur de domaine | — | ✓ |
-
-Le serveur d’administration constitue donc le **point intermédiaire** entre l’administrateur et les serveurs Windows.
-
-!!! danger "Ce n’est toujours pas un routeur"
-
-    Le serveur d’administration possède deux interfaces, mais il ne doit pas assurer le routage entre le VLAN Management et le VLAN Serveurs.
-
-    Le trafic n’est pas simplement transféré d’une interface vers l’autre.
-
-    L’administrateur ouvre une session RDP sur le serveur d’administration. Ce sont ensuite **les outils exécutés sur ce serveur** qui établissent de nouvelles communications vers le contrôleur de domaine.
+Le déroulement d’une administration est le suivant :
 
 ```mermaid
 sequenceDiagram
     participant PC as Poste administrateur
-    participant ADM as Serveur administration
+    participant ADM as Machine administration
     participant DC as Contrôleur de domaine
 
     PC->>ADM: Connexion RDP
-    Note over ADM: L’administrateur travaille<br/>sur le serveur d’administration
-    ADM->>DC: WinRM / RSAT / outils AD
+    Note over ADM: L’administrateur travaille<br/>sur la machine d’administration
+    ADM->>DC: Consoles d’administration / PowerShell
     DC-->>ADM: Réponse
 ```
 
-Ce n’est donc pas :
-
-```text
-PC ───── paquet routé par ADMIN ─────► DC
-```
-
-mais :
-
-```text
-PC ── RDP ──► ADMIN
-
-ADMIN ── nouvelle connexion ──► DC
-```
+La connexion RDP **s’arrête sur la machine d’administration**. Les outils exécutés sur celle-ci établissent ensuite leurs propres communications avec le DC depuis le VLAN Serveurs.
 
 <quiz>
-Le contrôleur de domaine doit être administré depuis le VLAN Management mais ne possède qu’une interface dans le VLAN Serveurs. Comment l’administration est-elle réalisée ?
+Comment le DC Core est-il administré ?
 
-- [ ] Le DC doit finalement recevoir une deuxième carte réseau
-- [ ] Le serveur d’administration route les paquets du poste vers le DC
-- [x] L’administrateur se connecte au serveur d’administration, puis les outils de ce serveur communiquent avec le DC
-- [ ] Le DC doit être temporairement déplacé dans le VLAN Management
+- [ ] Il possède une deuxième interface dans le VLAN Management
+- [ ] La machine d’administration route la connexion RDP jusqu’au DC
+- [x] L’administrateur travaille sur la machine d’administration, dont les outils communiquent ensuite avec le DC
+- [ ] Le DC est déplacé temporairement dans le VLAN Management
 </quiz>
 
 ---
 
 ### Pourquoi Windows Server Core ?
 
-Le contrôleur de domaine du socle est installé sous **Windows Server Core**.
+Le contrôleur de domaine fournit un **service d’infrastructure**. Il n’a pas besoin d’un environnement graphique complet.
 
-Server Core ne fournit pas l’environnement graphique Windows complet habituel.
-
-L’administration doit donc être pensée **à distance**.
-
-Cela permet également de bien distinguer :
+Cette architecture permet de distinguer :
 
 ```text
-le serveur qui fournit le service
-              ≠
-la machine depuis laquelle on l’administre
+serveur qui fournit le service
+            ≠
+machine depuis laquelle on l’administre
 ```
 
-Le serveur d’administration Windows GUI fournit les outils nécessaires à l’exploitation du domaine.
+Sur `PRF-DC01`, on installe les **rôles serveur** :
 
-On peut notamment y utiliser :
+```text
+PRF-DC01
+├── AD DS
+└── DNS
+```
 
-- Server Manager ;
-- PowerShell ;
-- les consoles MMC ;
-- les outils RSAT ;
-- les outils Active Directory ;
-- les outils DNS.
+Sur la machine Windows GUI, on installe les **fonctionnalités et outils d’administration** nécessaires.
 
-!!! note
+Cette machine doit ensuite être **membre du domaine**.
 
-    Le but pédagogique n’est pas de rendre l’installation plus pénible.
+L’administrateur y utilise principalement :
 
-    Il s’agit de vous obliger à construire un **véritable chemin d’administration** plutôt que d’utiliser systématiquement la console graphique locale du serveur.
+- les outils graphiques Windows pour Active Directory ;
+- la gestion DNS ;
+- la gestion des stratégies de groupe ;
+- PowerShell.
+
+??? info "RSAT"
+
+    Windows regroupe plusieurs outils d’administration distante sous le nom **RSAT** (*Remote Server Administration Tools*).
+
+    Ce terme n’est pas à mémoriser ici. Retenez surtout : **les rôles sont sur les serveurs ; les outils d’administration sont sur la machine GUI**.
+
+??? info "Proxmox : VirtIO et QEMU Guest Agent"
+
+    Avec Windows Server 2022 sous Proxmox, des pilotes **VirtIO** peuvent être nécessaires pour certains périphériques virtualisés.
+
+    Avec Windows Server 2025, certains pilotes peuvent être directement reconnus, mais il faut toujours vérifier les périphériques réellement disponibles.
+
+    Le **QEMU Guest Agent** reste utile pour les échanges avec l’hyperviseur et la remontée de certaines informations.
+
+    Ce point concerne l’intégration de la VM dans Proxmox, pas Active Directory lui-même.
 
 ---
 
-??? info "Proxmox : Windows Server, VirtIO et QEMU Guest Agent"
+### Nommage et conventions
 
-    Sur Proxmox, l’installation de Windows Server peut nécessiter des pilotes **VirtIO** pour certains périphériques virtualisés.
+**Les noms doivent être définis avant toute installation ou promotion du domaine.**
 
-    Avec Windows Server 2025, la prise en charge de certains matériels virtualisés peut évoluer, mais il faut toujours **vérifier réellement les périphériques reconnus** dans la VM.
-
-    Ne confondez pas :
-
-    - **VirtIO** : pilotes permettant à Windows d’utiliser les périphériques virtualisés ;
-    - **QEMU Guest Agent** : agent permettant des échanges d’informations et certaines opérations entre Proxmox et le système invité.
-
-    Ce point relève de l’intégration de la VM dans Proxmox, pas du fonctionnement d’Active Directory.
-
----
-
-### WinRM
-
-**WinRM** (*Windows Remote Management*) permet l’administration distante de machines Windows.
-
-Il est notamment utilisé avec PowerShell Remoting et différents outils d’administration.
-
-Les ports généralement associés à WinRM sont :
+Utilisez le préfixe prévu pour votre infrastructure. Dans les exemples du support, on utilise :
 
 ```text
-TCP 5985 → WinRM HTTP
-TCP 5986 → WinRM HTTPS
+PRF
 ```
 
-Dans notre architecture, les connexions WinRM vers le DC proviennent du **serveur d’administration**, pas directement de tous les postes du réseau.
-
-```mermaid
-flowchart LR
-    PC["Poste administrateur"]
-    ADM["Serveur administration"]
-    DC["DC Server Core"]
-
-    PC -->|"RDP"| ADM
-    ADM -->|"WinRM"| DC
-```
-
-!!! warning
-
-    RSAT et l’administration complète d’Active Directory ne se limitent pas aux seuls ports WinRM.
-
-    WinRM représente ici le mécanisme d’administration distante Windows. Les différents outils AD, DNS ou MMC peuvent utiliser d’autres protocoles.
-
----
-
-### Nommer le domaine avant de l’installer
-
-Le nom du domaine Active Directory doit être défini **avant la promotion du premier contrôleur de domaine**.
-
-SportLudique utilise le domaine public :
+Exemples de noms de machines :
 
 ```text
-sportludique.fr
+PRF-DC01     → premier contrôleur de domaine
+PRF-DC02     → deuxième contrôleur de domaine
+PRF-ADM01    → machine d’administration
 ```
 
-Chaque site utilise un sous-domaine dédié.
+Le domaine Active Directory utilise le **nom DNS prévu dans la documentation du projet**.
 
-| Site | Domaine Active Directory | NetBIOS |
-|---|---|---|
-| Chartres | `cha.chartres.sportludique.fr` | `CHA` |
-| Tours | `trs.tours.sportludique.fr` | `TRS` |
-| Orléans | `orl.orleans.sportludique.fr` | `ORL` |
-| Bourges | `brg.bourges.sportludique.fr` | `BRG` |
-| Blois | `blo.blois.sportludique.fr` | `BLO` |
+Le nom NetBIOS du domaine reprend le préfixe :
 
-Pour Chartres :
-
-```mermaid
-flowchart TB
-    ROOT["sportludique.fr"]
-    SITE["chartres.sportludique.fr"]
-    AD["cha.chartres.sportludique.fr<br/>Domaine Active Directory"]
-
-    ROOT --> SITE --> AD
+```text
+Nom DNS du domaine : <nom défini dans la documentation>
+Nom NetBIOS        : PRF
 ```
 
-!!! danger "Pas de `.local`"
+!!! danger "Pas de domaine en `.local`"
 
-    N’utilisez pas un domaine tel que :
+    N’inventez pas un domaine tel que :
 
-    `sportludique.local`
+    ```text
+    prf.local
+    entreprise.local
+    ad.local
+    ```
 
-    `chartres.local`
+    Utilisez le **nom de domaine prévu dans la documentation**.
 
-    `ad.local`
+    Le suffixe `.local` est notamment utilisé par **mDNS** et n’est pas conforme à l’architecture demandée.
 
-    Le suffixe `.local` est notamment utilisé par **mDNS**.
+!!! danger "Vérifiez avant la promotion"
 
-    Le domaine Active Directory doit être créé dans l’espace DNS prévu sous `sportludique.fr`.
+    Une erreur sur le nom d’une VM se corrige facilement.
+
+    Une erreur sur le **nom du domaine Active Directory** au moment de créer la forêt est d’une autre nature.
+
+    Vérifiez donc avant la promotion :
+
+    - le nom du serveur ;
+    - le nom DNS du domaine ;
+    - le nom NetBIOS ;
+    - l’adressage IPv4 ;
+    - le VLAN ;
+    - la passerelle ;
+    - la configuration DNS.
 
 <quiz>
-Quel nom est conforme à la convention Active Directory du site de Chartres ?
+Quel nom de domaine devez-vous utiliser ?
 
-- [ ] `chartres.local`
-- [ ] `cha.local`
-- [x] `cha.chartres.sportludique.fr`
-- [ ] `sportludique.ad`
+- [ ] `prf.local`
+- [ ] Un nom choisi librement au moment de l’installation
+- [x] Le nom DNS prévu dans la documentation du projet
+- [ ] Le nom du VLAN Serveurs
 </quiz>
 
 ---
 
-### Nom NetBIOS et nom DNS
+### Préparer le contrôleur de domaine Core
 
-Un domaine Active Directory possède notamment un nom DNS et un nom NetBIOS.
+La configuration de base de Windows Server Core a déjà été vue l’année dernière.
 
-Pour Chartres :
+Utilisez **SConfig** :
 
-```text
-Nom DNS     : cha.chartres.sportludique.fr
-Nom NetBIOS : CHA
+```powershell
+SConfig
 ```
 
-Un utilisateur peut alors rencontrer différentes formes d’identification.
+Configurez et vérifiez :
 
-Par exemple :
-
-```text
-CHA\jdupont
-```
-
-Le préfixe `CHA` correspond ici au nom NetBIOS du domaine.
-
-Une autre forme courante utilise un nom ressemblant à une adresse de courrier électronique :
-
-```text
-jdupont@cha.chartres.sportludique.fr
-```
-
-Cette forme est appelée **UPN** (*User Principal Name*).
-
-!!! note
-
-    Le nom DNS du domaine, le nom NetBIOS et l’UPN sont liés à l’identité Active Directory mais ne doivent pas être confondus.
+- le nom du serveur ;
+- l’adresse IPv4 statique ;
+- le préfixe réseau ;
+- la passerelle ;
+- le DNS ;
+- la date et l’heure ;
+- les paramètres nécessaires à l’administration distante.
 
 ---
 
-### Nommer le contrôleur de domaine
+### Installer AD DS et créer le domaine
 
-Les conventions de nommage du projet s’appliquent aux serveurs.
+Installez le rôle **Active Directory Domain Services** :
 
-| Site | Préfixe |
-|---|---|
-| Chartres | `CHA-` |
-| Tours | `TRS-` |
-| Orléans | `ORL-` |
-| Bourges | `BRG-` |
-| Blois | `BLO-` |
-
-Le premier contrôleur de domaine de Chartres pourra par exemple être nommé :
-
-```text
-CHA-DC01
+```powershell
+Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
 ```
 
-Le nom permet immédiatement d’identifier :
+Vérifiez l’installation :
 
-```text
-CHA  → site de Chartres
-DC   → contrôleur de domaine
-01   → premier serveur de ce rôle
+```powershell
+Get-WindowsFeature AD-Domain-Services
 ```
+
+Le premier contrôleur de domaine crée la **première forêt** et son **premier domaine** :
+
+```powershell
+Install-ADDSForest `
+    -DomainName "<nom-du-domaine>" `
+    -DomainNetbiosName "PRF" `
+    -InstallDNS
+```
+
+Remplacez `<nom-du-domaine>` par le nom défini dans la documentation.
+
+La commande demande notamment le mot de passe **DSRM** (*Directory Services Restore Mode*), puis le serveur redémarre après la promotion.
+
+Après redémarrage :
+
+```powershell
+Get-ADDomain
+Get-ADForest
+Get-ADDomainController -Filter *
+Get-Service DNS
+```
+
+<quiz>
+Quelle commande crée la première forêt Active Directory ?
+
+- [ ] `New-ADUser`
+- [ ] `Install-WindowsFeature DNS`
+- [x] `Install-ADDSForest`
+- [ ] `Get-ADForest`
+</quiz>
 
 ---
 
@@ -399,9 +306,7 @@ DC   → contrôleur de domaine
 
 DNS est une brique fondamentale d’Active Directory.
 
-Un poste ne doit pas simplement connaître l’adresse IP d’un contrôleur de domaine.
-
-Il doit pouvoir **localiser les services du domaine**.
+Un poste ne doit pas seulement connaître l’adresse IP d’un contrôleur de domaine : il doit pouvoir **localiser les services du domaine**.
 
 ```mermaid
 flowchart LR
@@ -409,199 +314,127 @@ flowchart LR
     DNS["DNS du domaine"]
     DC["Contrôleur de domaine"]
 
-    CLIENT -->|"1. Où se trouve le service ?"| DNS
+    CLIENT -->|"1. Recherche du service"| DNS
     DNS -->|"2. Informations DNS"| CLIENT
     CLIENT -->|"3. Contact du DC"| DC
 ```
 
-Active Directory publie dans DNS des enregistrements permettant aux clients de localiser différents services.
+Active Directory publie notamment des enregistrements **SRV** permettant aux clients de localiser ses services.
 
-!!! important
+!!! important "DNS des membres du domaine"
 
-    Dans une infrastructure Active Directory, DNS ne sert donc pas uniquement à transformer :
+    Les machines membres du domaine doivent utiliser le **DNS Active Directory**.
 
-    `serveur.exemple.fr` → `192.0.2.10`
-
-    Il participe également à la **découverte des services du domaine**.
-
----
-
-### Les enregistrements SRV
-
-DNS possède différents types d’enregistrements.
-
-Vous connaissez probablement déjà :
-
-```text
-A     → nom vers adresse IPv4
-AAAA  → nom vers adresse IPv6
-CNAME → alias
-```
-
-Active Directory utilise également des enregistrements **SRV**.
-
-Un enregistrement SRV permet d’indiquer qu’un serveur fournit un **service particulier**.
-
-Schématiquement :
-
-```text
-Quel serveur fournit ce service ?
-              │
-              ▼
-             DNS
-              │
-              ▼
-      enregistrement SRV
-              │
-              ▼
-       serveur à contacter
-```
-
-!!! note "Socle"
-
-    Au niveau Socle, vous devez surtout comprendre que les enregistrements SRV permettent aux machines de **localiser les services Active Directory**.
-
-    Leur structure détaillée sera étudiée plus loin si nécessaire.
-
-<quiz>
-Pourquoi un poste membre du domaine doit-il utiliser le DNS Active Directory ?
-
-- [ ] Uniquement pour accéder à Internet
-- [x] Pour pouvoir notamment localiser les services du domaine
-- [ ] Pour recevoir son adresse MAC
-- [ ] Pour remplacer le service DHCP
-</quiz>
-
----
-
-### Quel DNS configurer sur les machines ?
-
-Les machines membres du domaine doivent utiliser le **DNS Active Directory**.
-
-Une mauvaise configuration serait par exemple :
-
-```text
-Poste du domaine
-      │
-      └── DNS : 8.8.8.8
-```
-
-Le résolveur public connaît Internet, mais il ne connaît pas les informations privées du domaine Active Directory SportLudique.
+    Un DNS public comme `8.8.8.8` ou `1.1.1.1` ne connaît pas les informations privées du domaine.
 
 L’architecture attendue est :
 
 ```mermaid
 flowchart LR
-    CLIENT["Poste du domaine"]
+    CLIENT["Machine du domaine"]
     DNSAD["DNS Active Directory"]
     EXT["DNS externe"]
 
     CLIENT -->|"Requêtes DNS"| DNSAD
-    DNSAD -->|"Redirecteur<br/>si nécessaire"| EXT
+    DNSAD -->|"Redirecteur si nécessaire"| EXT
 ```
 
-Le serveur DNS AD répond pour les zones qu’il connaît et peut utiliser un **redirecteur** pour les autres requêtes.
+Le DNS AD répond pour les zones qu’il connaît et peut utiliser un **redirecteur** pour les autres requêtes.
 
-!!! danger "Le DNS public n’est pas un DNS de secours pour AD"
+!!! danger "Un DNS public n’est pas un DNS de secours pour AD"
 
-    Ajouter `8.8.8.8` ou `1.1.1.1` comme DNS alternatif sur les postes du domaine ne constitue pas une solution de haute disponibilité pour Active Directory.
-
-    Le deuxième DNS d’un poste membre doit, lorsqu’il existe, être lui aussi capable de résoudre correctement le domaine Active Directory.
-
----
-
-### Ajouter une machine au domaine
-
-Une machine Windows peut être intégrée au domaine lorsque plusieurs conditions sont réunies.
-
-Elle doit notamment :
-
-- disposer d’une configuration IP correcte ;
-- pouvoir joindre le réseau du domaine ;
-- utiliser le DNS Active Directory ;
-- pouvoir résoudre le domaine ;
-- disposer d’une heure cohérente ;
-- utiliser des identifiants autorisés à réaliser l’opération.
-
-```mermaid
-flowchart LR
-    PC["Poste Windows"]
-    DNS["DNS AD"]
-    DC["Contrôleur de domaine"]
-
-    PC -->|"Résolution"| DNS
-    PC -->|"Intégration au domaine"| DC
-```
-
-!!! warning "Le ping ne suffit pas"
-
-    Pouvoir faire :
-
-    ```text
-    ping 172.x.x.x
-    ```
-
-    vers le contrôleur de domaine ne prouve pas que la machine est correctement préparée pour rejoindre le domaine.
+    Si un deuxième DNS est configuré sur un membre du domaine, il doit lui aussi être capable de résoudre correctement le domaine Active Directory.
 
 <quiz>
-Un poste peut joindre l’adresse IP du contrôleur de domaine mais ne parvient pas à rejoindre le domaine. Sa configuration DNS indique `8.8.8.8`. Quelle vérification est prioritaire ?
+Pourquoi une machine membre du domaine doit-elle utiliser le DNS Active Directory ?
 
-- [ ] Changer l’adresse MAC du poste
-- [x] Configurer le poste pour utiliser le DNS Active Directory
-- [ ] Ajouter une deuxième passerelle par défaut
-- [ ] Réinstaller Windows
+- [ ] Uniquement pour accéder à Internet
+- [x] Pour pouvoir notamment localiser les services du domaine
+- [ ] Pour recevoir son adresse MAC
+- [ ] Pour remplacer DHCP
 </quiz>
 
 ---
 
-### Utilisateurs, groupes et ordinateurs
+### Joindre la machine d’administration au domaine
 
-Active Directory stocke différents types d’objets.
+Une fois le domaine et DNS fonctionnels, la **machine d’administration Windows GUI** peut rejoindre le domaine.
 
-Parmi les plus courants :
+Avant la jonction, vérifiez :
 
-- utilisateurs ;
-- groupes ;
-- ordinateurs ;
-- unités d’organisation.
+- son nom : par exemple `PRF-ADM01` ;
+- son adressage ;
+- son accès au VLAN Serveurs ;
+- sa configuration DNS : elle doit utiliser le **DNS Active Directory** ;
+- la résolution du nom du domaine ;
+- la cohérence de l’heure.
 
-```mermaid
-flowchart TB
-    AD["Domaine Active Directory"]
-    USERS["Utilisateurs"]
-    GROUPS["Groupes"]
-    COMPUTERS["Ordinateurs"]
-    OU["Unités d’organisation"]
+!!! warning "Le ping ne suffit pas"
 
-    AD --> USERS
-    AD --> GROUPS
-    AD --> COMPUTERS
-    AD --> OU
-```
+    Pouvoir joindre l’adresse IP du DC ne prouve pas qu’une machine est prête à rejoindre le domaine.
 
-Un compte utilisateur représente une identité.
+    La résolution DNS du domaine doit fonctionner.
 
-Un groupe permet notamment de regrouper plusieurs identités afin de faciliter l’attribution de droits.
-
-Un objet ordinateur représente une machine intégrée au domaine.
+Une fois membre du domaine, cette machine devient le **poste de travail d’administration Windows** de l’infrastructure.
 
 ---
 
-### Les unités d’organisation
+### Administrer Active Directory
 
-Les **OU** (*Organizational Units*) permettent d’organiser les objets Active Directory.
+L’administrateur se connecte en **RDP** sur la machine d’administration Windows GUI.
 
-Par exemple :
+Depuis cette interface graphique, il peut gérer notamment :
+
+- les utilisateurs et les groupes ;
+- les ordinateurs ;
+- les unités d’organisation ;
+- DNS ;
+- les stratégies de groupe.
+
+Les rôles **AD DS et DNS restent sur le contrôleur de domaine Core**. La machine d’administration ne fait qu’héberger les outils permettant de les gérer.
+
+Pour certaines opérations, PowerShell peut également être utilisé.
+
+Par exemple, pour ouvrir une session PowerShell distante sur le DC :
+
+```powershell
+Enter-PSSession PRF-DC01
+```
+
+PowerShell Remoting s’appuie notamment sur **WinRM** :
 
 ```text
-SportLudique
+TCP 5985 → WinRM HTTP
+TCP 5986 → WinRM HTTPS
+```
+
+!!! warning "WinRM ne résume pas toute l’administration Windows"
+
+    Les outils graphiques d’administration peuvent utiliser d’autres protocoles.
+
+    Ne retenez donc pas : « `5985/5986` sont ouverts, toute l’administration Windows fonctionnera ».
+
+---
+
+### Utilisateurs, groupes, ordinateurs et OU
+
+Active Directory stocke différents types d’objets :
+
+- **utilisateurs** : identités des personnes ;
+- **groupes** : regroupement d’identités pour faciliter l’attribution des droits ;
+- **ordinateurs** : machines membres du domaine ;
+- **OU** (*Organizational Units*) : organisation administrative des objets.
+
+Exemple :
+
+```text
+Domaine
 ├── Utilisateurs
 │   ├── Direction
 │   ├── Informatique
-│   └── Utilisateurs
-├── Ordinateurs
-│   ├── Postes
-│   └── Serveurs
+│   └── Employés
+├── Postes
+├── Serveurs
 └── Groupes
 ```
 
@@ -611,17 +444,13 @@ SportLudique
 
     Il ne s’agit pas de reproduire mécaniquement tout l’organigramme de l’entreprise.
 
----
-
-### Groupes et droits
-
 Une bonne pratique consiste à attribuer les permissions à des **groupes** plutôt que directement à chaque utilisateur.
 
 ```mermaid
 flowchart LR
     U1["Alice"]
     U2["Bob"]
-    G["Groupe<br/>Support"]
+    G["Groupe Support"]
     R["Ressource"]
 
     U1 --> G
@@ -629,19 +458,11 @@ flowchart LR
     G -->|"Permission"| R
 ```
 
-Cela simplifie l’administration :
-
-- arrivée d’un utilisateur → ajout au groupe ;
-- changement de fonction → changement de groupe ;
-- départ → désactivation ou suppression du compte.
-
 ---
 
 ### Les stratégies de groupe
 
 Les **GPO** (*Group Policy Objects*) permettent d’appliquer des paramètres aux utilisateurs et aux ordinateurs du domaine.
-
-Elles permettent par exemple de définir certaines configurations de sécurité ou certains paramètres du système.
 
 ```mermaid
 flowchart LR
@@ -655,15 +476,13 @@ flowchart LR
     OU --> PC2
 ```
 
-Au niveau Socle, l’objectif est surtout de comprendre que le domaine permet une **administration centralisée** des configurations.
+Au niveau Socle, retenez surtout que le domaine permet une **administration centralisée** des configurations.
 
 ---
 
 ### Authentification centralisée
 
-Lorsqu’un utilisateur utilise un compte du domaine, son identité peut être vérifiée par l’infrastructure Active Directory.
-
-Le principe général est :
+Lorsqu’un utilisateur utilise un compte du domaine, son identité est vérifiée par l’infrastructure Active Directory.
 
 ```mermaid
 flowchart LR
@@ -678,9 +497,9 @@ flowchart LR
 
 !!! note "Pas encore les tickets"
 
-    Au niveau Socle, vous devez comprendre **qui authentifie qui** et pourquoi le contrôleur de domaine est nécessaire.
+    Au niveau Socle, vous devez comprendre **qui authentifie qui**.
 
-    Le fonctionnement détaillé de Kerberos et de ses tickets sera étudié au niveau **Expertise**.
+    Le fonctionnement détaillé de Kerberos et des tickets est étudié au niveau **Expertise**.
 
 ---
 
@@ -688,21 +507,14 @@ flowchart LR
 
 À la fin du Socle, vous devez être capables d’expliquer :
 
-- ce qu’est un domaine Active Directory ;
-- le rôle d’AD DS ;
-- ce qu’est un contrôleur de domaine ;
-- pourquoi le DC est installé en Server Core ;
-- pourquoi le DC possède une seule interface dans le VLAN Serveurs ;
-- comment le serveur d’administration permet d’administrer ce DC ;
-- pourquoi le serveur d’administration n’est pas un routeur ;
-- le rôle de WinRM ;
-- la convention de nommage du domaine SportLudique ;
-- la différence entre nom DNS, NetBIOS et UPN ;
-- pourquoi Active Directory dépend de DNS ;
-- le rôle général des enregistrements SRV ;
-- pourquoi les postes du domaine doivent utiliser le DNS AD ;
-- ce que sont utilisateurs, groupes, ordinateurs et OU ;
-- le principe d’une GPO ;
+- le rôle d’**AD DS**, du **contrôleur de domaine** et de **DNS** ;
+- pourquoi le DC Core possède **une seule interface dans le VLAN Serveurs** ;
+- le rôle de la **machine d’administration Windows GUI** ;
+- pourquoi cette machine doit être **membre du domaine** ;
+- la différence entre **rôle serveur** et **outil d’administration** ;
+- pourquoi le nom du domaine doit être défini **avant sa création** ;
+- pourquoi les membres du domaine utilisent le **DNS Active Directory** ;
+- le rôle des utilisateurs, groupes, ordinateurs, OU et GPO ;
 - le principe général de l’authentification centralisée.
 
 ---
@@ -981,6 +793,111 @@ Une GPO doit configurer uniquement les serveurs du domaine. Quelle démarche est
 ---
 
 ## Expertise
+
+### Forêt, arbre, domaine et OU
+
+Jusqu'ici, nous avons principalement travaillé avec **un domaine**. Une architecture Active Directory plus importante nécessite de distinguer plusieurs niveaux logiques.
+
+```text
+Forêt
+└── Arbre
+    └── Domaine
+        ├── OU
+        ├── utilisateurs
+        ├── groupes
+        └── ordinateurs
+```
+
+#### Le domaine
+
+Un **domaine** regroupe des objets Active Directory dans une même structure logique et possède un nom DNS, par exemple :
+
+```text
+<nom-du-domaine>
+```
+
+Plusieurs contrôleurs de domaine peuvent héberger et répliquer **le même domaine**.
+
+```mermaid
+flowchart LR
+    D["Domaine<br/><nom-du-domaine>"]
+    DC1["DC01"]
+    DC2["DC02"]
+    D --- DC1
+    D --- DC2
+    DC1 <-->|"Réplication"| DC2
+```
+
+#### La forêt
+
+La **forêt** est la structure logique Active Directory de plus haut niveau.
+
+Lorsque le premier DC est créé avec `Install-ADDSForest`, on crée simultanément :
+
+- une nouvelle forêt ;
+- son premier domaine.
+
+Une forêt peut ne contenir qu'un seul domaine.
+
+#### L'arbre
+
+Un **arbre de domaines** correspond à des domaines partageant un espace de noms DNS hiérarchique continu.
+
+Exemple théorique :
+
+```text
+exemple.fr
+├── france.exemple.fr
+└── europe.exemple.fr
+```
+
+Comprendre cette notion ne signifie pas qu'il faut multiplier les domaines dans SportLudique.
+
+!!! warning "Site physique ≠ domaine"
+
+    Un nouveau bâtiment, un nouveau VLAN ou une nouvelle ville ne justifie pas automatiquement la création d'un nouveau domaine.
+
+    La **topologie réseau**, les **sites physiques** et la **structure logique Active Directory** sont des notions différentes.
+
+#### Une OU n'est pas un domaine
+
+Les **OU** servent à organiser et administrer les objets **à l'intérieur d'un domaine**.
+
+```mermaid
+flowchart TB
+    F["Forêt"]
+    D["Domaine"]
+    U1["OU Utilisateurs"]
+    U2["OU Postes"]
+    U3["OU Serveurs"]
+    F --> D
+    D --> U1
+    D --> U2
+    D --> U3
+```
+
+Créer une OU portant le nom d’un site ne crée pas un nouveau domaine.
+
+<quiz>
+Une entreprise ouvre un nouveau site physique. Faut-il automatiquement créer un nouveau domaine Active Directory ?
+
+- [ ] Oui, un domaine est obligatoire par ville
+- [ ] Oui, un domaine est obligatoire par VLAN
+- [x] Non, un domaine supplémentaire doit répondre à un besoin logique ou administratif réel
+- [ ] Oui, sinon DNS ne fonctionne pas
+</quiz>
+
+<quiz>
+Quelle structure constitue le niveau logique le plus élevé ?
+
+- [ ] Une OU
+- [ ] Un domaine
+- [x] Une forêt
+- [ ] Un groupe
+</quiz>
+
+---
+
 
 ### Comprendre réellement l’authentification
 
