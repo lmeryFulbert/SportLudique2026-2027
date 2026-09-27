@@ -211,7 +211,7 @@ Vous pouvez venir avec des schémas préparés sur support numérique ou papier,
 
 ### Grille d'évaluation
 
-Une **grille étudiant** est mise à votre disposition au format PDF. Elle présente les critères et le barème de l'évaluation.
+La **[grille d'évaluation étudiant](../../medias/cours/dmz/grille_DMZ_SportLudique_etudiant.pdf){ target="_blank" }**  est mise à votre disposition au format PDF. Elle présente les critères et le barème de l'évaluation.
 
 L'enseignant dispose d'une **grille détaillée** lui permettant d'apprécier la maîtrise technique correspondant au niveau choisi.
 
