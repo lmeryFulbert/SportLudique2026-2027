@@ -10,15 +10,17 @@ Les autres sites disposent des services nécessaires à leur activité et de rel
 
 ### Répartition des utilisateurs
 
-| Service                     | Chartres |   Tours | Orléans | Bourges |  Blois |
-| --------------------------- | -------: | ------: | ------: | ------: | -----: |
-| Direction et administration |       12 |       5 |       4 |       4 |      3 |
-| Ressources humaines         |       14 |       6 |       5 |       4 |      3 |
-| Comptabilité et finance     |       24 |      10 |       8 |       7 |      5 |
-| Commercial                  |       62 |      40 |      25 |      20 |     16 |
-| Logistique                  |       78 |      55 |      30 |      25 |     20 |
-| Informatique / DSI          |       26 |       8 |       5 |       4 |      3 |
-| **Total**                   |  **216** | **124** |  **77** |  **64** | **50** |
+| Service | Chartres | Tours | Orléans | Bourges | Blois |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Direction et administration | 12 | 5 | 4 | 4 | 3 |
+| Ressources humaines | 14 | 6 | 5 | 4 | 3 |
+| Comptabilité et finance | 24 | 10 | 8 | 7 | 5 |
+| Commercial | 62 | 0 | 0 | 0 | 0 |
+| Conception | 78 | 0 | 0 | 0 | 36 |
+| Production | 0 | 95 | 55 | 0 | 0 |
+| Logistique | 0 | 0 | 0 | 45 | 0 |
+| Informatique / DSI | 26 | 8 | 5 | 4 | 3 |
+| **Total** | **216** | **124** | **77** | **64** | **50** |
 
 Ces effectifs correspondent aux utilisateurs habituels de chaque site. Ils constituent une première donnée permettant d'évaluer les besoins de l'infrastructure.
 
