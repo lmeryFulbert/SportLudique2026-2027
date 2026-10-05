@@ -550,7 +550,7 @@ R1 doit savoir atteindre :
 192.168.20.0/24
 ```
 
-Par exemple :
+Par exemple, sur R1 il faut ajouter cette route pour joindre R2 :
 
 ```text
 ip route 192.168.20.0 255.255.255.0 10.0.0.2
@@ -572,7 +572,7 @@ R2 doit donc savoir atteindre :
 192.168.10.0/24
 ```
 
-Par exemple :
+Par exemple, sur R2 il faut ajouter cette route pour joindre R1 :
 
 ```text
 ip route 192.168.10.0 255.255.255.0 10.0.0.1

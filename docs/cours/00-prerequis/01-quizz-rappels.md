@@ -133,12 +133,12 @@ R1 possède une route vers le réseau de destination, mais R2 ne possède aucune
 ### Agrégation des routes
 
 <quiz>
-Un routeur possède les routes `192.168.64.0/20` vers R2 et `192.168.70.0/24` vers R3. Où sera envoyé un paquet destiné à `192.168.70.50` ?
-- [ ] Vers R2 car `/20` couvre davantage d'adresses
-- [x] Vers R3 car `/24` est la route la plus précise
-- [ ] Vers R2 et R3 simultanément
-- [ ] Vers la route par défaut
-> **Explication :** Les deux routes correspondent à l'adresse destination `192.168.70.50`, mais `/24` possède le préfixe le plus long. Le routeur utilise donc la route `192.168.70.0/24`.
+Une route globalisante `192.168.64.0/20` couvre quelle plage d'adresses ?
+- [ ] `192.168.64.0` à `192.168.64.255`
+- [ ] `192.168.64.0` à `192.168.71.255`
+- [x] `192.168.64.0` à `192.168.79.255`
+- [ ] `192.168.64.0` à `192.168.95.255`
+> **Explication :** Un `/20` correspond au masque
 </quiz>
 
 ### Route la plus précise
