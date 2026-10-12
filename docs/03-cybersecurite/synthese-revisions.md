@@ -1,6 +1,6 @@
 # Révisions — comprendre, qualifier, protéger
 
-[Retour au référentiel](cybersecu.md) · [Tableau complet](tableau-attaques.md)
+[Retour au référentiel](cybersecurite.md) · [Tableau complet](tableau-attaques.md)
 
 ## La méthode pour une étude de cas
 

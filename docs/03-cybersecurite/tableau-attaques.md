@@ -1,6 +1,6 @@
 # Tableau général — attaques et protections
 
-[Retour au référentiel](cybersecu.md)
+[Retour au référentiel](cybersecurite.md)
 
 C = confidentialité ; I = intégrité ; D = disponibilité. Les impacts dépendent des droits et du scénario. Le niveau indique le point d’entrée pédagogique ; l’Expertise analyse des combinaisons, elle ne rajoute pas une liste obligatoire.
 

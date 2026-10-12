@@ -21,14 +21,14 @@ flowchart TB
 
     subgraph L2[" "]
         direction RL
-        I["**I — INTÉGRITÉ**<br/><br/>Garantir l'exactitude des informations et détecter leurs altérations"]
-        P["**P — PREUVE**<br/><br/>Disposer d'éléments fiables pour établir les faits et les actions"]
+        I["**I — INTÉGRITÉ**<br/><br/>Garantir l'exactitude des informations <br/> et détecter leurs altérations"]
+        P["**P — PREUVE**<br/><br/>Disposer d'éléments fiables <br/> pour établir les faits et les actions"]
     end
 
     subgraph L1[" "]
         direction RL
-        D["**D — DISPONIBILITÉ**<br/><br/>Accéder aux informations et aux services au moment voulu"]
-        C["**C — CONFIDENTIALITÉ**<br/><br/>Réserver l'accès aux informations aux seules personnes autorisées"]
+        D["**D — DISPONIBILITÉ**<br/><br/>Accéder aux informations <br/> et aux services au moment voulu"]
+        C["**C — CONFIDENTIALITÉ**<br/><br/>Réserver l'accès aux informations <br/> aux seules personnes autorisées"]
     end
 
     style L1 fill:none,stroke:none
@@ -47,9 +47,12 @@ flowchart TB
     - **P :** les connexions et modifications sensibles doivent pouvoir être examinées à partir de traces suffisamment fiables.
 
 !!! info "Preuve, authentification et traçabilité : trois notions liées, mais différentes"
-    **Authentifier**, c'est vérifier une identité ou une origine. **Tracer**, c'est enregistrer des événements. **Apporter une preuve**, c'est pouvoir s'appuyer sur des éléments dont l'origine, l'intégrité, l'horodatage et la conservation sont suffisamment maîtrisés.
+    **Authentifier**, c'est vérifier une identité ou une origine. <br/>
+    **Tracer**, c'est enregistrer des événements. <br/>
+    **Apporter une preuve**, c'est pouvoir s'appuyer sur des éléments dont l'origine, l'intégrité, l'horodatage et la conservation sont suffisamment maîtrisés.
 
-    Un journal peut constituer **un élément de preuve**, mais il n'est pas automatiquement fiable. Une signature électronique peut attester l'origine et l'intégrité d'un document selon le mécanisme utilisé ; elle ne prouve pas que son contenu est vrai.
+    Un journal peut constituer **un élément de preuve**, mais il n'est pas automatiquement fiable. <br/>
+    Une **signature électronique** peut attester l'origine et l'intégrité d'un document selon le mécanisme utilisé ;<br/>
 
 !!! warning "Une attaque peut affecter plusieurs propriétés DICP"
     Un rançongiciel peut rendre des données **indisponibles (D)**, en modifier le contenu **(I)**, les exfiltrer **(C)** et effacer les traces nécessaires à l'enquête **(P)**. Ces effets ne sont pas systématiques : ils dépendent du scénario.
@@ -99,7 +102,10 @@ flowchart TD
     **Mesures :** MFA lorsque disponible, moindre privilège, comptes d'administration séparés, restrictions d'accès et journalisation protégée (**P**).
 
 !!! warning "Ne pas confondre risque, vulnérabilité et attaque"
-    « Logiciel non corrigé » désigne une **vulnérabilité** ; « hameçonnage » désigne une **technique d'attaque** ; « vol d'identifiants permettant de consulter des dossiers confidentiels » décrit un **scénario de risque**. Une cotation de type *vraisemblance × gravité* sert à prioriser les risques : ce n'est pas une mesure physique exacte.
+    « Logiciel non corrigé » désigne une **vulnérabilité** ; <br/>
+    « hameçonnage » désigne une **technique d'attaque** ; <br/>
+    « vol d'identifiants permettant de consulter des dossiers confidentiels » décrit un **scénario de risque**.<br/>
+    Une cotation de type **vraisemblance × gravité** sert à prioriser les risques : ce n'est pas une mesure physique exacte.
 
 ### 3. Défense en profondeur et moindre privilège
 
@@ -136,7 +142,8 @@ Le **moindre privilège** consiste à n'attribuer que les droits nécessaires, p
 | **Expertise** | Reconstituer un scénario combiné, concevoir et justifier des défenses et leurs vérifications. |
 
 !!! note "Le modèle OSI est un repère pédagogique, pas une frontière stricte"
-    DHCP et DNS sont des protocoles applicatifs, même si des attaques qui les visent perturbent le réseau. TLS et les sessions web ne correspondent pas strictement aux couches 6 et 5 du modèle théorique. Une attaque peut impliquer **plusieurs couches** et compromettre **plusieurs propriétés DICP**.
+    DHCP et DNS sont des protocoles applicatifs, même si des attaques qui les visent perturbent le réseau. <br/>
+    TLS et les sessions web ne correspondent pas strictement aux couches 6 et 5 du modèle théorique. Une attaque peut impliquer **plusieurs couches** et compromettre **plusieurs propriétés DICP**.
 
 ## Parcours par couches
 
@@ -152,17 +159,34 @@ Le **moindre privilège** consiste à n'attribuer que les droits nécessaires, p
 
 Consulter également le [tableau général des attaques](tableau-attaques.md) et la [synthèse pour les révisions](synthese-revisions.md).
 
-## Concepts avancés — Analyser des observations
+##  Concepts avancés
 
-Face à une situation suspecte, distinguer **reconnaissance** (ex. scan de ports), **vulnérabilité** (ex. contrôle d'accès absent), **mauvaise configuration** (ex. interface d'administration exposée), **attaque** (action visant un objectif malveillant) et **indice** (observation qui admet plusieurs explications).
+### Analyser et interpréter les événements de sécurité
 
-!!! example "Une anomalie n'est pas une preuve d'attaque"
-    Des changements fréquents dans une table MAC peuvent résulter d'une boucle Ethernet ou d'une modification de topologie. Il faut **recouper les observations** avant de conclure.
+La détection d'une anomalie ne signifie pas nécessairement qu'une attaque est en cours. Un dysfonctionnement technique, une erreur de configuration ou une activité légitime peuvent produire des événements similaires à ceux d'une cyberattaque.
 
-Dans SportLudique, les sources possibles sont : tables MAC et ARP, baux DHCP, routes et ACL, journaux Stormshield, événements DNS et AD, journaux du reverse proxy, Graylog et SIEM.
+L'analyse consiste à **collecter des informations, recouper plusieurs observations et rechercher les causes possibles** afin de déterminer si le système d'information est réellement menacé.
 
-!!! warning "Visibilité réelle"
-    Un équipement ne voit pas nécessairement tous les flux. Vérifier les capteurs, les sources collectées, les horodatages, les droits d'accès et la conservation avant d'interpréter les traces.
+!!! example "Exemple — Activité inhabituelle sur un réseau"
+
+    Un pare-feu enregistre de nombreuses tentatives de connexion vers différents ports d'un serveur.
+
+    Plusieurs hypothèses sont possibles :
+
+    - un outil de supervision vérifie les services disponibles ;
+    - un administrateur réalise un diagnostic réseau ;
+    - un attaquant effectue une reconnaissance pour identifier des services vulnérables.
+
+    **Les journaux seuls ne permettent pas toujours de déterminer l'intention.** Il faut notamment examiner la source des connexions, leur fréquence, le contexte et les autres événements enregistrés.
+
+!!! tip "Méthode d'analyse"
+
+    Face à une situation suspecte, il faut pouvoir répondre à trois questions :
+
+    1. **Qu'observe-t-on réellement ?**
+    2. **Quelles sont les explications possibles ?**
+    3. **Quels éléments permettraient de confirmer ou d'écarter une hypothèse ?**
+
 
 ## Expertise — Architecture et réponse à incident
 

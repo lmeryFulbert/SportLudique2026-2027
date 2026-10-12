@@ -1,32 +1,80 @@
-# 1 — Couche physique et accès aux équipements
+# 1 — Sécurité physique et accès aux équipements
 
-[Retour au référentiel](cybersecu.md)
+[← Retour au référentiel](00-cybersecurite.md)
+
+!!! abstract "Objectif de la fiche"
+    Comprendre comment un **accès matériel non maîtrisé** peut compromettre la sécurité d'un système d'information et distinguer les protections **physiques**, **du poste** et **de l'accès réseau**.
+
+    Les mécanismes de commutation et d'authentification réseau abordés en complément ne relèvent pas strictement de la couche physique du modèle OSI.
 
 ## Socle obligatoire
 
-### Physical Access Attack — attaque par accès physique
+### 1. Pourquoi protéger l'accès physique ?
 
-**Mécanisme et conditions.** Un individu accède à une station, une baie, une prise réseau, un disque ou une console. Il exploite une protection matérielle insuffisante ou une session déjà ouverte. L’accès peut permettre le vol, la modification ou l’interruption, mais son résultat dépend des protections actives : un disque chiffré et verrouillé reste différent d’un poste ouvert.
+Un intrus n'a pas toujours besoin d'attaquer un service par Internet : l'accès à une salle, un équipement, une prise réseau ou un support de stockage peut suffire à créer un incident. Les conséquences dépendent des protections déjà en place.
 
-**Risques C/I/D.** Vol d’informations, installation d’un dispositif malveillant, changement de configuration, coupure d’alimentation ou destruction. Une session abandonnée relève aussi du contrôle d’accès au système.
+```mermaid
+flowchart TB
+    A[Accès physique non autorisé]
+    A --> B[Poste ou disque]
+    A --> C[Prise réseau ou console]
+    A --> D[Baie ou alimentation]
+    B --> E[Lecture ou modification de données]
+    C --> F[Accès possible au réseau ou aux équipements]
+    D --> G[Interruption ou modification de service]
+```
 
-**Protections expliquées.** Fermer salles et baies, contrôler et tracer les accès ; la vidéosurveillance contribue à la dissuasion et à l’enquête, elle n’interdit pas matériellement l’accès. Verrouiller automatiquement les sessions. Protéger les accès console et administratifs avec authentification et droits adaptés.
+!!! example "Cas SportLudique — Une personne entre dans la salle réseau"
+    - Elle peut **débrancher** un switch ou un serveur : **disponibilité (D)**.
+    - Elle peut **modifier** un câblage ou une configuration : **intégrité (I)**.
+    - Elle peut **emporter** un disque non chiffré : **confidentialité (C)**.
+    - Sans contrôle d'accès ni traces fiables, il peut être difficile d'**établir les faits (P)**.
 
-Désactiver les ports inutilisés et les placer dans un VLAN de stationnement sans service utile. Ce VLAN n’est **pas un honeypot** : un honeypot est un système conçu pour observer des interactions suspectes. Éviter VLAN 1 pour les usages utilisateurs et l’administration est une pratique de durcissement, pas une garantie de sécurité. Un VLAN invité doit être filtré vis-à-vis du réseau interne.
+!!! warning "Accès physique ≠ compromission automatique"
+    Un disque chiffré et un poste verrouillé restent mieux protégés qu'une session ouverte. <br/>
+    À l'inverse, une porte verrouillée ne suffit pas si des prises accessibles donnent directement accès au réseau d'administration.
 
-**Exemple SportLudique.** Une personne branche un portable sur une prise disponible. Un port désactivé bloque cet accès ; un port actif dans le VLAN d’administration lui donne une exposition beaucoup plus sensible. L’existence du VLAN ne prouve pas que ses ports sont protégés.
+### 2. Protéger les locaux, équipements et supports
 
-### Supports et périphériques
+| Situation | Mesure adaptée | Limite à connaître |
+| --- | --- | --- |
+| Accès à la salle ou à la baie | Serrure, contrôle des accès, gestion des clés | Une porte fermée ne protège pas une session ouverte |
+| Poste laissé sans surveillance | Verrouillage automatique de session | Ne remplace pas la protection des données stockées |
+| Vol de disque ou d'ordinateur | Chiffrement du disque, protection des clés de récupération | Les données d'une session déverrouillée restent exposées |
+| Démarrage depuis un support externe | Paramétrage UEFI, restriction du démarrage externe, Secure Boot selon le matériel | Aucun réglage firmware ne supprime tout risque matériel |
+| Périphérique USB inconnu | Politique de périphériques autorisés, restrictions GPO ou Linux | Bloquer l'automontage ne bloque pas tous les périphériques malveillants |
+| Coupure ou manipulation d'équipement | Baie sécurisée, alimentation adaptée, surveillance | La vidéosurveillance documente, mais n'empêche pas l'accès |
 
-Chiffrer les disques (par exemple BitLocker) limite la lecture hors ligne après vol, sous réserve de protéger les clés de récupération. Cela ne protège pas les données d’une session déverrouillée. Restreindre le démarrage externe et protéger les réglages BIOS/UEFI ; compléter par Secure Boot lorsque possible. Un mot de passe firmware ne suffit pas contre toute manipulation matérielle.
+!!! tip "À retenir"
+    **La protection est cumulative** : contrôler l'entrée, sécuriser les matériels et protéger les sessions et les données. Une mesure seule ne suffit pas.
 
-Les politiques GPO de restriction des supports amovibles contrôlent les usages autorisés. Désactiver le montage automatique sous Linux réduit les traitements automatiques mais n’interdit ni le montage manuel ni un périphérique USB simulant un clavier. Gérer les types de périphériques admis et les droits.
+### 3. Une prise Ethernet constitue-t-elle un accès au SI ?
 
-## Concepts avancés — contrôle d’accès au réseau
+Une prise Ethernet reliée à un port actif peut permettre à un équipement de communiquer sur le réseau associé. **L'accès aux autres réseaux dépend ensuite des VLAN, du routage et du filtrage**.
 
-**Port Security** limite les adresses MAC apprises ou autorisées sur un port. Il réduit certains abus, mais une adresse MAC peut être copiée ; ce n’est pas une authentification forte.
+```mermaid
+flowchart LR
+    PC[Ordinateur inconnu] --> P[Prise Ethernet]
+    P --> SW[Port du switch]
+    SW -->|Port désactivé| X[Pas de liaison utile]
+    SW -->|Port actif| V[Réseau du VLAN configuré]
+    V --> FW[Filtrage inter-VLAN]
+    FW --> R[Autres services autorisés]
+```
 
-Exemple Cisco IOS indicatif, à adapter au modèle et à la topologie ; une station unique est supposée, sans téléphone ni hyperviseur :
+!!! warning "VLAN de stationnement : ce qu'il fait réellement"
+    Un port inutilisé peut être **désactivé administrativement** et affecté, par précaution, à un **VLAN isolé sans service**. Un VLAN de stationnement n'est **pas un honeypot**. Éviter le VLAN 1 pour les usages courants relève du durcissement, mais ne constitue pas en soi une protection d'accès.
+
+!!! question "Question d'étude de cas"
+    Un étudiant branche son ordinateur personnel sur une prise reliée au VLAN d'administration. **Quel est le problème de sécurité ?** Que faudrait-il vérifier sur la configuration du port et sur les règles de filtrage ?
+
+## Concepts avancés — Contrôler l'accès au réseau
+
+Les deux mécanismes ci-dessous relèvent principalement du **contrôle d'accès sur le réseau Ethernet** (couche 2), mais ils complètent la sécurisation des prises physiques.
+
+### 4. Port Security : limiter les adresses MAC sur un port
+
+Sur certains commutateurs, **Port Security** limite le nombre d'adresses MAC autorisées ou apprises sur un port d'accès. Cela peut réduire certains branchements non prévus, **sans authentifier véritablement la personne ou l'équipement** : une adresse MAC peut être usurpée.
 
 ```text
 interface FastEthernet0/1
@@ -36,14 +84,51 @@ interface FastEthernet0/1
  switchport port-security violation shutdown
 ```
 
-Le dépassement provoque un état de violation pouvant désactiver le port. Sans adresse configurée, le premier équipement appris peut être l’intrus. Vérifier avec `show port-security interface FastEthernet0/1`. La remise en service doit suivre la recherche de cause.
+!!! note "Lire cette configuration Cisco"
+    L'exemple suppose **un seul poste**, sans téléphone IP ni hyperviseur. Si une violation survient, le port peut passer en état `err-disabled`. Vérifier avec `show port-security interface FastEthernet0/1` avant toute remise en service.
 
-**802.1X** fait dialoguer un supplicant, un authentificateur (switch) et un serveur d’authentification, souvent RADIUS. Avec EAP-TLS, la confiance repose sur les certificats et leur validation. Les modes de secours, notamment MAB basé sur la MAC, n’apportent pas la même assurance. Étudier le mécanisme ne suppose pas de le déployer dans SportLudique.
+    Sans adresse MAC explicitement configurée, **le premier appareil appris n'est pas forcément légitime**.
 
-## Expertise — scénario de conception
+### 5. IEEE 802.1X : authentifier avant d'ouvrir l'accès
 
-Une salle contient postes partagés, téléphones et ports inutilisés. Justifier une politique d’accès qui prévoit les équipements sans supplicant, les pannes RADIUS, la gestion des certificats et la séparation invités/administration. Définir comment vérifier le refus d’un équipement inconnu sans interrompre toute la salle.
+Le principe est différent : le commutateur joue le rôle d'**authentificateur**, le poste celui de **supplicant**, et un serveur **RADIUS** participe à la décision d'autorisation. Le protocole EAP transporte la méthode d'authentification choisie ; **EAP-TLS** repose notamment sur des certificats.
+
+```mermaid
+sequenceDiagram
+    participant P as Poste (supplicant)
+    participant S as Switch (authentificateur)
+    participant R as Serveur d'authentification (AAA - RADIUS)
+    P->>S: Demande d'accès / échange EAPOL
+    S->>R: Transmission de l'authentification (RADIUS)
+    R-->>S: Acceptation ou refus
+    alt Authentification acceptée
+        S-->>P: Accès réseau autorisé selon la politique
+    else Authentification refusée
+        S-->>P: Accès refusé ou restreint
+    end
+```
+
+
+!!! warning "Limites de l'authentification 802.1X"
+
+    Certains équipements ne prennent pas en charge 802.1X.<br/>
+    Le mécanisme **MAB (MAC Authentication Bypass)** permet
+    de les autoriser à partir de leur adresse MAC, mais cette
+    protection reste limitée car une adresse MAC peut être usurpée.
+
+    Le contrôle d'accès dépend également de la disponibilité
+    du serveur RADIUS et, selon la méthode EAP utilisée,
+    de la gestion des certificats.
+
+!!! example "Application dans l'infra SIO"
+
+    La section SIO du lycée utilise déjà un serveur **RADIUS pour
+    l'authentification Wi-Fi**.
+
+    Le même principe peut être appliqué aux ports Ethernet :<br/>
+    un switch joue alors le rôle d'authentificateur et consulte
+    le serveur RADIUS avant d'autoriser l'accès au réseau.
 
 ## Référence
 
-[ANSSI — Guide d’hygiène informatique](https://messervices.cyber.gouv.fr/guides/guide-dhygiene-informatique).
+- [ANSSI — Guide d'hygiène informatique](https://messervices.cyber.gouv.fr/guides/guide-dhygiene-informatique).
