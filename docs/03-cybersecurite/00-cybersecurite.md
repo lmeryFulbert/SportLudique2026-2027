@@ -21,23 +21,23 @@ flowchart TB
 
     subgraph L2[" "]
         direction RL
-        I["**I — INTÉGRITÉ**<br/><br/>Garantir l'exactitude des informations <br/> et détecter leurs altérations"]
-        P["**P — PREUVE**<br/><br/>Disposer d'éléments fiables <br/> pour établir les faits et les actions"]
+        I["I — INTÉGRITÉ<br/><br/>Garantir l'exactitude des informations <br/> et détecter leurs altérations"]
+        P["P — PREUVE<br/><br/>Disposer d'éléments fiables <br/> pour établir les faits et les actions"]
     end
 
     subgraph L1[" "]
         direction RL
-        D["**D — DISPONIBILITÉ**<br/><br/>Accéder aux informations <br/> et aux services au moment voulu"]
-        C["**C — CONFIDENTIALITÉ**<br/><br/>Réserver l'accès aux informations <br/> aux seules personnes autorisées"]
+        D["D — DISPONIBILITÉ<br/><br/>Accéder aux informations <br/> et aux services au moment voulu"]
+        C["C — CONFIDENTIALITÉ<br/><br/>Réserver l'accès aux informations <br/> aux seules personnes autorisées"]
     end
 
     style L1 fill:none,stroke:none
     style L2 fill:none,stroke:none
 
-    style D fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:2px
-    style I fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
-    style C fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-    style P fill:#f3e8ff,stroke:#9333ea,color:#581c87,stroke-width:2px
+    style D fill:#1e3a8a,stroke:#60a5fa,color:#ffffff,stroke-width:2px
+    style I fill:#14532d,stroke:#4ade80,color:#ffffff,stroke-width:2px
+    style C fill:#78350f,stroke:#fbbf24,color:#ffffff,stroke-width:2px
+    style P fill:#581c87,stroke:#c084fc,color:#ffffff,stroke-width:2px
 ```
 
 !!! example "Exemple — Annuaire Active Directory de SportLudique"
@@ -111,18 +111,7 @@ flowchart TD
 
 La **défense en profondeur** associe plusieurs contrôles complémentaires. Si une mesure échoue, d'autres peuvent limiter la propagation, détecter l'incident ou faciliter la restauration.
 
-```mermaid
-flowchart LR
-    A[Accès externe] --> B[Filtrage]
-    B --> C[Segmentation]
-    C --> D[Authentification et droits]
-    D --> E[Services et données]
-    B -.-> J[Journalisation et supervision]
-    C -.-> J
-    D -.-> J
-    E -.-> J
-    E --> S[Sauvegardes protégées et restauration]
-```
+![Défense en profondeur](../medias/cours/cyber/defense-en-profondeur.png)
 
 Le **moindre privilège** consiste à n'attribuer que les droits nécessaires, pour la durée nécessaire. Les comptes d'administration doivent être distincts des comptes utilisés au quotidien.
 
@@ -151,13 +140,13 @@ Le **moindre privilège** consiste à n'attribuer que les droits nécessaires, p
 | --- | --- |
 | [Couche 1 — Accès physique](couche1.md) | Accès aux équipements, supports et environnement |
 | [Couche 2 — Ethernet et commutation](couche2.md) | MAC, ARP, VLAN, DHCP et protections locales |
-| [Couche 3 — Réseau](couche3.md) | IP, routage, ICMP et IPv6 |
+| [Couche 3 — Réseau](couche3.md) | IP, routage, ICMP et IPv6 (non etudié) |
 | [Couche 4 — Transport](couche4.md) | TCP, UDP, ports, reconnaissance et saturation |
 | [Couche 5 — Sessions](couche5.md) | Sessions, authentification et rejeu |
 | [Couche 6 — Présentation](couche6.md) | TLS, HTTPS, certificats et confiance |
 | [Couche 7 — Applications](couche7.md) | DNS, applications web et compromissions |
 
-Consulter également le [tableau général des attaques](tableau-attaques.md) et la [synthèse pour les révisions](synthese-revisions.md).
+Consulter également la [synthèse pour les révisions](synthese-revisions.md).
 
 ##  Concepts avancés
 
@@ -190,15 +179,45 @@ L'analyse consiste à **collecter des informations, recouper plusieurs observati
 
 ## Expertise — Architecture et réponse à incident
 
-Une attaque peut combiner un accès initial, une élévation de privilèges, un déplacement latéral et une action sur l'objectif ; la persistance n'est pas systématique.
+Une attaque peut combiner plusieurs actions, **sans ordre systématique** :
+
+- **Accès initial** : obtenir un premier accès à un équipement ou à un compte.
+- **Élévation des privilèges** : obtenir davantage de droits.
+- **Déplacement latéral** : utiliser un accès compromis pour atteindre d’autres machines du réseau.
+- **Action sur l’objectif** : voler, modifier, chiffrer ou détruire des données, ou perturber un service.
+
+L’attaquant peut également chercher à **maintenir son accès dans le temps** : c’est la **persistance**, qui n’est pas systématique.
+
+Le schéma suivant illustre **un parcours possible** :
 
 ```mermaid
-flowchart LR
-    A[Accès initial] --> B[Prise de contrôle éventuelle]
-    B --> C[Élévation des privilèges]
-    C --> D[Déplacement latéral]
-    D --> E[Action sur l'objectif]
+flowchart TB
+    A["Accès initial"]
+    B["Poste compromis"]
+    C["Serveur interne"]
+    D["Serveur de données"]
+    P["Élévation des privilèges"]
+    E["Action sur l’objectif"]
+
+    A --> B
+    B -->|"Déplacement latéral"| C
+    C -->|"Déplacement latéral"| D
+    C -.->|"Si nécessaire : obtenir plus de droits"| P
+    D --> E
+
+    style A fill:#78350f,stroke:#fbbf24,color:#ffffff
+    style B fill:#1e3a8a,stroke:#60a5fa,color:#ffffff
+    style C fill:#1e3a8a,stroke:#60a5fa,color:#ffffff
+    style D fill:#1e3a8a,stroke:#60a5fa,color:#ffffff
+    style P fill:#581c87,stroke:#c084fc,color:#ffffff
+    style E fill:#7f1d1d,stroke:#f87171,color:#ffffff
 ```
+
+!!! tip "Deux notions à distinguer"
+    **Déplacement latéral : changer de machine.**  
+    **Élévation des privilèges : obtenir davantage de droits.**
+
+    Une élévation des privilèges peut survenir sur différentes machines au cours de l’attaque ; elle n’est pas obligatoire avant chaque déplacement latéral.
 
 En réponse à un incident, il faut agir selon les procédures de l'organisation. La **préservation des traces** doit être envisagée dès la détection : un confinement immédiat peut être nécessaire, mais certaines actions risquent de détruire des indices.
 
@@ -221,15 +240,22 @@ flowchart TD
 Un attaquant obtient les identifiants d'un utilisateur VPN, accède au réseau interne puis tente d'atteindre des sauvegardes grâce à des permissions trop larges.
 
 ```mermaid
-flowchart LR
-    A[Identifiants volés] --> B[Connexion VPN]
-    B --> C[Accès interne]
-    C --> D[Droits excessifs]
-    D --> E[Accès aux sauvegardes]
-    M[MFA] -.-> B
-    S[Segmentation] -.-> C
-    P[Moindre privilège] -.-> D
-    I[Copies isolées] -.-> E
+flowchart TB
+    A["Identifiants volés"] --> B["Connexion VPN"]
+    B --> C["Accès interne"]
+    C --> D["Droits excessifs"]
+    D --> E["Accès aux sauvegardes"]
+
+    M["Authentification multifacteur — MFA"] -.->|"Freine l’utilisation des identifiants volés"| B
+    S["Segmentation et filtrage"] -.->|"Limitent les ressources accessibles"| C
+    P["Moindre privilège"] -.->|"Limite les droits du compte compromis"| D
+    I["Copies isolées"] -.->|"Préservent des copies hors d’atteinte"| E
+
+    classDef attaque fill:#7f1d1d,stroke:#f87171,color:#ffffff,stroke-width:2px
+    classDef protection fill:#14532d,stroke:#4ade80,color:#ffffff,stroke-width:2px
+
+    class A,B,C,D,E attaque
+    class M,S,P,I protection
 ```
 
 | Étape | Protection pertinente | Observation possible |

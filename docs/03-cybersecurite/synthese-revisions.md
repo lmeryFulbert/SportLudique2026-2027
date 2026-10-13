@@ -1,6 +1,6 @@
 # Révisions — Analyser une situation de cybersécurité
 
-[Retour au référentiel](cybersecurite.md)
+[Retour au référentiel](00-cybersecurite.md)
 
 !!! info "L'objectif"
     Dans une étude de cas, il ne suffit pas de connaître le nom d'une attaque ou de réciter une liste de protections.

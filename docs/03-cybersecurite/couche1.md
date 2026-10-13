@@ -9,20 +9,39 @@
 
 ## Socle obligatoire
 
-### 1. Pourquoi protéger l'accès physique ?
+### 1. Pourquoi protéger l’accès physique ?
 
-Un intrus n'a pas toujours besoin d'attaquer un service par Internet : l'accès à une salle, un équipement, une prise réseau ou un support de stockage peut suffire à créer un incident. Les conséquences dépendent des protections déjà en place.
+Un intrus qui accède à une salle peut voler un disque, brancher un équipement sur une prise réseau ou couper une alimentation. **Il peut ainsi compromettre la sécurité sans passer par une attaque depuis Internet.** Les conséquences dépendent des protections en place.
 
 ```mermaid
 flowchart TB
-    A[Accès physique non autorisé]
-    A --> B[Poste ou disque]
-    A --> C[Prise réseau ou console]
-    A --> D[Baie ou alimentation]
-    B --> E[Lecture ou modification de données]
-    C --> F[Accès possible au réseau ou aux équipements]
-    D --> G[Interruption ou modification de service]
+    A["Accès physique non autorisé"]
+
+    A --> B["Vol d’un poste ou d’un disque"]
+    A --> C["Branchement sur une prise réseau"]
+    A --> D["Coupure de l’alimentation"]
+
+    B --> E["Lecture possible des données : confidentialité menacée"]
+    C --> F["Accès possible au réseau interne"]
+    D --> G["Arrêt des équipements : disponibilité menacée"]
+
+    P["Chiffrement du disque"] -.->|"Protège les données au repos"| E
+    Q["Contrôle d’accès réseau et ports inutilisés désactivés"] -.->|"Limitent les connexions non autorisées"| F
+    R["Alimentation secourue — onduleur"] -.->|"Maintient temporairement le fonctionnement"| G
+
+    S["Locaux et baies verrouillés, accès contrôlés"] -.->|"Limitent l’accès physique"| A
+
+    classDef action fill:#78350f,stroke:#fbbf24,color:#ffffff,stroke-width:2px
+    classDef risque fill:#7f1d1d,stroke:#f87171,color:#ffffff,stroke-width:2px
+    classDef protection fill:#14532d,stroke:#4ade80,color:#ffffff,stroke-width:2px
+
+    class A,B,C,D action
+    class E,F,G risque
+    class P,Q,R,S protection
 ```
+
+!!! warning "Un accès physique ne donne pas automatiquement tous les accès"
+    Un disque chiffré, un poste verrouillé ou une prise réseau contrôlée peuvent limiter les possibilités de l’intrus. **Il faut identifier ce qu’il peut réellement faire avant de conclure sur les critères DICP menacés.**
 
 !!! example "Cas SportLudique — Une personne entre dans la salle réseau"
     - Elle peut **débrancher** un switch ou un serveur : **disponibilité (D)**.
@@ -53,13 +72,25 @@ flowchart TB
 Une prise Ethernet reliée à un port actif peut permettre à un équipement de communiquer sur le réseau associé. **L'accès aux autres réseaux dépend ensuite des VLAN, du routage et du filtrage**.
 
 ```mermaid
-flowchart LR
-    PC[Ordinateur inconnu] --> P[Prise Ethernet]
-    P --> SW[Port du switch]
-    SW -->|Port désactivé| X[Pas de liaison utile]
-    SW -->|Port actif| V[Réseau du VLAN configuré]
-    V --> FW[Filtrage inter-VLAN]
-    FW --> R[Autres services autorisés]
+flowchart TB
+    PC["Ordinateur inconnu"] --> P["Prise Ethernet"]
+    P --> SW["Port du switch"]
+
+    SW -->|"Port désactivé"| X["Accès bloqué sur ce port"]
+    SW -->|"Port actif, sans contrôle d’accès supplémentaire"| V["Connexion au VLAN configuré"]
+
+    V --> L["Accès possible aux équipements du même VLAN"]
+    V -->|"Vers un autre VLAN"| FW["Filtrage inter-VLAN"]
+    FW -->|"Flux autorisé"| R["Service accessible"]
+    FW -->|"Flux interdit"| B["Communication bloquée"]
+
+    classDef equipement fill:#1e3a8a,stroke:#60a5fa,color:#ffffff,stroke-width:2px
+    classDef exposition fill:#78350f,stroke:#fbbf24,color:#ffffff,stroke-width:2px
+    classDef protection fill:#14532d,stroke:#4ade80,color:#ffffff,stroke-width:2px
+
+    class PC,P,SW equipement
+    class V,L,R exposition
+    class X,FW,B protection
 ```
 
 !!! warning "VLAN de stationnement : ce qu'il fait réellement"
@@ -128,6 +159,15 @@ sequenceDiagram
     Le même principe peut être appliqué aux ports Ethernet :<br/>
     un switch joue alors le rôle d'authentificateur et consulte
     le serveur RADIUS avant d'autoriser l'accès au réseau.
+
+!!! tip "Projet possible au semestre 2 — Contrôler l’accès au réseau avec 802.1X"
+    **802.1X s’utilise aussi bien sur un réseau Wi-Fi, comme dans l’infrastructure SIO, que sur des prises Ethernet classiques.** Ce mécanisme de contrôle d’accès fonctionne au niveau de la **couche 2** : il n’est pas lié à un support physique particulier de couche 1.
+
+    Avant d’autoriser un accès normal au réseau, le **switch ou le point d’accès Wi-Fi** s’appuie sur un **serveur RADIUS** pour authentifier l’utilisateur ou l’équipement.
+
+    **Projet possible dans SportLudique au semestre 2 :** mettre en place ce contrôle d’accès avec **NPS (Windows Server) ou FreeRADIUS (Linux)**, puis vérifier qu’un équipement autorisé peut se connecter et qu’un équipement non authentifié ne peut pas accéder au réseau interne.
+
+    **Pour aller plus loin :** utiliser des certificats et attribuer un VLAN selon le profil authentifié.
 
 ## Référence
 
