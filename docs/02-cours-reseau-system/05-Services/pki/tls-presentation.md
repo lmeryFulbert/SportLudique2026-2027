@@ -162,31 +162,91 @@ sequenceDiagram
 !!! tip "Point essentiel"
     Le certificat sert à **authentifier le serveur**, tandis que TLS permet ensuite de protéger les **échanges HTTP**. Ce sont deux mécanismes complémentaires.
 
-## 5. OpenSSL et Let's Encrypt : pourquoi étudier les deux ?
+## 5. Obtenir et gérer des certificats : quelles solutions ?
 
-### OpenSSL : comprendre les opérations
+Un certificat TLS peut être délivré par une **autorité de certification interne** ou par une **autorité publique**. Il faut distinguer les **outils de manipulation et d'administration** des **organismes qui délivrent les certificats**.
 
-**OpenSSL** est un ensemble de bibliothèques et d'outils permettant notamment de générer des clés, créer des demandes de signature (**CSR**), signer et examiner des certificats, et tester TLS.
+### OpenSSL : comprendre et manipuler les mécanismes
 
-Dans SportLudique, nous utilisons OpenSSL pour **comprendre concrètement** les rôles du serveur web et de l'autorité de certification.
+**OpenSSL** est un ensemble de bibliothèques et d'outils cryptographiques. Il permet notamment de :
 
-### Let's Encrypt : automatiser sur Internet
+- générer une paire de clés et protéger une clé privée ;
+- créer une **demande de signature de certificat (CSR)** contenant la clé publique et les informations demandées ;
+- examiner un certificat **X.509** (émetteur, titulaire, SAN, validité, usages) ;
+- signer des certificats avec une autorité que l'on administre ;
+- vérifier une chaîne de certification et tester une connexion TLS.
 
-**Let's Encrypt** est une autorité de certification publique qui délivre gratuitement des certificats TLS. Des clients comme **Certbot** peuvent automatiser les démarches, la validation du contrôle d'un nom de domaine et le renouvellement des certificats.
+Dans SportLudique, **OpenSSL est d'abord un outil d'apprentissage** : les étudiants réalisent les opérations nécessaires à la certification et comprennent ce qui peut être automatisé ensuite.
 
-Cela répond à un besoin opérationnel : **un administrateur n'a pas vocation à signer manuellement tous les certificats de ses sites publics.**
+!!! info "Une CSR n'est pas un certificat"
+    Le serveur conserve sa **clé privée** et transmet sa **CSR** à l'autorité. Après contrôle, celle-ci délivre un certificat signé. **La clé privée du serveur n'a pas à être transmise à l'autorité.**
 
-| Avec OpenSSL dans le TP | Avec Let's Encrypt en production |
+### AD CS : administrer une PKI interne sous Windows Server
+
+**Active Directory Certificate Services (AD CS)** est un rôle de Windows Server permettant de mettre en place une autorité de certification et d'administrer une **PKI d'entreprise**.
+
+Dans un domaine Active Directory, une **autorité d'entreprise** peut utiliser des **modèles de certificats** et l'**inscription automatique** (*auto-enrollment*) par stratégie de groupe (GPO). Cela facilite la délivrance et le renouvellement des certificats pour les ordinateurs et les utilisateurs du domaine.
+
+| Service de l'entreprise | Utilité des certificats |
 |---|---|
-| Nous créons notre propre autorité. | Une autorité publique reconnue délivre le certificat. |
-| Nous générons et signons manuellement les demandes. | Un client ACME automatise les échanges et les validations. |
-| Le client doit faire confiance à notre CA locale. | Les navigateurs courants reconnaissent normalement la chaîne de confiance publique. |
-| Objectif : **apprendre les mécanismes**. | Objectif : **exploiter et renouveler facilement HTTPS**. |
+| **LDAPS** | Le contrôleur de domaine présente un certificat serveur pour établir une connexion LDAP protégée par TLS. |
+| **NPS / RADIUS** | Le serveur NPS présente un certificat dans des méthodes d'authentification comme **PEAP** ou **EAP-TLS**. |
+| **802.1X Wi-Fi et Ethernet** | Avec **EAP-TLS**, le client et le serveur d'authentification utilisent des certificats pour s'authentifier mutuellement. |
+| **HTTPS interne** | Les applications internes présentent des certificats émis par une autorité reconnue par les postes de l'organisation. |
 
-!!! warning "Une CA privée peut aussi être utilisée en entreprise"
-    Let's Encrypt est adapté à de nombreux **sites publics**. Une **PKI interne** reste parfaitement pertinente pour des services privés, des équipements ou des applications dont l'organisation maîtrise les postes clients et leurs magasins de confiance.
+!!! example "SportLudique — Windows Server 2025"
+    Dans une infrastructure comprenant un domaine Active Directory, une PKI AD CS peut délivrer des certificats aux contrôleurs de domaine pour **LDAPS** et au serveur **NPS** pour l'authentification réseau. Les postes doivent reconnaître l'autorité émettrice et vérifier l'identité du serveur.
 
-    À l'inverse, un nom purement interne de l'environnement SportLudique ne permet pas automatiquement d'obtenir un certificat public : la méthode de validation du domaine doit être compatible avec les exigences de l'autorité publique.
+!!! note "AD CS n'est pas obligatoire pour LDAPS"
+    LDAPS nécessite un **certificat serveur adapté et reconnu par les clients**, mais celui-ci peut provenir d'une autre autorité. AD CS est particulièrement pratique dans un environnement Windows intégré à Active Directory.
+
+    Attention également au vocabulaire Microsoft : une **autorité autonome** (*Standalone CA*) AD CS n'est pas synonyme de « PKI indépendante » au sens général. Une **autorité d'entreprise** (*Enterprise CA*) est celle qui offre notamment l'intégration aux modèles de certificats et à l'inscription automatique via Active Directory.
+
+### Let's Encrypt : des certificats publics gratuits et automatisés
+
+**Let's Encrypt** est une **autorité de certification publique** qui délivre gratuitement des certificats TLS. Le protocole **ACME**, utilisé notamment par **Certbot**, permet d'automatiser la demande, la vérification du contrôle du domaine et le renouvellement.
+
+Les certificats délivrés sont généralement reconnus par les navigateurs et systèmes récents, car ceux-ci disposent des autorités racines nécessaires dans leurs magasins de confiance.
+
+!!! warning "SportLudique et l'Internet simulé"
+    Un nom DNS existant uniquement dans l'Internet simulé SportLudique ne suffit pas pour obtenir un certificat Let's Encrypt. L'autorité publique doit pouvoir **valider le contrôle d'un domaine réel** selon une méthode ACME autorisée. Un certificat public n'exige pas nécessairement que le serveur web interne soit accessible depuis Internet : une validation **DNS-01** peut notamment convenir lorsqu'on maîtrise le DNS public du domaine.
+
+### Les autorités commerciales : certificats et services associés
+
+Des organismes tels que **DigiCert** ou **Sectigo** proposent des certificats publics et des services de gestion, d'assistance ou de validation d'organisation selon leurs offres.
+
+Il existe notamment plusieurs niveaux de validation de l'identité du demandeur : **DV** (*Domain Validation*), **OV** (*Organization Validation*) et **EV** (*Extended Validation*). Ces catégories ne déterminent pas, à elles seules, la robustesse du chiffrement TLS.
+
+**Un certificat payant ne chiffre pas mieux qu'un certificat gratuit** lorsqu'ils reposent sur des mécanismes cryptographiques équivalents. Les différences portent notamment sur les contrôles d'identité, les services et les modalités de gestion.
+
+### Comparer les solutions sans les confondre
+
+| Solution | Nature | Usage principal | Confiance du client |
+|---|---|---|---|
+| **OpenSSL** | Outil cryptographique | Clés, CSR, certificats, vérifications et CA manuelle | Dépend de l'autorité qui signe le certificat |
+| **AD CS** | Service PKI Microsoft | Certificats internes et automatisation dans un domaine | Autorité interne à faire reconnaître par les clients |
+| **Let's Encrypt** | Autorité publique gratuite | Certificats publics avec automatisation ACME | Chaîne généralement reconnue par défaut |
+| **DigiCert, Sectigo…** | Autorités commerciales | Certificats publics et services associés | Chaîne généralement reconnue par défaut |
+
+!!! tip "L'idée essentielle"
+    **OpenSSL et AD CS sont des outils ou services logiciels ; Let's Encrypt et les autorités commerciales sont des organismes qui émettent des certificats.** Les quatre approches ne sont donc pas des concurrents directs.
+
+    Ce qui compte pour le client est la **validation du certificat** : nom attendu, période de validité, usages autorisés, chaîne de confiance et, selon les mécanismes applicables, état de révocation.
+
+??? question "Analyse — Quelle solution choisir ?"
+    Une entreprise doit sécuriser trois services :
+
+    1. Un site **Apache** sur l'Internet simulé SportLudique, pour lequel les étudiants doivent manipuler les clés et les CSR.
+    2. Un **contrôleur de domaine Windows Server 2025** utilisé en LDAPS et un serveur **NPS** pour l'accès Wi-Fi 802.1X.
+    3. Un site web public destiné à des visiteurs dont l'entreprise ne maîtrise pas les postes.
+
+    Pour chaque situation, proposez une solution adaptée et **justifiez le choix en expliquant comment les clients accordent leur confiance au certificat**.
+
+    **Éléments de réponse :**
+
+    1. **OpenSSL et une CA pédagogique interne** : manipulation des clés et des CSR ; installation contrôlée du certificat racine sur les postes de test.
+    2. **AD CS**, particulièrement adapté au domaine : émission et renouvellement des certificats des serveurs ; confiance distribuée et configurée sur les clients. D'autres PKI restent techniquement possibles.
+    3. **Let's Encrypt** ou une **autorité commerciale** : chaîne publique reconnue par les navigateurs, sous réserve d'une validation correcte du domaine.
 
 ## 6. HTTPS ne signifie pas « site honnête »
 
@@ -210,7 +270,7 @@ Ce principe rejoint les quatre critères de sécurité étudiés en cybersécuri
     2. **Le certificat présente notamment la clé publique et les noms DNS du serveur.**
     3. **Une autorité de certification signe des certificats** ; le navigateur valide une chaîne de confiance.
     4. **La clé privée doit rester secrète**, particulièrement celle de l'autorité de certification.
-    5. **OpenSSL sert ici à comprendre** ce que des solutions comme Let's Encrypt automatisent en pratique.
+    5. **OpenSSL sert à manipuler**, **AD CS à gérer une PKI interne**, et **Let's Encrypt ou une autorité commerciale à délivrer des certificats publics**.
 
 La mise en œuvre est décrite dans [Travail à faire — TLS et PKI](tls-pki.md) : 
 
