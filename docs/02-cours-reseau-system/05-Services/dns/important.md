@@ -89,7 +89,7 @@ ns2.blois.sportludique.fr. IN A 221.87.141.1
 ```
 
 !!! note "Pourquoi les glue records sont-ils nécessaires ?"
-    Pour trouver l'adresse de `ns1.chartres.sportludique.fr`, un résolveur pourrait devoir interroger le serveur DNS de Chartres.
+    Pour trouver l'adresse de `ns1.ville.sportludique.fr`, un résolveur pourrait devoir interroger le serveur DNS de Chartres.
 
     Mais pour interroger ce serveur, il doit déjà connaître son adresse IP !
 
@@ -102,7 +102,7 @@ ns2.blois.sportludique.fr. IN A 221.87.141.1
 Depuis un poste disposant de `dig`, vérifier les serveurs DNS déclarés pour Chartres :
 
 ```bash
-dig chartres.sportludique.fr NS
+dig ville.sportludique.fr NS
 ```
 
 Interroger directement le premier serveur DNS de Chartres :
