@@ -178,25 +178,76 @@ Trois mécanismes de sécurité complètent les contrôles de messagerie :
 | POP3 / POP3S | **110 / 995** | Récupération des messages |
 | DNS | **53 TCP/UDP** | Recherche MX et résolution des noms |
 
+
+
 ## Vérifiez vos connaissances
 
-??? question "1 — SMTP permet-il de consulter les messages reçus ?"
-    **Non.** SMTP sert à soumettre et transférer les messages. Pour consulter une boîte, on utilise notamment IMAP.
+<quiz>
+Quelle est la fonction principale du protocole SMTP ?
 
-??? question "2 — À quoi sert un enregistrement MX ?"
-    Il indique le **nom du serveur de messagerie** chargé de recevoir les courriels d'un domaine.
+- [ ] Consulter les messages reçus
+- [x] Soumettre et transférer des courriels
+- [ ] Synchroniser les dossiers de messagerie
+- [ ] Télécharger les messages depuis le serveur
 
-??? question "3 — Pourquoi IMAP est-il plus pratique que POP3 sur plusieurs appareils ?"
-    IMAP synchronise les dossiers et les états des messages avec le serveur.
+SMTP sert à soumettre et transférer les messages. IMAP et POP3 permettent de récupérer les courriels.
+</quiz>
 
-??? question "4 — Un serveur qui répond `250 OK` a-t-il vérifié l'identité de l'expéditeur ?"
-    **Pas nécessairement.** Le code indique que la commande SMTP est acceptée, pas que l'expéditeur est authentifié.
+<quiz>
+À quoi sert un enregistrement DNS MX ?
 
-??? question "5 — Une connexion SMTP sur le port 25 est-elle toujours non chiffrée ?"
-    **Non.** STARTTLS peut permettre de négocier TLS sur ce port, sans garantie systématique en l'absence de politique imposant TLS.
+- [ ] Indiquer directement l'adresse IPv4 du serveur
+- [ ] Identifier le serveur DNS faisant autorité
+- [x] Désigner les serveurs chargés de recevoir les courriels d'un domaine
+- [ ] Autoriser les adresses IP des serveurs expéditeurs
 
-??? question "6 — Quelle différence entre SPF, DKIM et DMARC ?"
-    **SPF** vérifie l'autorisation de l'adresse IP émettrice pour un domaine ; **DKIM** vérifie une signature ; **DMARC** contrôle l'alignement avec le domaine visible dans `From:` et publie une politique.
+Un enregistrement MX indique le nom d'un serveur de messagerie et sa priorité. Les enregistrements A ou AAAA permettent ensuite de résoudre son adresse IP.
+</quiz>
+
+<quiz>
+Pourquoi IMAP est-il plus adapté que POP3 à une utilisation sur plusieurs appareils ?
+
+- [ ] Il permet d'envoyer des courriels
+- [ ] Il ne nécessite aucune connexion au serveur
+- [ ] Il supprime automatiquement les messages du serveur
+- [x] Il synchronise les dossiers et les états des messages
+
+IMAP conserve les messages sur le serveur et synchronise leur état entre les appareils.
+</quiz>
+
+<quiz>
+Que signifie une réponse SMTP `250 OK` ?
+
+- [ ] L'identité de l'expéditeur a été vérifiée
+- [x] Le serveur a accepté la commande SMTP
+- [ ] Le message a été livré au destinataire final
+- [ ] La connexion est désormais chiffrée
+
+Le code 250 indique que la commande a été acceptée. Il ne garantit ni l'authentification de l'expéditeur ni la livraison finale.
+</quiz>
+
+<quiz>
+Une connexion SMTP sur le port 25 est-elle toujours non chiffrée ?
+
+- [ ] Oui, le port 25 interdit TLS
+- [ ] Oui, seul le port 465 permet le chiffrement
+- [x] Non, STARTTLS peut permettre de chiffrer la connexion
+- [ ] Non, TLS est automatiquement obligatoire sur le port 25
+
+STARTTLS permet de négocier TLS sur le port 25. Entre serveurs de messagerie, ce chiffrement est souvent opportuniste.
+</quiz>
+
+<quiz>
+Quelle proposition décrit correctement SPF, DKIM et DMARC ?
+
+- [ ] SPF chiffre les messages, DKIM protège les pièces jointes et DMARC bloque les spams
+- [ ] SPF vérifie les mots de passe, DKIM authentifie les utilisateurs et DMARC chiffre SMTP
+- [x] SPF vérifie l'autorisation de l'IP émettrice, DKIM vérifie une signature et DMARC contrôle l'alignement des domaines
+- [ ] SPF, DKIM et DMARC sont des protocoles de consultation des courriels
+
+SPF vérifie l'autorisation de l'adresse IP émettrice pour le domaine SMTP. DKIM vérifie une signature cryptographique. DMARC vérifie l'alignement avec le domaine visible dans From et publie une politique de traitement.
+</quiz>
+
 
 ## Pour aller plus loin
 
