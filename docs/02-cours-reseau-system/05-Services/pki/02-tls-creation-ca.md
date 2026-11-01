@@ -48,6 +48,8 @@ Cette organisation permet de distinguer les fichiers de **l'autorité de certifi
 
 Vérifiez votre travail avec la commande `tree`.
 
+Exécutez les commandes suivantes depuis `~/pki-groupe` et remplacez `<ville>` par le nom de votre ville dans les commandes et les fichiers de configuration.
+
 !!! warning "Clés privées"
     Les clés privées sont confidentielles. Assurez-vous que les répertoires `cles/` ne sont accessibles qu'à leur propriétaire.
 
@@ -115,7 +117,7 @@ openssl x509 -in autorite/certificats/ca-<ville>.crt \
 ??? question "Un certificat autosigné est-il nécessairement frauduleux ?"
     Non. Il n'est simplement **pas reconnu par défaut** par les clients. Sa confiance doit être établie par un autre moyen, par exemple une installation explicite et vérifiée.
 
-### Création de la demande de certificat du serveur web
+### 4. Création de la demande de certificat du serveur web
 
 Nous allons créer un certificat pour le serveur Apache, accessible avec deux noms :
 
@@ -186,15 +188,15 @@ Vérifiez que les deux noms DNS apparaissent dans les SAN.
 
 Pour ce premier essai, nous utilisons `openssl x509 -req` : **pas de registre de CA à administrer au Socle**.
 
-La CA doit imposer les usages du certificat délivré, plutôt que reprendre aveuglément toutes les extensions de la CSR.
+La CA doit vérifier les extensions de la CSR avant de les recopier dans le certificat délivré.
 
 Signez la CSR :
 
 ```bash
 openssl x509 -req -days 365 \
   -in serveur/demandes/web.csr \
-  -CA autorite/certificats/ca-autonome.crt \
-  -CAkey autorite/cles/ca-groupe.key \
+  -CA autorite/certificats/ca-<ville>.crt \
+  -CAkey autorite/cles/ca-<ville>.key \
   -CAserial autorite/ca.srl \
   -CAcreateserial \
   -out serveur/certificats/web.crt \
@@ -214,8 +216,11 @@ openssl x509 -req -days 365 \
 Contrôlez le résultat :
 
 ```bash
-openssl x509 -in serveur/certificats/web-autonome.crt \
+openssl x509 -in serveur/certificats/web.crt \
   -noout -subject -issuer -dates -ext subjectAltName
+
+openssl verify -CAfile autorite/certificats/ca-<ville>.crt \
+  serveur/certificats/web.crt
 ```
 
 **Résultat attendu :** `OK`.
@@ -257,13 +262,15 @@ flowchart TB
 ```
 
 !!! warning "Deux certificats, une seule clé"
-    Conservez `ca-<ville>-autonome.crt` pour comprendre le Socle, mais **n'utilisez plus ce certificat autosigné comme émetteur** pour les nouveaux certificats. Le certificat intermédiaire signé par le prestataire le remplace dans la chaîne utilisée en Avancé.
+    Conservez `ca-<ville>.crt` pour comprendre le Socle, mais **n'utilisez plus ce certificat autosigné comme émetteur** pour les nouveaux certificats. Le certificat intermédiaire signé par le prestataire le remplace dans la chaîne utilisée en Avancé.
 
 ### 2. Créer la CSR de votre CA existante
 
 ```bash
+mkdir -p autorite/demandes
+
 openssl req -new -sha256 \
-  -key autorite/cles/ca-groupe.key \
+  -key autorite/cles/ca-<ville>.key \
   -out autorite/demandes/ca-groupe.csr \
   -subj "/C=FR/O=SportLudique/CN=CA <ville> SportLudique"
 
@@ -276,18 +283,19 @@ openssl req -in autorite/demandes/ca-groupe.csr -noout -verify -text
 
 Téléchargez le [certificat public de la CA racine SportLudique](../../../medias/certificats/sportludique-root.crt.pem) et récupérez auprès du prestataire le certificat intermédiaire signé.
 
+Placez ces fichiers dans `autorite/certificats/`, sous les noms `sportludique-root.crt.pem` et `ca-intermediaire.crt`.
+
 !!! warning "Vérifier l'empreinte de la CA racine"
     Avant de faire confiance au certificat téléchargé, vérifiez son empreinte SHA-256 :
 
     ```bash
-    openssl x509 -in sportludique-root.crt.pem -noout -fingerprint -sha256
+    openssl x509 -in autorite/certificats/sportludique-root.crt.pem -noout -fingerprint -sha256
     ```
 
     **Empreinte SHA-256 de référence :**
 
     ```text
-    63:AF:BC:08:20:1F:75:82:43:40:83:50:DA:28:15:F8:
-    0A:A5:33:A0:AB:3D:E4:B0:C5:3E:C3:77:5B:1C:6B:0A
+    3C:8F:51:57:6E:C0:EF:51:94:9C:D5:12:E0:C8:BD:8A:CC:BF:DD:9B:FD:C0:50:00:9D:CE:FC:D6:AE:08:5F:0B
     ```
 
     Les deux empreintes doivent être **strictement identiques**.
@@ -327,7 +335,7 @@ Ce résultat confirme que le certificat de votre CA intermédiaire peut être va
 Comparez l'empreinte de la clé publique extraite de la clé privée et du nouveau certificat :
 
 ```bash
-openssl pkey -in autorite/cles/ca-groupe.key -pubout -outform DER | openssl dgst -sha256
+openssl pkey -in autorite/cles/ca-<ville>.key -pubout -outform DER | openssl dgst -sha256
 openssl x509 -in autorite/certificats/ca-intermediaire.crt -pubkey -noout | \
   openssl pkey -pubin -outform DER | openssl dgst -sha256
 ```
@@ -386,7 +394,18 @@ commonName = supplied
 
 ### 6. Émettre un nouveau certificat serveur
 
-Reprenez la CSR du serveur et son fichier d'extensions du Socle, après avoir vérifié les noms demandés. Signez avec **le certificat intermédiaire** :
+Reprenez la CSR du serveur du Socle, après avoir vérifié les noms demandés. Créez `serveur/demandes/web.ext` avec les extensions autorisées, en adaptant les noms DNS à votre ville :
+
+```ini
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+subjectAltName = DNS:www.chartres.sportludique.fr,DNS:chartres.sportludique.fr
+```
+
+Signez avec **le certificat intermédiaire** :
 
 ```bash
 openssl ca -config autorite/openssl.cnf \
@@ -410,7 +429,7 @@ openssl verify -show_chain \
   -verify_hostname "www.ville.sportludique.fr" \
   -CAfile autorite/certificats/sportludique-root.crt.pem \
   -untrusted autorite/certificats/ca-intermediaire.crt \
-  serveur/certificats/web.crt
+  serveur/certificats/web-intermediaire.crt
 ```
 
 **Résultat attendu :** `OK`. En cas d'échec, vérifiez les dates de validité, les extensions et le nom DNS. La CA intermédiaire et la racine doivent rester valides pendant la durée du certificat serveur.
@@ -480,7 +499,7 @@ Cette commande regroupe les deux certificats publics dans un même fichier, dans
 
     Il peut ainsi vérifier toute la chaîne de certification, depuis le serveur Apache jusqu'à l'autorité racine.
 
-Le déploiement du certificat dans Apache et l'importation de la CA racine dans le navigateur sont étudiés dans le [TP Apache HTTPS](tls-socle.md).
+Le déploiement du certificat dans Apache et l'importation de la CA racine dans le navigateur sont étudiés dans le [TP Apache HTTPS](03-tls-apache.md).
 
 ### Validation de l'Avancé
 
@@ -490,8 +509,8 @@ Le déploiement du certificat dans Apache et l'importation de la CA racine dans 
 ??? question "2 — Quel certificat doit être approuvé par les postes clients ?"
     Le certificat public de la **CA racine SportLudique**, après vérification de son empreinte.
 
-??? question "3 — Pourquoi faut-il émettre un nouveau certificat serveur ?"
-    Le certificat du Socle est signé sous l'identité de la CA autonome. Le nouveau certificat doit être émis par la CA intermédiaire, afin de construire la chaîne vers la racine SportLudique.
+??? question "3 — Pourquoi émet-on un nouveau certificat serveur dans ce TP ?"
+    Pour délivrer un certificat avec la CA intermédiaire et enregistrer cette émission dans le registre OpenSSL.
 
 **Livrables :** CSR de la CA, certificat intermédiaire, contrôle de la chaîne, certificat serveur renouvelé et extrait du registre OpenSSL. Aucune clé privée.
 
@@ -499,7 +518,7 @@ Le déploiement du certificat dans Apache et l'importation de la CA racine dans 
 
 Signer manuellement chaque CSR fonctionne dans un laboratoire, mais devient fastidieux lorsque les services et les renouvellements se multiplient.
 
-Le protocole **ACME** permet d'automatiser les demandes. Dans SportLudique, **step-ca** peut exploiter la CA intermédiaire du groupe ; **Certbot** peut demander un certificat et prouver le contrôle du nom DNS grâce au challenge **DNS-01**.
+Le protocole **ACME** permet d'automatiser les demandes. Un service comme **step-ca** peut exploiter une CA intermédiaire ; **Certbot** peut demander un certificat et prouver le contrôle du nom DNS grâce au challenge **DNS-01**.
 
 ```mermaid
 sequenceDiagram
@@ -519,10 +538,10 @@ sequenceDiagram
 !!! tip "À retenir"
     **ACME automatise** les étapes que vous venez de réaliser à la main. Il ne remplace ni la vérification des droits sur les noms DNS ni la protection des clés privées.
 
-La mise en œuvre de step-ca, de Certbot et des mises à jour DNS dynamiques est abordée dans le [TP Expert — ACME et DNS-01](tls-expert.md).
+Cette partie présente le principe d'ACME ; **aucune mise en œuvre n'est demandée ici**.
 
 ## Ressources
 
 - [Cours — TLS, HTTPS et certificats](01-tls-presentation.md)
-- [Fiche technique — OpenSSL](fiche-openssl.md)
-- [TP — Apache HTTPS](tls-socle.md)
+- [Fiche technique — OpenSSL](04-openssl-aide-memoire.md)
+- [TP — Apache HTTPS](03-tls-apache.md)

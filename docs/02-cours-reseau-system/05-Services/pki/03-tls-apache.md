@@ -41,7 +41,7 @@ Vous avez déjà généré la clé privée et fait signer le certificat du serve
 |---|---|
 | `serveur/cles/web.key` | Clé privée du serveur web |
 | `serveur/certificats/web.crt` **ou** `web-intermediaire.crt` | Certificat du serveur signé par votre CA |
-| `autorite/certificats/ca-autonome.crt` | Certificat public de votre CA autonome (Socle PKI) |
+| `autorite/certificats/ca-<ville>.crt` | Certificat public de votre CA autonome (Socle PKI) |
 | `autorite/certificats/ca-intermediaire.crt` | Certificat public de votre CA intermédiaire (Avancé PKI) |
 
 !!! warning "Attention aux clés privées"
@@ -99,7 +99,11 @@ sudo chmod 600 /etc/ssl/sportludique/private/web.key
 
 ## 5. Activer HTTPS
 
-Choisissez **uniquement** l'onglet correspondant à votre serveur web. Les exemples utilisent Chartres : adaptez le nom DNS à votre groupe.
+Choisissez uniquement l'onglet correspondant à votre serveur web. Les exemples utilisent Chartres : adaptez le nom DNS à votre groupe.
+
+Apache : copiez le fichier default-ssl.conf, puis adaptez-le à votre site.
+
+Nginx : copiez le fichier default situé dans /etc/nginx/sites-available/, puis adaptez-le à votre site.
 
 === "Apache"
 
@@ -110,6 +114,10 @@ Choisissez **uniquement** l'onglet correspondant à votre serveur web. Les exemp
     ```
 
     Créez `/etc/apache2/sites-available/sportludique-ssl.conf` :
+
+     ```bash
+    sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/www.ville.sportludique.fr.conf
+    ```
 
     ```apache
     <VirtualHost *:443>
@@ -175,8 +183,10 @@ Depuis un **poste distinct**, ouvrez le site `https://www.chartres.sportludique.
 
 Téléchargez ou copiez **le certificat public de l'autorité à approuver** :
 
-- **CA autonome :** `ca-autonome.crt`, issu du TP PKI de votre groupe ;
+- **CA autonome :** `ca-<ville>.crt`, issu du TP PKI de votre groupe ;
 - **CA intermédiaire :** [sportludique-root.crt.pem](../../../medias/certificats/sportludique-root.crt.pem), fourni par le prestataire.
+
+En passant du Socle à l'Avancé, retirez du magasin de confiance le certificat de la CA autonome pour vérifier que la chaîne est bien validée à partir de la racine SportLudique.
 
 !!! warning "Contrôler la racine SportLudique"
     Avant d'importer la racine SportLudique, vérifiez son empreinte :
@@ -188,12 +198,12 @@ Téléchargez ou copiez **le certificat public de l'autorité à approuver** :
     **Empreinte SHA-256 de référence :**
 
     ```text
-    63:AF:BC:08:20:1F:75:82:43:40:83:50:DA:28:15:F8:0A:A5:33:A0:AB:3D:E4:B0:C5:3E:C3:77:5B:1C:6B:0A
+    3C:8F:51:57:6E:C0:EF:51:94:9C:D5:12:E0:C8:BD:8A:CC:BF:DD:9B:FD:C0:50:00:9D:CE:FC:D6:AE:08:5F:0B
     ```
 
     N'importez pas le certificat si l'empreinte diffère. Cette valeur doit être obtenue par un canal fiable indépendant du téléchargement.
 
-=== "Debian / Linux Mint"
+=== "Debian / Linux"
 
     Copiez le certificat public de la CA choisie sur le poste, puis installez-le dans le magasin système (avec une extension `.crt`) :
 
@@ -232,6 +242,10 @@ Vérifiez également le certificat présenté par le serveur dans votre navigate
 
 Réalisez ensuite une nouvelle capture Wireshark sur le poste client, cette fois avec le filtre `tcp.port == 443` : comparez-la avec la capture HTTP de l'étape 2.
 
+```bash
+curl "https://www.chartres.sportludique.fr/?message=bonjour-sportludique"
+```
+
 ??? question "HTTP ou HTTPS ?"
     Pourquoi le marqueur visible dans la capture HTTP n'apparaît-il plus en clair dans la capture HTTPS ? Quel rôle jouent respectivement le certificat et TLS ?
 
@@ -247,4 +261,4 @@ Votre travail est validé lorsque :
 - le navigateur reconnaît l'autorité de certification attendue ;
 - le nom DNS correspond à un SAN du certificat ;
 - vous pouvez expliquer la différence entre les captures HTTP et HTTPS ;
-- vous savez distinguer `web.key`, `web.crt`, `ca-autonome.crt`, `ca-intermediaire.crt` et `fullchain.pem`.
+- vous savez distinguer `web.key`, `web.crt`, `ca-<ville>.crt`, `ca-intermediaire.crt` et `fullchain.pem`.

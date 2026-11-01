@@ -101,10 +101,11 @@ Cette opération s'effectue **sur la machine de la CA intermédiaire déjà init
 **1 — Contrôler la CSR reçue :**
 
 ```bash
-openssl req -in csr/web.csr -noout -verify -text
+cd ~/pki-groupe
+openssl req -in serveur/demandes/web.csr -noout -verify -text
 ```
 
-**2 — Définir les extensions approuvées** dans `csr/web.ext` :
+**2 — Définir les extensions approuvées** dans `serveur/demandes/web.ext` :
 
 ```ini
 [server]
@@ -119,13 +120,12 @@ subjectAltName = DNS:www.chartres.sportludique.fr
 **3 — Signer pour 90 jours :**
 
 ```bash
-cd /root/pki-intermediate
-openssl ca -config openssl.cnf -notext -days 90 \
-  -in csr/web.csr -out certs/web.crt \
-  -extfile csr/web.ext -extensions server
+openssl ca -config autorite/openssl.cnf -notext -days 90 \
+  -in serveur/demandes/web.csr -out serveur/certificats/web-intermediaire.crt \
+  -extfile serveur/demandes/web.ext -extensions server
 ```
 
-**À remettre au serveur :** son certificat `web.crt` et le certificat **public** de la CA intermédiaire. **Jamais la clé privée de la CA.** Vérifiez avant signature que la racine et l'intermédiaire resteront valides pendant toute la durée demandée.
+**À remettre au serveur :** son certificat `web-intermediaire.crt` et le certificat **public** de la CA intermédiaire. **Jamais la clé privée de la CA.** Vérifiez avant signature que la racine et l'intermédiaire resteront valides pendant toute la durée demandée.
 
 ## 6. Vérifier un certificat et sa chaîne de confiance
 
@@ -223,20 +223,20 @@ openssl pkcs12 -export \
 Sur la CA intermédiaire, pour un certificat **émis par cette CA** et présent dans son registre :
 
 ```bash
-cd /root/pki-intermediate
-openssl ca -config openssl.cnf -revoke certs/web.crt -crl_reason keyCompromise
-openssl ca -config openssl.cnf -gencrl -crlexts crl_ext \
-  -out crl/intermediate.crl.pem
-openssl crl -in crl/intermediate.crl.pem -noout -text
+cd ~/pki-groupe
+openssl ca -config autorite/openssl.cnf -revoke serveur/certificats/web-intermediaire.crt -crl_reason keyCompromise
+openssl ca -config autorite/openssl.cnf -gencrl \
+  -out autorite/crl/intermediate.crl.pem
+openssl crl -in autorite/crl/intermediate.crl.pem -noout -text
 ```
 
 **Tester le rejet du certificat révoqué :**
 
 ```bash
-openssl verify -CAfile certs/root.crt \
-  -untrusted certs/intermediate.crt \
-  -CRLfile crl/intermediate.crl.pem \
-  -crl_check certs/web.crt
+openssl verify -CAfile autorite/certificats/sportludique-root.crt.pem \
+  -untrusted autorite/certificats/ca-intermediaire.crt \
+  -CRLfile autorite/crl/intermediate.crl.pem \
+  -crl_check serveur/certificats/web-intermediaire.crt
 ```
 
 Le dernier contrôle doit **échouer** pour le certificat révoqué. Générer une CRL ne suffit pas : les clients doivent aussi pouvoir la récupérer et la vérifier. Faites l'exercice avec un certificat de test.

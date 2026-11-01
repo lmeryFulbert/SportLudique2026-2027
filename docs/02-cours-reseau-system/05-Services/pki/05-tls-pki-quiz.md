@@ -25,14 +25,14 @@
 </quiz>
 
 <quiz>
-**3 — Quel certificat faut-il importer comme autorité de confiance sur le poste client SportLudique ?**
+**3 — Au Socle, quel certificat faut-il importer comme autorité de confiance sur le poste client SportLudique ?**
 
 - [ ] La clé privée `web.key`.
 - [ ] La clé privée de la CA du groupe.
-- [x] Le certificat public de la CA racine SportLudique, après vérification de son empreinte.
+- [x] Le certificat public de la CA autonome du groupe, après vérification de son empreinte.
 - [ ] La demande de signature `web.csr`.
 
-**Explication :** Le client accorde sa confiance à la CA racine. Les clés privées restent secrètes ; la CSR n'est pas un certificat de confiance.
+**Explication :** Au Socle, le client accorde sa confiance à la CA autonome du groupe. En Avancé, il fait confiance à la CA racine SportLudique. Les clés privées restent secrètes ; la CSR n'est pas un certificat de confiance.
 </quiz>
 
 <quiz>

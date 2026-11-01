@@ -52,9 +52,9 @@ sequenceDiagram
     participant N as Navigateur
     participant A as Serveur Apache
     Note over N,A: Connexion TCP établie sur le port 443
-    N->>A: ClientHello (versions, algorithmes, clé ECDHE)
-    A-->>N: ServerHello (paramètres, clé ECDHE)
-    Note over N,A: Calcul des secrets de négociation
+    N->>A: ClientHello (versions et algorithmes proposés)
+    A-->>N: ServerHello (paramètres retenus)
+    Note over N,A: Établissement des clés de session
     A-->>N: {Certificat et chaîne intermédiaire}
     A-->>N: {Preuve de possession de la clé privée}
     A-->>N: {Finished}
@@ -100,11 +100,13 @@ La validation porte aussi sur le **nom DNS demandé**, les **dates** et les **us
 Une CA racine utilise généralement un certificat autosigné. Ce certificat devient une **ancre de confiance** lorsqu'il est explicitement approuvé par le client. En revanche, un certificat serveur directement autosigné n'est généralement pas reconnu par défaut.
 
 !!! note "SportLudique : une hiérarchie de confiance"
-    La **CA racine SportLudique**, administrée par les enseignants, signe les **CA intermédiaires des groupes**. Chaque groupe utilise ensuite sa CA pour signer les certificats de ses services (Apache, Stalwart, LDAPS…).
+    **Au Socle**, chaque groupe utilise une **CA autonome**, dont le certificat public doit être approuvé par les clients.
+
+    **En Avancé**, la **CA racine SportLudique**, administrée par les enseignants, signe les **CA intermédiaires des groupes**. Chaque groupe utilise ensuite sa CA pour signer les certificats de ses services (Apache, Stalwart, LDAPS…).
 
     **[Télécharger le certificat public de la CA racine](../../../medias/certificats/sportludique-root.crt.pem)**
 
-    Les postes clients doivent faire confiance à cette racine pour valider les certificats des groupes. **La clé privée de la CA racine n'est jamais distribuée.**
+    En Avancé, les postes clients doivent faire confiance à cette racine pour valider les certificats des groupes. **La clé privée de la CA racine n'est jamais distribuée.**
 
 ## 4. De la clé privée au certificat signé
 
@@ -126,15 +128,18 @@ sequenceDiagram
 | `web.key` | Clé privée du serveur | **Secrète**, conservée sur le serveur |
 | `web.csr` | Demande de certificat | Transmise à la CA |
 | `web.crt` | Certificat signé | Public |
-| `intermediate.crt` | Certificat de la CA du groupe | Public |
-| `root.crt` | Certificat de la CA racine | Public, distribué aux clients |
-| `fullchain.pem` | Certificat serveur puis intermédiaire | Public |
+| `ca-<ville>.crt` | Certificat de la CA autonome | Public, approuvé par les clients au Socle |
+| `ca-intermediaire.crt` | Certificat de la CA du groupe signé par la racine | Public, utilisé en Avancé |
+| `sportludique-root.crt.pem` | Certificat de la CA racine | Public, approuvé par les clients en Avancé |
+| `fullchain.pem` | Certificat serveur puis intermédiaire | Public, utilisé en Avancé |
 
-Le format **PEM** est un encodage texte courant pour les certificats et les clés. Les commandes de création, de lecture et de vérification figurent dans la [fiche OpenSSL](fiche-openssl.md).
+Le format **PEM** est un encodage texte courant pour les certificats et les clés. Les commandes de création, de lecture et de vérification figurent dans la [fiche OpenSSL](04-openssl-aide-memoire.md).
 
 ## 5. La PKI SportLudique
 
 Une **PKI** (*Public Key Infrastructure*) organise les autorités de certification et la gestion des certificats.
+
+L'organisation suivante correspond au niveau **Avancé**.
 
 | Autorité | Périmètre |
 |---|---|
@@ -153,13 +158,13 @@ Les certificats ont une durée de validité limitée : ils doivent être **renou
 
 En entreprise, il serait peu pratique de créer et renouveler tous les certificats manuellement. Le protocole **ACME** automatise ces opérations.
 
-Dans SportLudique, **step-ca** fournit le service de certification du groupe, tandis que **Certbot** peut demander et renouveler les certificats Apache. Avec le challenge **DNS-01**, le demandeur prouve qu'il contrôle un nom en publiant un enregistrement DNS TXT, par exemple :
+Avec **Let's Encrypt**, **Certbot** peut demander et renouveler les certificats Apache. Avec le challenge **DNS-01**, le demandeur prouve qu'il contrôle un nom en publiant un enregistrement DNS TXT, par exemple :
 
 ```dns
 _acme-challenge.www.chartres.sportludique.fr.
 ```
 
-Les détails de la mise à jour DNS, de TSIG et de l'automatisation sont étudiés dans le **parcours Expert**.
+Le principe d'ACME est présenté ici **sans mise en œuvre**.
 
 ### Quelques solutions à connaître
 
@@ -182,7 +187,7 @@ Les détails de la mise à jour DNS, de TSIG et de l'automatisation sont étudi�
 
 - [Socle — Avancé - Création de votre CA](02-tls-creation-ca.md)
 - [Tous — Configurer Apache avec TLS](03-tls-apache.md)
-- [Validation des connaissances](05-tls-pki-quiz)
+- [Validation des connaissances](05-tls-pki-quiz.md)
 - [Fiche technique OpenSSL](04-openssl-aide-memoire.md)
 
 ## Références
