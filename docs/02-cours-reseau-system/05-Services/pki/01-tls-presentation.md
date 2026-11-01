@@ -180,12 +180,10 @@ Les détails de la mise à jour DNS, de TSIG et de l'automatisation sont étudi�
 
 ## 7. Pour passer à la pratique
 
-- [Socle — Apache et HTTPS](tls-socle.md)
-- [Avancé — CA intermédiaire du groupe](tls-avance.md)
-- [Expert — ACME et DNS-01](tls-expert.md)
-- [Validation des connaissances](tls-quiz.md)
-- [Fiche technique OpenSSL](fiche-openssl.md)
-- [Réutiliser la PKI dans les services](tls-services.md)
+- [Socle — Avancé - Création de votre CA](02-tls-creation-ca.md)
+- [Tous — Configurer Apache avec TLS](03-tls-apache.md)
+- [Validation des connaissances](05-tls-pki-quiz)
+- [Fiche technique OpenSSL](04-openssl-aide-memoire.md)
 
 ## Références
 
