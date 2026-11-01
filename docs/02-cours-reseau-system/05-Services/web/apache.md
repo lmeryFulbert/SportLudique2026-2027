@@ -2,7 +2,11 @@
 
 Dans SportLudique, vous déployez **Apache dans la DMZ** pour publier le site de votre ville. Il doit être accessible **depuis le réseau extérieur pédagogique (« faux Internet »)** ainsi que **depuis les postes du LAN autorisés par les règles de filtrage Stormshield**. Vous vérifierez ces deux accès depuis des postes clients, en utilisant le FQDN du site.
 
-Ce support est consacré à **Apache HTTP Server, aux VirtualHosts, à leur publication sur le réseau et à leur disponibilité**. Les exercices se réalisent ici **en HTTP (TCP 80)** pour isoler les mécanismes du serveur web. Le chiffrement des échanges, HTTPS et la gestion des certificats feront l'objet d'un **support distinct** .
+Ce module est consacré à la mise en place et à l'administration d'un serveur web Apache : configuration des VirtualHosts, publication des sites et disponibilité du service.
+
+Les premières activités sont réalisées en HTTP (TCP 80) afin de maîtriser le fonctionnement du serveur avant d'aborder la sécurisation des échanges.
+
+Le protocole HTTPS et la gestion des certificats sont traités dans le module `PKI`. Le TP Socle HTTPS peut être réalisé dès la fin du Socle Apache, indépendamment des activités avancées sur les VirtualHosts et la haute disponibilité.
 
 ## Introduction 
 
