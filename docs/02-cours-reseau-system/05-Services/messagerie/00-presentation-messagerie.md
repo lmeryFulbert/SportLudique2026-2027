@@ -29,7 +29,7 @@ Les principaux rôles sont les suivants :
 | **Serveur IMAP/POP3** | Permet à Bob de consulter sa boîte | IMAP ou POP3 |
 
 !!! tip "Un rôle n'est pas forcément une machine"
-    Le MSA, le MTA et le MDA peuvent fonctionner sur **un même serveur**. Stalwart regroupe ces fonctions ; une architecture classique utilise notamment Postfix et Dovecot.
+    Le MSA, le MTA et le MDA peuvent fonctionner sur **un même serveur**. Stalwart regroupe ces fonctions ; une architecture classique utilise notamment `Postfix` (serveur SMTP) et `Dovecot` (Serveur IMAP).
 
 Le parcours est simple : **Alice soumet** son message, le serveur de Chartres **trouve le serveur de Tours grâce au DNS**, les serveurs **transfèrent** le message, puis Bob **consulte** sa boîte aux lettres.
 
@@ -162,7 +162,7 @@ Trois mécanismes de sécurité complètent les contrôles de messagerie :
 | **DMARC** | Le domaine affiché dans `From:` est-il aligné avec un domaine ayant réussi SPF ou DKIM, et quelle politique appliquer en cas d'échec ? |
 
 !!! success "À connaître dès le socle"
-    **SPF, DKIM et DMARC** sont indispensables à la compréhension de la cybersécurité des courriels. Leur configuration sera étudiée dans un **chapitre commun**, puis mise en pratique avec **Stalwart** et **Postfix/Dovecot**.
+    **SPF, DKIM et DMARC** sont indispensables à la compréhension de la cybersécurité des courriels. Leur configuration sera étudiée dans un **chapitre commun**, puis mise en pratique avec **Stalwart**.
 
 !!! warning "Ces mécanismes ne font pas tout"
     SPF, DKIM et DMARC **ne chiffrent pas** les courriels et ne garantissent pas qu'un message est inoffensif. Un message de phishing peut provenir d'un domaine correctement authentifié.

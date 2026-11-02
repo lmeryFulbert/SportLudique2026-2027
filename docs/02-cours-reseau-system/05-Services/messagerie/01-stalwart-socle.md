@@ -1,159 +1,287 @@
-# Stalwart — Socle : installer et exploiter une messagerie
+# Stalwart — Socle : installer et observer les échanges en clair
 
-## 1. Préparer Debian 13
+!!! abstract "Mission"
+    Installez Stalwart, créez **deux utilisateurs en plus de l'administrateur**, puis échangez des messages en SMTP 587 et IMAP 143 sans TLS. Analysez une capture Wireshark pour expliquer ce que peut lire un observateur du réseau.
 
-Partir d'une VM stable avec adressage IP, resolution DNS et Date/heure correcte.
+**Prérequis :**  Adressage et DMZ du groupe, résolution DNS opérationnelle, Comprendre le protocole TLS et nottament le rôle d'une CA.
 
-Dimensionnement **proposé pour ce petit laboratoire**, et non capacité garantie par l'éditeur : 2 vCPU, 4 Gio de RAM, 30 Gio de disque extensible, interface DMZ, adresse fixe. Utiliser LVM si prévu dans le projet ; surveiller l'espace occupé par les boîtes et les journaux. Prévoir une console hyperviseur et un instantané avant modification.
+!!! warning "Périmètre du laboratoire"
+    Utilisez uniquement des identités et des mots de passe **fictifs, jamais réutilisés**. Limitez les ports de démonstration aux postes du groupe. Conservez l'administration en **HTTPS sur 443** ; les exceptions ci-dessous concernent les protocoles de courrier.
 
-## 2. Installer Stalwart nativement
+## 1. Préparer le serveur DNS
 
-L’installation de Stalwart s’effectue ici avec le **script fourni par l’éditeur**, sans passer par `apt` : cette procédure n’utilise ni paquet `.deb` ni dépôt APT proposant Stalwart. Le script télécharge le programme, installe ses fichiers, crée un compte de service et met en place une **unité systemd** pour démarrer automatiquement Stalwart et gérer son fonctionnement. Avant de l’exécuter, observez son contenu avec `cat install.sh` et repérez ces différentes opérations. Contrairement à une installation par paquet, les fichiers ainsi installés ne sont pas suivis par `dpkg` et les mises à jour de Stalwart ne seront pas prises en charge par `apt upgrade`.
-
-[Documentation officielle — Installation de Stalwart sous Linux](https://stalw.art/docs/install/platform/linux/){ target="_blank" rel="noopener" }
-
-## 3 Remplir l'assistant
-
-**Objectif :** créer un serveur autonome avec stockage local.
-
-**Explication :** ce TP ne dépend ni d'AD ni d'une base distante. Les paramètres hors socle sont laissés pour la suite.
-
-**Réalisation :** renseigner les écrans suivants :
-
-| Écran / champ | Choix du TP |
-| --- | --- |
-| Server Hostname | `mail.ville.sportludique.fr` |
-| Default Email Domain | `ville.sportludique.fr` |
-| Automatically Obtain TLS Certificate | Désactivé : certificat PKI importé dans un second temps |
-| Generate Email Signing Keys | Désactivé au socle ; traité au niveau expert |
-| Main Data Storage | RocksDB local, `/var/lib/stalwart/` |
-| Attachment & File Storage | Use data store |
-| Full-Text Search Index | Use data store |
-| Cache & Temporary Data | Local in-process store |
-| Directory Type | Use the internal directory |
-| Log Destination | Log file, `/var/log/stalwart/` |
-| DNS Server Type | Manual DNS server management |
-
-Terminer l'assistant. Relever de façon privée l'adresse et le mot de passe de l'administrateur permanent affichés. Le compte bootstrap n'est pas le compte utilisateur de messagerie. Choisir ensuite un secret personnel long et distinct dans les informations d'authentification de ce compte permanent (`Management › Directory › Accounts`).
-
-**Vérification :** le fichier `/etc/stalwart/config.json` existe désormais. Il indique le stockage ; **l'essentiel de la configuration se trouve dans la base**, pas dans un gros fichier texte à éditer.
-
-## 5. Publier A et MX
-
-### Objectif et explication
-
-Le nom du serveur pointe vers une adresse ; le domaine de messagerie pointe vers ce **nom** au moyen d'un MX. Un MX ne contient pas une IP.
-
-### Réalisation
-
-Dans la zone BIND `ville.sportludique.fr`, adapter ces **gabarits non exécutables tels quels** :
+Dans **votre zone DNS**, publiez le nom `mail` et un MX. Adaptez ce gabarit avant de l'enregistrer :
 
 ```dns
-; Remplacer IP_DMZ_MAIL par l'IPv4 réelle joignable depuis cette vue DNS.
-mail    300 IN A  IP_DMZ_MAIL
-@       300 IN MX 10 mail.ville.sportludique.fr.
+; Gabarit : remplacez l'adresse et la ville par vos valeurs réelles.
+@       IN MX 10 mail.ville.sportludique.fr.
+
+mail    IN A     ADRESSE_JOIGNABLE_DU_SERVEUR
+
 ```
 
-`@` désigne l'origine de la zone ; `10` est une préférence MX (la plus faible est préférée) ; le point final empêche l'ajout de l'origine. Le TTL 300 est proposé pour faciliter les essais. Le nom cible du MX doit avoir son propre A/AAAA, pas être un alias CNAME. Ne pas publier d'AAAA car IPv6 n'est pas étudié.
+Utilisez l'adresse IP adaptée à votre architecture réseau : l'adresse publique du serveur de messagerie pour les clients externes et, si nécessaire, son adresse privée pour les clients du LAN.
 
-Appliquer la procédure DNS déjà maîtrisée : modifier le bon fichier, augmenter le numéro de série, vérifier puis recharger la zone. Avec BIND, utiliser les noms et chemins **réels** :
+L'enregistrement **MX** doit pointer vers un **nom DNS disposant d'un enregistrement A**, et non directement vers une adresse IP ou un alias CNAME.
 
-### Vérification
+Incrémentez le numéro de série de la zone DNS, rechargez la configuration et vérifiez la résolution des enregistrements A et MX avec `dig`.
 
-Depuis le serveur puis depuis un poste LAN :
-
-=== "Linux avec DIG"
+=== "dig"
 
     ```bash
-    dig ville.sportludique.fr MX +noall +answer
-    dig mail.ville.sportludique.fr A +noall +answer
+    dig mail.ville.sportludique.fr A +short
+    dig ville.sportludique.fr MX +short
     ```
 
-=== "Windows avec nslookup"
+=== "nslookup"
 
     ```bash
     nslookup
-    > set Q=MX
-    > ville.sportludique.fr 
+    > set type=A
+    > mail.ville.sportludique.fr
+    > set type=MX
+    > ville.sportludique.fr
+    > exit
     ```
 
-Attendre le MX de préférence 10 et l'adresse DMZ prévue.
+!!! warning "nslookup"
+    `nslookup` dispose d'un **mode interactif** permettant de préciser le type d'enregistrement DNS recherché.
 
-## 6. Créer deux comptes locaux
+    Par défaut, il recherche les adresses IP associées à un nom de domaine (enregistrements **A** et **AAAA**, selon la configuration).
 
-### Objectif et explication
+    Pour rechercher un autre type d'enregistrement, utilisez la commande `set type=MX`, `set type=NS`, etc.
 
-Un **compte** porte une identité et des droits ; l'**adresse** sert à acheminer le courrier ; 
-la **boîte** conserve messages et dossiers ;
-le **mot de passe** prouve l'identité à l'authentification. 
-Un utilisateur peut avoir plusieurs adresses sans avoir plusieurs boîtes.
+## 2. Installer Stalwart
 
-### Réalisation
+### 2.1 Installer avec le script officiel
 
-Vérifier le domaine dans `Management › Domains › Domains` : `ville.sportludique.fr`, activé.
+L'administration de Stalwart doit être accessible **uniquement depuis le VLAN de management**. Adaptez les règles de filtrage de votre pare-feu en conséquence.
 
-Dans `Management › Directory › Accounts`, créer deux comptes de type utilisateur :
+Suivez la [documentation officielle de Stalwart](https://stalw.art/docs/install/platform/linux/){:target="_blank"} pour installer le serveur sur Debian.
 
-| Champ technique / fonction | Alice | Bob |
-| --- | --- | --- |
-| `name` : partie locale | `alice` | `bob` |
-| `domainId` : domaine choisi dans la liste | `ville.sportludique.fr` | `ville.sportludique.fr` |
-| `description` | Alice Chartres | Bob Chartres |
-| `credentials` : mot de passe | Secret individuel saisi dans l'interface | Autre secret individuel |
-| Rôle | User | User |
-| Adresse résultante | `alice@chartres.sportludique.fr` | `bob@chartres.sportludique.fr` |
+Contrairement aux installations précédentes réalisées avec `apt`, Stalwart utilise un **script d'installation** qui configure notamment son service `systemd`. Sa mise à jour ne s'effectue donc pas avec `apt upgrade`.
 
-Conserver les droits utilisateur ordinaires. Ne pas attribuer Admin aux comptes Thunderbird. Choisir une limite de boîte adaptée au disque si l'enseignant en impose une.
+Une fois l'installation terminée, vérifiez le fonctionnement du service et identifiez le compte système utilisé ainsi que les ports en écoute.
 
-### Vérification
+```bash
+sudo systemctl status stalwart
+sudo systemctl show stalwart --property=User,Group,ExecStart
+sudo ss -lntp
+```
 
-Les deux comptes apparaissent avec les bonnes adresses et sans privilèges d'administration. 
+À ce stade, Stalwart est en phase d'initialisation (*bootstrap*) et son interface de configuration est accessible sur le port **TCP 8080**. Cette interface ne doit pas être exposée aux autres réseaux.
 
-## 7. Configurer Thunderbird
+En cas de problème, consultez les journaux du service :
 
-### Objectif et explication
+```bash
+sudo journalctl -u stalwart -n 80 --no-pager
+```
 
-Configurer un profil pour Alice et un autre pour Bob, ou deux postes différents. Pour tester les mots de passe et éviter les confusions, nommer clairement les deux identités.
+### 2.2 Initialiser localement avant le premier accès Web
 
-### Réalisation
+!!! info "Pourquoi cette étape en ligne de commande ?"
+    Lors de l'installation, Stalwart utilise le port 8080 en HTTP pour son initialisation (bootstrap). 
 
-Ajouter un compte de courrier existant, saisir nom, adresse et mot de passe, puis choisir la configuration manuelle :
+**Si le serveur est déjà initialisé** (`/etc/stalwart/config.json` existe et l'administration fonctionne), sautez cette étape. Ne réinitialisez pas son stockage.
+
+La documentation indique comment personnaliser le mot de passe administrateur ou comment retrouvé celui generé par défaut à partir des journaux.
+
+Ce mot de passe change à chaque redémarrage en bootstrap. Ne le confondez pas avec celui du compte permanent qui sera créé.
+
+Remplissez les champs de la configuration initiale avecl'assistant :
+- nom du serveur,
+- domaine,
+- stockage local SQlite,
+- annuaire interne
+- DNS manuel.
+
+Les demandes de certificat public sont désactivées dans le faux Internet SportLudique.
+
+Ces deux valeurs sont l'identifiant **`admin@ville.sportludique.fr`** et son mot de passe permanent.
+Consignez-les dans votre gestionnaire de mots de passe ;
+
+redemarrer le service avec systemd
+
+```bash
+sudo systemctl restart stalwart
+sudo ss -lntp
+```
+
+Le redémarrage est **obligatoire** pour quitter le bootstrap. La base contient l'essentiel des réglages ; `config.json` décrit le stockage.
+
+
+### 2.3 Ouvrir l'administration en HTTPS
+
+Accédez à l'interface d'administration de Stalwart :
+
+**`https://mail.ville.sportludique.fr/`** (remplacez `ville` par votre site).
+
+Utilisez le **nom DNS du serveur**, conformément au certificat autosigné généré lors de l'initialisation (*bootstrap*), dont le champ SAN contient ce nom.
+
+Votre navigateur affiche un avertissement de sécurité, car le certificat autosigné n'est pas reconnu par une autorité de certification de confiance.
+
+Dans le cadre de ce laboratoire, **acceptez l'exception de sécurité**, puis connectez-vous avec votre compte administrateur. La connexion est chiffrée, mais l'identité du serveur n'est pas vérifiée par une chaîne de confiance reconnue. Ce problème sera résolu dans le TP Avancé avec un certificat délivré par votre PKI.
+
+Vérifiez ensuite les ports en écoute. Sur une installation neuve, vous devriez retrouver les ports **25, 465, 993, 995, 4190, 443 et 8080**. Les ports **587 (SMTP Submission)** et **143 (IMAP)** seront configurés dans le TP Avancé.
+
+!!! warning "Port 8080"
+    Le port 8080 reste actif en HTTP après l'initialisation. **Son accès doit être interdit depuis le réseau des services**.
+
+!!! success "Point de validation 1"
+    Présentez le service Stalwart actif, sa version, les ports en écoute et l'accès à l'administration en **HTTPS**. Expliquez l'origine de l'avertissement affiché par le navigateur.
+
+## 3. Vérifier le domaine et créer Alice et Bob
+
+Les menus ci-dessous sont ceux de l'interface en anglais. Utilisez les noms techniques entre parenthèses si l'interface est traduite.
+
+1. Ouvrez **Management › Domains › Domains**. Vérifiez le domaine `ville.sportludique.fr` créé au bootstrap et **Enabled** activé. Si le domaine manque sur un serveur déjà préparé, utilisez **Create**, renseignez **Domain Name**, activez **Enabled** et enregistrez. Laissez **Allow Relaying** désactivé.
+2. Ouvrez **Management › Directory › Accounts**, puis **Create**.
+3. Renseignez les valeurs suivantes ; le nom d'utilisateur est la partie locale, le domaine est sélectionné séparément.
+
+| Champ | Alice | Bob |
+|---|---|---|
+| Username (`name`) | `alice` | `bob` |
+| Domain (`domainId`) | domaine du groupe | domaine du groupe |
+| Full Name (`description`) | `Alice — groupe` | `Bob — groupe` |
+| Credentials | ajoutez un **Password** | ajoutez un autre **Password** |
+| Roles | **User role** | **User role** |
+| Permissions | héritées | héritées |
+| Adresse résultante | `alice@ville.sportludique.fr` | `bob@ville.sportludique.fr` |
+
+Choisissez deux secrets fictifs distincts assez longs pour satisfaire la politique de mots de passe. Enregistrez chaque compte avec **Save**. Relisez les fiches créées : adresses complètes, bon domaine et absence du rôle administrateur. Les comptes sont disponibles **sans redémarrage**.
+
+Source : [gestion officielle des comptes](https://stalw.art/docs/auth/accounts/manage/){:target="_blank"} .
+
+## 4. Ajouter les listeners sans TLS
+
+Un **listener** accepte les connexions sur une adresse et un port, puis leur associe un protocole.
+
+### 4.1 Créer SMTP 587 et IMAP 143
+
+Dans **Settings › Network › Listeners**, choisissez **Create** pour chaque listener. Si le port existe déjà, modifiez son listener au lieu d'en créer un second.
+
+| Champ | Soumission SMTP | Consultation IMAP |
+|---|---|---|
+| Listener Id (`name`) | **`submission`** | **`imap`** |
+| Protocol (`protocol`) | SMTP (`smtp`) | IMAP (`imap`) |
+| Bind addresses (`bind`) | `ipv4-service:587` | `ipv4-service:143` |
+| Enable TLS (`useTls`) | **désactivé** | **désactivé** |
+| Implicit TLS (`implicitTls`) | **désactivé** | **désactivé** |
+
+Cette écoute IPv4 concerne les interfaces de la VM ; le pare-feu doit limiter les sources aux postes du laboratoire. Ne modifiez pas le listener **`https`**. Enregistrez avec **Save**. et redemarrer le service. 
+
+!!! danger "Attention : session d'administration"
+    Après le redémarrage du service, votre session HTTPS peut ne plus être valide. Reconnectez-vous à l'interface d'administration avant de poursuivre les modifications.
+
+Source : [listeners et redémarrage](https://stalw.art/docs/server/listener/){:target="_blank"} .
+
+### 4.2 Autoriser temporairement l'authentification IMAP en clair et SMTP sans authentification
+
+#### IMAP
+
+Ouvrez **Settings › Network › IMAP › Authentication settings**.
+
+Activez **Allow plain text authentication** (`allowPlainTextAuth = true`) pour autoriser l'authentification IMAP par mot de passe sans chiffrement.
+
+Enregistrez avec **Save**.
+
+#### SMTP
+
+Ouvrez **Settings › SMTP › AUTH Stage**.
+
+Dans **Must match sender**, remplacez `true` par `false`.
+
+Par défaut, Stalwart vérifie que l'adresse de l'expéditeur correspond à celle de l'utilisateur authentifié. Cette vérification doit être désactivée pour permettre l'envoi de messages sans authentification SMTP dans notre laboratoire.
+
+Enregistrez avec **Save**.
+
+!!! warning "Redémarrage obligatoire"
+    Le bouton **Save** enregistre les modifications, mais ne redémarre pas Stalwart.
+
+    **Après chaque modification de configuration**, redémarrez le service pour appliquer les nouveaux paramètres :
+
+    ```bash
+    sudo systemctl restart stalwart
+    ```
+
+!!! danger "Configuration réservée au laboratoire"
+    Ces réglages permettent de transmettre des identifiants IMAP en clair et d'envoyer des messages SMTP sans authentification ni vérification de l'adresse de l'expéditeur.
+
+    Ils sont destinés uniquement à l'analyse des protocoles avec Wireshark. Limitez les accès aux réseaux du laboratoire et conservez les restrictions de relais SMTP.
+
+Sources : [Documentation Stalwart — SMTP AUTH](https://stalw.art/docs/ref/object/mta-stage-auth/#saslmechanisms){:target="_blank"} et [variables des expressions SMTP](https://stalw.art/docs/ref/expression/variable/mta-ehlo-variable/){:target="_blank"}.
+
+Sources : [MtaStageAuth.saslMechanisms](https://stalw.art/docs/ref/object/mta-stage-auth/#saslmechanisms), [variables listener, local_port et is_tls](https://stalw.art/docs/ref/expression/variable/mta-ehlo-variable/).
+
+
+### Configuration de Thunderbird
+
+Configurez votre compte de messagerie dans Thunderbird avec les paramètres suivants :
+
+| Paramètre | Valeur |
+|---|---|
+| Serveur entrant | `mail.ville.sportludique.fr` |
+| Protocole | IMAP |
+| Port | `143` |
+| Sécurité de connexion | Aucune |
+| Méthode d'authentification | Mot de passe normal |
+| Serveur sortant | `mail.ville.sportludique.fr` |
+| Protocole | SMTP |
+| Port | `25` |
+| Sécurité de connexion | Aucune |
+| Méthode d'authentification | Aucune |
+
+Remplacez `ville` par le nom de votre site.
+
+!!! danger "Authentification en clair"
+    Cette configuration est volontairement non sécurisée afin d'observer les échanges avec Wireshark. Sur IMAP, **l'identifiant et le mot de passe circulent en clair**. Le serveur SMTP accepte ici l'envoi sans authentification.
+
+    Cette configuration est réservée au laboratoire et ne doit jamais être exposée à Internet.
+
+## 5. Configurer Thunderbird et échanger des messages
+
+Créez les deux comptes sur deux postes ou dans des profils clairement identifiés. Relevez la version dans **Aide › À propos de Thunderbird**.
+
+1. Ouvrez **Paramètres des comptes › Gestion des comptes › Ajouter un compte de messagerie** ; selon la version, utilisez l'écran d'ajout de compte affiché au démarrage.
+2. Saisissez le nom, l'adresse complète et le secret fictif, puis ouvrez **Configuration manuelle**.
+3. Utilisez les paramètres suivants pour Alice, puis pour Bob :
 
 | Paramètre | Entrant | Sortant |
-| --- | --- | --- |
-| Protocole | IMAP | SMTP Submission |
-| Serveur | `mail.chartres.sportludique.fr` | `mail.chartres.sportludique.fr` |
-| Port | **143** | **25** |
-| Sécurité de connexion | sans | sans |
-| Authentification | Mot de passe normal| Mot de passe normal|
+|---|---|---|
+| Protocole | IMAP | SMTP |
+| Serveur | `mail.ville.sportludique.fr` | même nom |
+| Port | **143** | **587** |
+| Sécurité de connexion | **Aucune** | **Aucune** |
+| Méthode d'authentification | **Mot de passe normal** | **Mot de passe normal** |
+| Nom d'utilisateur | adresse électronique complète | adresse électronique complète |
 
+4. Relancez le test de configuration, puis terminez. Si Thunderbird affiche un avertissement de connexion non chiffrée avec une confirmation, confirmez uniquement pour ce compte fictif du laboratoire.
+5. Dans **Paramètres des comptes › Paramètres serveur**, contrôlez l'IMAP. Dans **Serveur sortant (SMTP) › Modifier**, contrôlez SMTP, puis vérifiez que chaque identité utilise **son propre identifiant SMTP**.
+6. Envoyez d'Alice à Bob un message intitulé **`TP Stalwart sans TLS`**, contenant seulement un court texte fictif. Relevez-le chez Bob et répondez. Examinez aussi **Indésirables/Junk** si nécessaire.
 
-L'intitulé « mot de passe normal » décrit le mécanisme d'authentification, pas un transport sans chiffrement. Ne pas choisir STARTTLS sur 465/993. Vérifier que chaque identité utilise son propre serveur sortant et son propre identifiant.
+« Mot de passe normal » est une méthode d'authentification, pas une garantie de chiffrement. SMTP utilise ici PLAIN ou LOGIN ; IMAP peut utiliser PLAIN ou sa commande LOGIN.
 
-### Vérification
+## 6. Capturer et expliquer les échanges avec Wireshark
 
-Les dossiers IMAP s'affichent sans exception TLS. L'envoi ne réclame pas le mot de passe de l'autre utilisateur.
+1. Sur le poste client, lancez Wireshark et sélectionnez **l'interface qui transporte réellement le trafic vers Stalwart**. Une capture sur un autre poste d'un réseau commuté ne voit pas nécessairement ces échanges.
+2. Démarrez la capture **avant** l'ouverture des connexions. Fermez puis relancez Thunderbird ou utilisez le client Python pour provoquer une nouvelle authentification.
+3. Envoyez et lisez le message fictif. Arrêtez la capture et enregistrez-la sous `stalwart-socle.pcapng`.
+4. Utilisez ces filtres d'affichage :
 
-## 10. Valider le socle
+| Recherche | Filtre Wireshark |
+|---|---|
+| Courrier du TP | `tcp.port == 587 || tcp.port == 143` |
+| Début des connexions TCP | `tcp.flags.syn == 1 && (tcp.port == 587 || tcp.port == 143)` |
+| SMTP | `tcp.port == 587` |
+| IMAP | `tcp.port == 143` |
+| Un dialogue précis | `tcp.stream eq N` — remplacez `N` par le numéro observé |
 
-### Checklist
+Si 587 n'est pas reconnu comme SMTP, utilisez **Analyser › Décoder comme… › SMTP**. Sélectionnez un paquet puis **Suivre › Flux TCP**.
 
-- [ ] Version Stalwart et version WebUI relevées ; Debian 13 confirmé.
-- [ ] Adresse DMZ, route, DNS et horloge vérifiés.
-- [ ] Service natif sous systemd et compte `stalwart`.
-- [ ] Stockage local et emplacement de journalisation identifiés.
-- [ ] A et MX corrects depuis les postes concernés.
-- [ ] Deux utilisateurs ordinaires, mots de passe distincts.
-- [ ] Aller-retour Alice/Bob réussi et événements retrouvés.
+Dans SMTP, retrouvez `EHLO`, `AUTH`, `MAIL FROM`, `RCPT TO`, `DATA`, le sujet et le corps du message. Dans IMAP, retrouvez `CAPABILITY`, `LOGIN` ou `AUTHENTICATE`, puis les commandes de sélection et de lecture (`SELECT`, `FETCH`…).
 
-## Documentations
+Avec **AUTH PLAIN**, la chaîne Base64 contient généralement `\0identifiant\0mot_de_passe`. Avec **AUTH LOGIN** SMTP, les réponses du client encodent séparément l'identifiant et le secret. Avec **LOGIN IMAP**, ils peuvent être directement lisibles dans la commande. 
 
-- [Version stable 1.0.0 et rupture de compatibilité](https://github.com/stalwartlabs/stalwart/releases/tag/v1.0.0)
-- [Installation native Linux](https://stalw.art/docs/install/platform/linux/)
-- [Assistant et choix initiaux](https://stalw.art/docs/install/setup-wizard/)
-- [Configuration et stockage des paramètres](https://stalw.art/docs/configuration/)
-- [Listeners et ports par défaut](https://stalw.art/docs/server/listener/)
-- [Certificats et sources PEM](https://stalw.art/docs/server/tls/certificates/)
-- [Mode de récupération](https://stalw.art/docs/configuration/recovery-mode/)
-- [Domaines](https://stalw.art/docs/domains/) 
-- [gestion des comptes](https://stalw.art/docs/auth/accounts/manage/)
+**Base64 est un encodage réversible, pas un chiffrement.** Selon le client et MIME, le corps du message peut également être encodé ; cela ne le rend pas confidentiel.
+
+Poursuivez avec le [TP Avancé — TLS et PKI intermédiaire](02-stalwart-avance.md). SPF, DKIM et DMARC relèvent du chapitre transversal **« Cybersécurité pour tous »**.

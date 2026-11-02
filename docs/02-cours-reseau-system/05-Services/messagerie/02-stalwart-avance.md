@@ -1,97 +1,205 @@
-# TP Stalwart — Avancé : sécuriser les connexions ou intégrer Active Directory
+# Stalwart — Avancé : STARTTLS, TLS implicite et PKI intermédiaire
 
-## Objectifs
+!!! abstract "Mission"
+    Sécurisez les échanges de messagerie, comparez **STARTTLS** et **TLS implicite** avec Thunderbird et Wireshark, puis remplacez le certificat autosigné par un certificat signé par **la CA intermédiaire de votre groupe**.
 
-À partir du serveur Stalwart fonctionnel réalisé au niveau socle **sans TLS**, vous devez mettre en œuvre **l’un des deux objectifs indépendants** suivants :
+**Prérequis :** TP Socle réalisé, deux comptes de messagerie, capture Wireshark du Socle et CA intermédiaire signée par la racine SportLudique. Consultez le [cours TLS](../pki/01-tls-presentation.md) et le [TP PKI](../pki/02-tls-creation-ca.md). **Vous ne créez pas de nouvelle CA dans ce TP.**
 
-- **Objectif A :** sécuriser les connexions de messagerie avec TLS et STARTTLS à partir d’une PKI interne.
-- **Objectif B :** permettre aux utilisateurs Active Directory d’utiliser leur messagerie avec leurs identifiants du domaine.
+## 1. Comprendre les deux modes TLS
 
-Vous devez rechercher les procédures dans la documentation officielle, adapter les paramètres à votre site et apporter les preuves du fonctionnement obtenu.
+| | STARTTLS | TLS implicite |
+|---|---|---|
+| Principe | La connexion commence en clair, puis passe sous TLS | TLS est négocié dès le début de la connexion |
+| SMTP | **587** | **465** |
+| IMAP | **143** | **993** |
+| Dans Wireshark | Commande `STARTTLS` visible avant le chiffrement | Négociation TLS dès le début, sans commande `STARTTLS` |
+| Dans Thunderbird | **STARTTLS** | **SSL/TLS** |
 
-## Objectif A — Sécuriser les connexions avec une PKI interne
+Dans les deux cas, **l'authentification et les messages doivent être protégés par TLS**. Les adresses IP et les ports restent visibles dans une capture réseau.
 
-### Résultat attendu
+## 2. Configurer STARTTLS
 
-Les utilisateurs doivent pouvoir envoyer et consulter leurs messages au moyen de connexions chiffrées. Les clients doivent reconnaître le certificat présenté par Stalwart et vérifier l’identité du serveur.
+Dans **Settings › Network › Listeners**, vérifiez ou adaptez les deux listeners :
 
-### Cahier des charges
+| Listener | Port | Enable TLS | Implicit TLS |
+|---|---:|---|---|
+| `submission` (SMTP) | **587** | Activé | Désactivé |
+| `imap` (IMAP) | **143** | Activé | Désactivé |
 
-- Utiliser un certificat serveur délivré par une **autorité de certification interne**.
-- Le certificat doit couvrir le nom DNS utilisé pour joindre le serveur : `mail.ville.sportludique.fr`.
-- Configurer la soumission SMTP avec **STARTTLS** et la consultation IMAP avec **STARTTLS ou TLS implicite**.
-- Exiger le chiffrement avant la transmission des identifiants sur les services destinés aux utilisateurs.
-- Installer le certificat d’autorité dans les magasins de confiance nécessaires sur les postes clients.
-- Transmettre le **certificat public de l’autorité** et son empreinte aux autres équipes pour leur permettre d’établir la confiance.
-- Conserver les clés privées sur les systèmes auxquels elles appartiennent : elles ne doivent pas être transmises aux autres équipes.
-- Maintenir le fonctionnement des boîtes et des échanges réalisés au socle.
+Enregistrez avec **Save**, puis redémarrez Stalwart :
 
-!!! warning "Chiffrer et vérifier l’identité"
+```bash
+sudo systemctl restart stalwart
+```
 
-    Une connexion chiffrée ne suffit pas à démontrer que le client communique avec le bon serveur. La validation doit porter également sur le nom DNS, les dates de validité et la chaîne de confiance. Une exception permanente aux avertissements de certificat n’est pas une solution attendue.
+!!! warning "Appliquer les modifications"
+    Le bouton **Save** enregistre les paramètres, mais ne redémarre pas le service. **Redémarrez Stalwart après chaque modification de configuration dans ce TP**, puis reconnectez Thunderbird.
 
-### Validation attendue
+### Tester avec Thunderbird
 
-Vous devez démontrer :
+Dans les paramètres des comptes, utilisez le nom `mail.ville.sportludique.fr` (adaptez `ville`) et votre adresse électronique complète comme identifiant.
 
-- Un échange de messages entre deux utilisateurs avec les nouvelles connexions sécurisées.
-- La reconnaissance du certificat avec avertissement sur les postes configurés.
-- Le refus d’une authentification sans chiffrement sur les services utilisateurs concernés.
-- Une connexion TLS validée depuis un poste d’une autre équipe ayant reçu votre certificat d’autorité.
+| Paramètre | Serveur entrant | Serveur sortant |
+|---|---|---|
+| Protocole | IMAP | SMTP |
+| Port | **143** | **587** |
+| Sécurité | **STARTTLS** | **STARTTLS** |
+| Authentification | Mot de passe normal | Mot de passe normal |
 
-### Livrables
+Envoyez un message entre deux comptes, puis relevez-le dans Thunderbird.
 
-- Tableau des services, ports et modes de chiffrement retenus.
-- Présentation de la chaîne de confiance et des noms couverts par le certificat.
-- Certificat public de l’autorité accompagné de son empreinte.
-- Preuves des tests et explication d’un incident de confiance rencontré ou provoqué.
+!!! info "Certificat autosigné"
+    Tant que Stalwart utilise le certificat autosigné du Socle, Thunderbird peut afficher un avertissement ou refuser la connexion. Si le test ne peut pas aboutir, **installez d'abord le certificat de l'étape 4**, puis recommencez. Ne désactivez pas TLS pour contourner le problème.
 
-## Objectif B — Intégrer les utilisateurs Active Directory
+### Observer avec Wireshark
 
-### Résultat attendu
+Démarrez la capture **avant** de reconnecter Thunderbird. Utilisez le filtre :
 
-Les utilisateurs autorisés doivent pouvoir envoyer et consulter leurs messages dans Stalwart avec leurs **identifiants Active Directory**, sans création manuelle d’un second mot de passe dans Stalwart.
+```text
+tcp.port == 587 || tcp.port == 143
+```
 
-Les messages et les boîtes restent stockés sur le serveur de messagerie ; Active Directory fournit les identités et vérifie les mots de passe.
+Repérez la commande **STARTTLS**, puis le début de la négociation TLS. Comparez avec la capture du Socle : pouvez-vous encore lire les identifiants et le contenu du message ?
 
-### Cahier des charges
+## 3. Tester TLS implicite
 
-- Utiliser le contrôleur de domaine du site comme source d’identités au moyen de LDAP.
-- Définir un périmètre explicite d’utilisateurs autorisés : OU dédiée ou groupe de messagerie.
-- Utiliser un compte de service disposant des seuls droits de lecture nécessaires, sans privilèges d’administration AD.
-- Identifier les attributs servant à la connexion, à l’adresse électronique et au nom affiché.
-- Renseigner une adresse unique de la forme `utilisateur@ville.sportludique.fr` pour chaque utilisateur concerné.
-- Définir et documenter la forme de l’identifiant à saisir dans Thunderbird.
-- Permettre l’accès à au moins **deux utilisateurs AD**.
-- Limiter les communications entre Stalwart en DMZ et l’annuaire interne aux flux nécessaires.
-- Prévoir un moyen de retrouver l’accès administratif en cas d’erreur de configuration de l’annuaire.
-- Conserver les boîtes locales du socle ; ne pas supposer qu’une adresse identique fusionne automatiquement un compte local et un compte AD.
+Dans **Settings › Network › Listeners**, vérifiez les listeners normalement présents après l'installation :
 
-!!! note "Deux objectifs indépendants"
+| Listener | Port | Enable TLS | Implicit TLS |
+|---|---:|---|---|
+| `submissions` (SMTP) | **465** | Activé | Activé |
+| `imaps` (IMAP) | **993** | Activé | Activé |
 
-    Le déploiement de la PKI de l’objectif A n’est pas un prérequis à cet objectif. Si des connexions restent en clair dans la maquette, utiliser exclusivement des comptes et des mots de passe pédagogiques dédiés, jamais réutilisés sur un autre service.
+S'ils sont absents, créez-les en vous appuyant sur la configuration des listeners existants. Enregistrez et redémarrez Stalwart si vous avez modifié la configuration.
 
-### Validation attendue
+Dans Thunderbird, conservez le même nom DNS, les mêmes comptes et **Mot de passe normal** :
 
-Vous devez démontrer :
+| Paramètre | Serveur entrant | Serveur sortant |
+|---|---|---|
+| Protocole | IMAP | SMTP |
+| Port | **993** | **465** |
+| Sécurité | **SSL/TLS** | **SSL/TLS** |
+| Authentification | Mot de passe normal | Mot de passe normal |
 
-- La connexion des deux utilisateurs avec leurs identifiants AD.
-- L’envoi, la réception et la réponse à un message.
-- Le refus d’un utilisateur extérieur au périmètre autorisé.
-- La prise en compte d’un changement de mot de passe AD lors d’une nouvelle authentification.
-- Le refus d’une nouvelle authentification après désactivation d’un compte, en tenant compte des éventuels caches.
-- La conservation des données de messagerie après désactivation du compte AD.
+Envoyez et recevez un message. Capturez une **nouvelle connexion** avec Wireshark :
 
-Une session déjà ouverte ne constitue pas une preuve de nouvelle authentification : les tests doivent distinguer ces deux situations.
+```text
+tcp.port == 465 || tcp.port == 993
+```
 
-### Livrables
+Cette fois, **TLS commence dès l'établissement de la connexion applicative** : aucune commande `STARTTLS` ne doit apparaître.
 
-- Preuves des tests d’authentification et d’échange de messages.
-- Explication du comportement observé après changement de mot de passe et désactivation.
+!!! question "Comparer les deux modes"
+    Quelle différence voyez-vous dans Wireshark entre STARTTLS et TLS implicite ? Les messages sont-ils chiffrés dans les deux cas ?
 
-## Documentation officielle
+## 4. Remplacer le certificat autosigné
 
-- [Configuration des listeners et des modes TLS](https://stalw.art/docs/server/listener/){ target="_blank" rel="noopener" }
-- [Gestion des certificats](https://stalw.art/docs/server/tls/certificates/){ target="_blank" rel="noopener" }
-- [Authentification SMTP](https://stalw.art/docs/mta/inbound/auth/){ target="_blank" rel="noopener" }
-- [Intégration LDAP et Active Directory](https://stalw.art/docs/auth/backend/ldap/){ target="_blank" rel="noopener" }
+### 4.1 Obtenir un certificat signé par la CA intermédiaire
+
+Réutilisez la procédure du [module PKI](../pki/02-tls-creation-ca.md) :
+
+1. Sur le serveur mail, créez une **clé privée** et une **demande de signature (CSR)** pour `mail.ville.sportludique.fr`.
+2. Vérifiez que ce nom figure dans le **SAN** de la demande.
+3. Faites signer la CSR par **la CA intermédiaire de votre groupe**, déjà signée par la racine SportLudique.
+4. Récupérez le certificat du serveur et le certificat public de la CA intermédiaire.
+
+**La clé privée du serveur ne quitte jamais le serveur mail. La clé privée de la CA ne doit jamais être copiée sur Stalwart.**
+
+Préparez un fichier PEM contenant les certificats **dans cet ordre** :
+
+| Ordre | Certificat | Rôle |
+|---|---|---|
+| 1 | Certificat de `mail.ville.sportludique.fr` | Identifie le serveur |
+| 2 | Certificat de la CA intermédiaire | Permet de construire la chaîne de confiance |
+
+Le certificat de la **CA racine** sera installé comme autorité de confiance sur le poste client ; il n'est pas nécessaire de l'ajouter au fichier présenté par le serveur.
+
+### 4.2 Installer le certificat dans Stalwart
+
+Dans **Settings › TLS › Certificates › Create** :
+
+| Champ | Valeur |
+|---|---|
+| **Certificate** | **Text value** : contenu PEM du certificat serveur suivi de celui de la CA intermédiaire |
+| **Private Key** | **Secret value** : clé privée du serveur mail |
+
+Enregistrez avec **Save**. Dans **Settings › Network › General**, sélectionnez ce certificat dans **Default Certificate**, puis enregistrez et redémarrez Stalwart :
+
+```bash
+sudo systemctl restart stalwart
+```
+
+### 4.3 Faire reconnaître la CA par Thunderbird
+
+Téléchargez le [certificat public de la racine SportLudique](../../../medias/certificats/sportludique-root.crt.pem), puis **vérifiez son empreinte** avec celle fournie dans le module PKI.
+
+Dans Thunderbird : **Paramètres › Vie privée et sécurité › Certificats › Gérer les certificats › Autorités › Importer**. Importez la **CA racine** et autorisez-la à identifier les serveurs TLS. Supprimez les éventuelles exceptions liées à l'ancien certificat autosigné, puis relancez Thunderbird.
+
+| Élément | Résultat attendu |
+|---|---|
+| Nom du serveur | `mail.ville.sportludique.fr` présent dans le SAN |
+| Certificat serveur | Signé par la CA intermédiaire du groupe |
+| Chaîne de confiance | Serveur → CA intermédiaire → racine SportLudique |
+| Thunderbird | Connexion sans avertissement ni exception de certificat |
+
+Refaites les tests d'envoi et de réception en **STARTTLS**, puis en **TLS implicite**.
+
+## 5. Interdire l'authentification sans TLS
+
+Le Socle autorisait volontairement l'authentification IMAP en clair. Il faut maintenant supprimer cette possibilité.
+
+| Emplacement dans Stalwart | Réglage attendu |
+|---|---|
+| **Settings › Network › IMAP › Authentication settings** | **Allow plain text authentication** : désactivé (`false`) |
+| **Settings › SMTP › AUTH Stage › Allowed Mechanisms** | Autoriser les mécanismes d'authentification uniquement lorsque `is_tls` est vrai |
+| **Settings › SMTP › AUTH Stage › Require Authentication** | `local_port != 25` |
+| **Settings › SMTP › AUTH Stage › Must match sender** | `true` |
+
+Pour **Allowed Mechanisms**, reprenez la règle du Socle et conservez uniquement :
+
+| Condition | Mécanismes autorisés |
+|---|---|
+| `local_port != 25 && is_tls` | `plain`, `login`, `oauthbearer`, `xoauth2` |
+| Valeur par défaut | `false` |
+
+Enregistrez, puis **redémarrez Stalwart**. Testez à nouveau l'envoi et la réception avec Thunderbird, en STARTTLS puis en TLS implicite.
+
+!!! danger "Ne pas ouvrir le relais SMTP"
+    Conservez la restriction **Allow Relaying** du Socle. Ne la remplacez surtout pas par `true` : un client non authentifié ne doit pas pouvoir utiliser votre serveur comme relais vers des domaines externes.
+
+## 6. Validation de l'Avancé
+
+- [ ] Les listeners **587/143** fonctionnent en STARTTLS.
+- [ ] Les listeners **465/993** fonctionnent en TLS implicite.
+- [ ] Deux captures Wireshark montrent clairement la différence entre les deux modes.
+- [ ] Le certificat serveur est signé par la CA intermédiaire du groupe et contient le bon SAN.
+- [ ] La racine SportLudique est reconnue par Thunderbird, sans exception de certificat.
+- [ ] Les messages sont envoyés et reçus en TLS ; l'authentification en clair n'est plus autorisée côté serveur.
+
+## Dépannage — uniquement en cas de problème
+
+Commencez par vérifier le service et les ports :
+
+```bash
+sudo systemctl status stalwart --no-pager
+sudo ss -lntp | grep -E ':143|:587|:465|:993'
+```
+
+Pour diagnostiquer une négociation TLS, remplacez `ville` par votre site :
+
+| Protocole | Commande |
+|---|---|
+| SMTP STARTTLS | `openssl s_client -starttls smtp -connect mail.ville.sportludique.fr:587 -servername mail.ville.sportludique.fr` |
+| IMAP STARTTLS | `openssl s_client -starttls imap -connect mail.ville.sportludique.fr:143 -servername mail.ville.sportludique.fr` |
+| SMTP implicite | `openssl s_client -connect mail.ville.sportludique.fr:465 -servername mail.ville.sportludique.fr` |
+| IMAP implicite | `openssl s_client -connect mail.ville.sportludique.fr:993 -servername mail.ville.sportludique.fr` |
+
+Ces commandes permettent de voir le certificat présenté et les éventuelles erreurs TLS. Elles ne remplacent pas les tests Thunderbird. Pour les erreurs du service :
+
+```bash
+sudo journalctl -u stalwart -n 80 --no-pager
+```
+
+**Documentation :** [listeners Stalwart](https://stalw.art/docs/server/listener/){:target="_blank"}, [certificats TLS](https://stalw.art/docs/server/tls/certificates/){:target="_blank"}, [authentification](https://stalw.art/docs/auth/authentication/){:target="_blank"}.
+
+Poursuivez avec le module [**SPF, DKIM et DMARC**](03-spf-dkim-dmarc.md)  consacré à la protection contre l'usurpation des adresses électroniques.
