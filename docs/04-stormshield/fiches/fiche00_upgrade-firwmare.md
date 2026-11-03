@@ -1,4 +1,4 @@
-# Mise à jour des pare-feu Stormshield
+# Fiche 00 - Mise à jour des pare-feu Stormshield
 
 Les pare-feu Stormshield utilisés dans l'infrastructure SportLudique disposent d'une **licence permettant de continuer à utiliser les équipements**.
 
