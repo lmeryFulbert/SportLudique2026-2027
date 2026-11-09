@@ -5,7 +5,7 @@
 !!! abstract "Objectif de la fiche"
     Identifier les attaques exploitant **les adresses IPv4, les messages ICMP et les décisions de routage** ; expliquer leur mécanisme, leurs conséquences sur le **DICP** et les protections adaptées.
 
-    Ce document traite **uniquement d'IPv4**. Le fonctionnement normal d'ICMP (types, codes, `ping`, `traceroute`, Redirect) est détaillé dans le [cours ICMP](../02-cours-reseau-system/07-icmp/icmp.md).
+    Ce document traite **uniquement d'IPv4**. Le fonctionnement normal d'ICMP (types, codes, `ping`, `traceroute`, Redirect) est détaillé dans le [cours ICMP](../02-cours-reseau-system/07-icmp/icmp.md#8-icmp-redirect--type-5).
 
 !!! info "Deux approches complémentaires"
     - **Cours ICMP :** comprendre ce que fait le protocole en fonctionnement normal.
@@ -93,7 +93,7 @@ sequenceDiagram
     Limiter les débits ICMP destinés aux équipements ou au plan de contrôle, superviser les volumes et filtrer les abus. **Si la liaison Internet est déjà saturée, un filtrage sur le pare-feu local ne libère pas cette liaison** : il faut pouvoir agir en amont.
 
 !!! warning "Ne pas confondre ICMP et ping"
-    Un filtrage sélectif d'Echo Request peut être justifié. **Bloquer indistinctement tout ICMP** prive également le réseau de messages d'erreur et d'outils de diagnostic utiles. Voir le [cours ICMP](../icmp/icmp.md).
+    Un filtrage sélectif d'Echo Request peut être justifié. **Bloquer indistinctement tout ICMP** prive également le réseau de messages d'erreur et d'outils de diagnostic utiles. Voir le [cours ICMP](../02-cours-reseau-system/07-icmp/icmp.md).
 
 ### 3. Smurf — réflexion et amplification ICMP (attaque historique)
 
