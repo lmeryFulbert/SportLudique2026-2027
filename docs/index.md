@@ -240,6 +240,11 @@ On en reparlera dans le cours de cybersécurité.
 
 Cette documentation évoluera avec le projet au cours de l'année.
 
+
+## Prévisionnel du projet
+
+![Prévisionnel des trois périodes du projet SportLudique](./medias/Prévisionnel%20SportLudique%20_%20parcours%20SISR.png){ width="100%" }
+
 Vous allez installer des services, configurer des réseaux, déployer des applications, automatiser certaines tâches…
 
 Vous allez aussi casser des configurations, chercher pendant deux heures pourquoi quelque chose qui fonctionnait hier ne fonctionne mystérieusement plus aujourd'hui, réparer le problème… puis probablement en provoquer un autre.

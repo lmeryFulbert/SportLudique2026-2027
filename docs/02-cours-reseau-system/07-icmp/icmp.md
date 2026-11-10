@@ -3,7 +3,7 @@
 !!! abstract "Objectifs du cours"
     Comprendre le rôle du protocole **ICMP (Internet Control Message Protocol)** dans IPv4, interpréter ses principaux **types et codes**, expliquer le fonctionnement de `ping`, `traceroute`, des messages d'erreur et du diagnostic des problèmes d'acheminement.
 
-    Ce cours porte **uniquement sur ICMPv4**. Les détournements malveillants du protocole sont étudiés dans le [référentiel de cybersécurité — couche 3](../../03-cybersecurit/couche3.md) 
+    Ce cours porte **uniquement sur ICMPv4**. Les détournements malveillants du protocole sont étudiés dans le [référentiel de cybersécurité — couche 3](../../03-cybersecurite/couche3.md) 
 
 
 !!! danger "ICMP ne se résume pas au PING !"
