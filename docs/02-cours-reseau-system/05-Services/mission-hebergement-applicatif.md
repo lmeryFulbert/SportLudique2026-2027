@@ -66,12 +66,6 @@ Les applications publiées doivent être accessibles au moyen de connexions HTTP
 
 Vous devez proposer une stratégie de gestion des certificats numériques et du chiffrement TLS.
 
-Plusieurs approches peuvent être envisagées, notamment :
-
-- L'utilisation d'un certificat générique (wildcard) pour les applications d'un même domaine ;
-- La gestion de certificats propres à chaque application ;
-- Le chiffrement des communications entre les différents composants de l'infrastructure.
-
 Votre proposition doit préciser où les connexions TLS sont établies et éventuellement terminées, ainsi que les conséquences de ce choix sur la sécurité.
 
 Le chiffrement des communications internes devra être étudié et justifié en fonction des risques identifiés.
