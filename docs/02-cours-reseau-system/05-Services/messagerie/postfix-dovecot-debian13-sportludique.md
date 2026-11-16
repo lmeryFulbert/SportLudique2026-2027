@@ -194,115 +194,29 @@ cp -a /etc/dovecot /etc/dovecot.old
 cp -a /etc/aliases /etc/aliases.old
 ```
 
-### 2.4 — Placer les quatre fichiers de la PKI
+### 2.4 — Installer le certificat TLS du serveur
 
-Obtenir les fichiers PEM existants : certificat serveur, clé privée serveur, certificat intermédiaire et certificat racine. Le certificat serveur doit contenir le SAN **`DNS:mail.ville.sportludique.fr`** et être utilisable pour l'authentification d'un serveur TLS.
+À partir de votre infrastructure PKI, obtenez un certificat TLS valide pour votre serveur de messagerie.
 
-Les chemins `/CHEMIN/REEL/...` ci-dessous sont les emplacements où vous avez effectivement déposé ces fichiers. **Aucune clé privée de la racine ou de l'intermédiaire ne doit être copiée sur cette VM.**
+Le certificat doit respecter les exigences suivantes :
 
-**Modification — répertoires d'installation :**
+- Être signé par une autorité de certification reconnue par les postes clients.
+- Contenir le **SAN `DNS:mail.ville.sportludique.fr`** correspondant au nom réel de votre serveur.
+- Autoriser l'usage **TLS Web Server Authentication (`serverAuth`)**.
+- Disposer d'une chaîne de certification complète permettant de remonter jusqu'à l'autorité racine.
 
-```bash
-mkdir -p /etc/ssl/certs/sportludique
-mkdir -p /etc/ssl/private/sportludique
-chmod 700 /etc/ssl/private/sportludique
-```
+Installez sur votre serveur de messagerie :
 
-Copier les certificats publics :
+- Le **certificat serveur accompagné de son certificat intermédiaire** (`fullchain.pem`).
+- La **clé privée du serveur**, dont l'accès doit être strictement limité.
+- Le certificat de l'autorité racine dans le magasin de confiance si nécessaire.
 
-```bash
-cp /CHEMIN/REEL/mail.crt /etc/ssl/certs/sportludique/mail.crt
-cp /CHEMIN/REEL/intermediate.crt /etc/ssl/certs/sportludique/intermediate.crt
-cp /CHEMIN/REEL/root.crt /etc/ssl/certs/sportludique/root.crt
-```
+!!! danger "Protection des clés privées"
+    Seule la clé privée du **serveur de messagerie** doit être présente sur cette machine. Les clés privées des autorités de certification ne doivent jamais y être copiées.
 
-Fixer les droits des fichiers publics :
+**Travail attendu :** vérifiez la validité du certificat, la correspondance avec sa clé privée et les permissions des fichiers.
 
-```bash
-chmod 755 /etc/ssl/certs/sportludique
-chmod 644 /etc/ssl/certs/sportludique/mail.crt /etc/ssl/certs/sportludique/intermediate.crt /etc/ssl/certs/sportludique/root.crt
-```
-
-### 2.5 — Construire les fichiers de chaîne
-
-Dovecot utilise un fichier public contenant **le certificat serveur, puis l'intermédiaire** :
-
-**Modification :**
-
-```bash
-cat /etc/ssl/certs/sportludique/mail.crt /etc/ssl/certs/sportludique/intermediate.crt > /etc/ssl/certs/sportludique/fullchain.pem
-chmod 644 /etc/ssl/certs/sportludique/fullchain.pem
-```
-
-Postfix utilise la directive moderne `smtpd_tls_chain_files`. Son fichier contient **la clé privée serveur, puis ce fullchain** :
-
-```bash
-cat /etc/ssl/private/sportludique/mail.key /etc/ssl/certs/sportludique/fullchain.pem > /etc/ssl/private/sportludique/postfix-chain.pem
-chmod 600 /etc/ssl/private/sportludique/postfix-chain.pem
-```
-
-La racine sera reconnue par les clients. Il n'est pas nécessaire de l'envoyer dans le fullchain. Le fichier combiné Postfix est **privé**, puisqu'il contient la clé.
-
-```bash
-ls -l /etc/ssl/certs/sportludique/fullchain.pem
-ls -l /etc/ssl/private/sportludique/postfix-chain.pem
-```
-
-**Validation :** fullchain public, fichier combiné privé. Ne pas afficher le contenu du fichier combiné dans une capture ou un livrable.
-
-### 2.6 — Valider les certificats avant de démarrer les services
-
-Examiner le SAN et les usages :
-
-```bash
-openssl x509 -in /etc/ssl/certs/sportludique/mail.crt -noout -ext subjectAltName,extendedKeyUsage
-```
-
-Vérifier le certificat avec la racine et l'intermédiaire :
-
-```bash
-openssl verify -purpose sslserver -verify_hostname mail.orleans.sportludique.fr \
-  -CAfile /etc/ssl/certs/sportludique/root.crt \
-  -untrusted /etc/ssl/certs/sportludique/intermediate.crt \
-  /etc/ssl/certs/sportludique/mail.crt
-```
-
-Vérifier que la clé privée correspond au certificat. Les deux commandes calculent une empreinte de la **clé publique**, avec la même représentation :
-
-```bash
-openssl x509 -in /etc/ssl/certs/sportludique/mail.crt -pubkey -noout | openssl pkey -pubin -outform DER | openssl dgst -sha256
-```
-
-```bash
-openssl pkey -in /etc/ssl/private/sportludique/mail.key -pubout -outform DER | openssl dgst -sha256
-```
-
-Comparer enfin la racine à l'empreinte fournie par l'enseignant :
-
-```bash
-openssl x509 -in /etc/ssl/certs/sportludique/root.crt -noout -fingerprint -sha256
-```
-
-**Validation :** SAN correct, `openssl verify` renvoie `OK`, les deux empreintes de clé publique sont identiques et la racine est bien celle attendue. Si l'une des commandes OpenSSL affiche une erreur, ne pas considérer son empreinte de sortie comme un résultat valide.
-
-### 2.11 — Préparer le poste client et les accès réseau
-
-**Sur le poste Linux de test, modification — outils de contrôle :**
-
-```bash
-sudo apt update
-sudo apt install openssl dnsutils netcat-openbsd swaks libnet-ssleay-perl libio-socket-ssl-perl libterm-readkey-perl
-```
-
-Copier le **certificat public racine vérifié** dans le répertoire personnel du compte qui réalisera les tests, sous le nom `sportludique-root.crt`. Les commandes client utiliseront `~/sportludique-root.crt`.
-
-```bash
-openssl x509 -in ~/sportludique-root.crt -noout -fingerprint -sha256
-```
-
-Sur le réseau du laboratoire, autoriser TCP 25 vers la VM depuis les autres serveurs, et TCP 143/587 depuis les clients. Si NAT, prévoir les redirections correspondantes. Pour l'envoi vers les autres domaines, autoriser aussi SMTP 25 sortant et la résolution DNS.
-
-**Validation de la partie 2 :** paramètres connus, DNS correct, logiciels présents, sauvegardes faites et fichiers TLS vérifiés. Les essais réseau des services auront lieu après leur activation.
+Vous devrez ensuite renseigner les chemins de ces fichiers dans les configurations **Postfix** et **Dovecot**.
 
 ## Partie 3 — Créer les comptes virtuels et préparer Dovecot
 
@@ -310,39 +224,38 @@ Dans cette architecture, Dovecot doit être prêt à recevoir les messages par L
 
 ### 3.1 — Créer le compte technique `vmail`
 
-**Sur la VM mail, vérifier d'abord s'il existe :**
+Les boîtes aux lettres des utilisateurs virtuels seront stockées dans des fichiers appartenant à un **compte système dédié**, nommé `vmail`.
+
+Ce compte ne sert qu'à gérer les fichiers de messagerie. Il ne doit pas permettre d'ouvrir une session sur le serveur.
+
+**Créer le groupe et le compte `vmail` :**
 
 ```bash
-getent passwd vmail
-getent group vmail
+sudo groupadd vmail
+sudo useradd -g vmail -d /var/vmail -M -s /usr/sbin/nologin vmail
 ```
 
-Sur la VM neuve, ces commandes ne doivent rien afficher. Si le compte existe déjà, vérifier sa fonction au lieu de le recréer ou de modifier son UID à l'aveugle.
+L'option `-M` évite la création automatique du répertoire `/var/vmail`, qui sera préparé à l'étape suivante. Le shell `/usr/sbin/nologin` interdit les connexions interactives. Aucun mot de passe ne doit être défini pour ce compte.
 
-**Modification — création du groupe puis du compte technique :**
-
-```bash
-groupadd vmail
-useradd -g vmail -d /var/vmail -M -s /usr/sbin/nologin vmail
-```
-
-Le compte reçoit automatiquement un UID d'utilisateur ordinaire disponible. `-M` laisse la création du répertoire à l'étape suivante. Le shell `nologin` interdit la session interactive. **Ne pas définir de mot de passe pour `vmail`.**
+**Vérifier la création du compte :**
 
 ```bash
 id vmail
 getent passwd vmail
-passwd -S vmail
 ```
 
-**Validation :** `vmail` existe, son domicile déclaré est `/var/vmail`, son shell est `/usr/sbin/nologin` et son mot de passe est verrouillé. Relever l'UID et le GID affichés, qui serviront à interpréter les contrôles de fichiers. Alice et Bob ne sont pas créés dans Linux.
+Relevez les valeurs **UID** et **GID** attribuées à `vmail`. Elles permettront de vérifier les propriétaires des fichiers de messagerie.
+
+!!! info "Comptes système et comptes virtuels"
+    Le compte `vmail` existe dans Linux et possède les fichiers des boîtes aux lettres. En revanche, **Alice et Bob ne sont pas des utilisateurs Linux** : leurs identifiants et mots de passe seront gérés par Dovecot.
 
 ### 3.2 — Préparer les répertoires de stockage
 
 **Modification :**
 
 ```bash
-mkdir -p /var/vmail/orleans.sportludique.fr/alice
-mkdir -p /var/vmail/orleans.sportludique.fr/bob
+mkdir -p /var/vmail/ville.sportludique.fr/alice
+mkdir -p /var/vmail/ville.sportludique.fr/bob
 chown -R vmail:vmail /var/vmail
 ```
 
@@ -362,25 +275,33 @@ ls -ld /var/vmail /var/vmail/orleans.sportludique.fr/alice /var/vmail/orleans.sp
 
 **Validation :** ces répertoires appartiennent à `vmail:vmail`. Le sous-répertoire `Maildir` sera créé par Dovecot lors de la première distribution ; on ne fabrique pas un fichier appelé `Maildir`.
 
-### 3.3 — Générer le hachage du mot de passe d'Alice
+### 3.3 — Générer les mots de passe hachés des utilisateurs
 
-Vérifier les algorithmes disponibles :
+Dovecot conserve les mots de passe des utilisateurs virtuels sous forme de **hachages**, et non en clair. Lors d'une authentification, il vérifie que le mot de passe fourni correspond au hachage enregistré.
 
-```bash
-doveadm pw -l
-```
-
-**Validation préalable :** la liste contient `ARGON2ID`, fourni par le paquet Dovecot de Debian 13.
-
-Générer le hachage d'Alice :
+Vérifier que l'algorithme `ARGON2ID` est disponible :
 
 ```bash
-doveadm pw -s ARGON2ID
+sudo doveadm pw -l
 ```
 
-Saisir deux fois le mot de passe choisi. Copier **toute la ligne produite**, depuis `{ARGON2ID}` jusqu'au dernier caractère. Le mot de passe n'est ni un argument de commande ni un texte à enregistrer dans le fichier de comptes.
+Générer le hachage du mot de passe d'Alice :
 
-**Validation :** une ligne de hachage est produite sans erreur. Le hachage n'est pas une clé de chiffrement ; Dovecot l'utilisera pour vérifier le mot de passe fourni par le client.
+```bash
+sudo doveadm pw -s ARGON2ID
+```
+
+Saisir deux fois le mot de passe choisi. Dovecot retourne une chaîne commençant par `{ARGON2ID}`.
+
+**Conservez cette chaîne complète** : elle sera utilisée dans le fichier de comptes virtuels (`passwd-file`) à l'étape suivante.
+
+Répétez l'opération pour Bob, avec un mot de passe différent.
+
+!!! tip "Pourquoi hacher les mots de passe ?"
+    Un hachage est une empreinte calculée à partir du mot de passe. Contrairement à un chiffrement, il n'est pas conçu pour être déchiffré.
+
+    Lorsqu'Alice se connecte avec Thunderbird, Dovecot vérifie son mot de passe à partir du hachage enregistré dans `passwd-file`, sans avoir besoin de conserver le mot de passe en clair.
+
 
 ### 3.4 — Créer le fichier des comptes
 
@@ -390,11 +311,36 @@ Saisir deux fois le mot de passe choisi. Copier **toute la ligne produite**, dep
 nano /etc/dovecot/users
 ```
 
-Ajouter la ligne d'Alice en remplaçant le libellé de hachage par la sortie réelle de la commande précédente :
+
+Ajoutez la ligne d'Alice dans `/etc/dovecot/users`, en remplaçant le libellé du hachage par la valeur réelle générée précédemment :
 
 ```text
-alice@orleans.sportludique.fr:HACHAGE_COMPLET_ALICE_A_REMPLACER
+alice:HACHAGE_COMPLET_ALICE_A_REMPLACER:1002:1002::/var/vmail/alice
 ```
+
+Les valeurs `1002:1002` correspondent respectivement à l'**UID** (identifiant utilisateur) et au **GID** (identifiant du groupe) du compte technique `vmail`, propriétaire des boîtes aux lettres.
+
+Retrouvez ces valeurs avec :
+
+```bash
+id vmail
+```
+
+Exemple de résultat :
+
+```text
+uid=1002(vmail) gid=1002(vmail) groupes=1002(vmail)
+```
+
+!!! note "Pourquoi utiliser alice plutôt que son adresse complète ?"
+    Nous avons choisi la directive `auth_username_format = %{user | username | lower}` dans la configuration de Dovecot.
+
+    Elle transforme automatiquement `alice@orleans.sportludique.fr` en `alice` avant la recherche dans le fichier des utilisateurs.
+
+    Ce choix simplifie les identifiants, mais **suppose que les noms d'utilisateurs soient uniques sur le serveur**, même si plusieurs domaines de messagerie sont hébergés. Deux adresses comme `alice@sportludique.fr` et `alice@orleans.sportludique.fr` seraient ainsi associées au même compte.
+
+    Les UID et GID doivent être adaptés à votre installation : ils ne valent pas nécessairement `1002`.
+
 
 Il n'y a **pas d'espace** autour du `:`. Ne pas ajouter de guillemets autour du hachage. Dans `nano`, les caractères `$` du hachage restent du texte : ils ne sont pas interprétés par le shell.
 
@@ -404,18 +350,45 @@ Générer ensuite un hachage propre au mot de passe de Bob :
 doveadm pw -s ARGON2ID
 ```
 
-Rouvrir le fichier et ajouter Bob :
+
+Rouvrez le fichier `/etc/dovecot/users` pour ajouter Bob :
 
 ```bash
-nano /etc/dovecot/users
+sudo nano /etc/dovecot/users
 ```
 
-Le fichier contient maintenant deux lignes, avec leurs **vrais hachages distincts** :
+Le fichier contient désormais deux comptes virtuels, avec leurs **hachages de mots de passe distincts** :
 
 ```text
-alice@orleans.sportludique.fr:HACHAGE_COMPLET_ALICE_A_REMPLACER
-bob@orleans.sportludique.fr:HACHAGE_COMPLET_BOB_A_REMPLACER
+alice:HACHAGE_COMPLET_ALICE:1002:1002::/var/vmail/alice
+bob:HACHAGE_COMPLET_BOB:1002:1002::/var/vmail/bob
 ```
+
+Remplacez les valeurs `HACHAGE_COMPLET_ALICE` et `HACHAGE_COMPLET_BOB` par les véritables hachages générés précédemment, en conservant leur préfixe `{ARGON2ID}`.
+
+Les champs séparés par `:` indiquent :
+
+- **Identifiant** : `alice` ou `bob` ;
+- **Mot de passe** : hachage du mot de passe ;
+- **UID et GID** : `1002`, correspondant au compte technique `vmail` ;
+- **Répertoire personnel** : emplacement de la boîte aux lettres virtuelle.
+
+!!! warning "Identifiants et UID/GID"
+    Les identifiants doivent correspondre au format défini par `auth_username_format`. Ici, Dovecot transforme `alice@sportludique.fr` en `alice`.
+
+    Les valeurs `1002` correspondent à notre installation. Vérifiez celles de votre compte `vmail` avec `id vmail` et adaptez-les si nécessaire.
+
+
+
+!!! warning "Cohérence des identifiants"
+    Le format des comptes dans `/etc/dovecot/users` dépend de la directive `auth_username_format` définie précédemment.
+
+    Avec `auth_username_format = %{user | username | lower}`, Dovecot transforme `alice@sportludique.fr` en `alice` avant de rechercher le compte. Le fichier doit donc contenir **`alice` et non son adresse électronique complète**.
+
+    Si vous choisissez de conserver les adresses complètes, vous devez adapter cette directive ainsi que les chemins des boîtes aux lettres définis dans `userdb`.
+
+    **Une incohérence entre ces paramètres entraîne un échec d'authentification**, même avec un mot de passe correct.
+
 
 Protéger ce fichier :
 
@@ -427,115 +400,312 @@ ls -l /etc/dovecot/users
 
 **Validation :** propriétaire `root`, groupe `dovecot`, permissions `-rw-r-----`. Les deux lignes contiennent chacune une adresse complète et un hachage commençant par `{ARGON2ID}`. Ce fichier est sensible ; ne pas le recopier dans les captures du compte rendu.
 
-### 3.5 — Configurer Dovecot dans un seul fichier
+### 3.4 — Configurer Dovecot
 
-**Modification — remplacer le contenu de `/etc/dovecot/dovecot.conf`, sauvegardé précédemment :**
+Sous Debian 13, la configuration de Dovecot est répartie dans plusieurs fichiers situés dans `/etc/dovecot/conf.d/`. Chaque fichier regroupe les paramètres d'une fonction : authentification, stockage, TLS ou gestion des services.
+
+**Pour chaque fichier de configuration :**
+
+1. Ouvrez le fichier indiqué avec `sudo nano`.
+2. Recherchez les directives ou les blocs de configuration concernés.
+3. Si une directive est commentée (`#`), retirez le commentaire pour l'activer.
+4. Modifiez sa valeur conformément aux indications du tutoriel.
+5. Si une directive est absente, ajoutez-la dans le fichier ou le bloc approprié.
+
+!!! warning "Ne dupliquez pas les directives"
+    **Ne recopiez pas les blocs proposés à la fin des fichiers sans vérifier leur contenu existant.**
+
+    Certaines directives ou certains blocs peuvent déjà être présents, parfois commentés ou configurés avec des valeurs différentes.
+
+    L'objectif est de **modifier les paramètres existants**, pas de créer plusieurs définitions d'un même service.
+
+Les extraits de configuration présentés dans la suite indiquent les **valeurs attendues**, et non le contenu intégral des fichiers à remplacer.
+
+
+#### Authentification — `10-auth.conf`
+
+Ouvrir le fichier :
 
 ```bash
-nano /etc/dovecot/dovecot.conf
+sudo nano /etc/dovecot/conf.d/10-auth.conf
 ```
 
-Copier cette configuration complète :
+Rechercher les directives suivantes, les décommenter si nécessaire et adapter leurs valeurs :
 
 ```ini
-dovecot_config_version = 2.4.0
-dovecot_storage_version = 2.4.0
-
-protocols {
-  imap = yes
-  lmtp = yes
-}
-listen = *
-
-auth_mechanisms = plain login
 auth_allow_cleartext = no
-auth_username_format = %{user | lower}
+[...]
+auth_mechanisms = plain login
+[...]
+auth_username_format = %{user|username|lower}
+```
 
+Vérifier également les inclusions en fin de fichier. Désactiver l'authentification par les comptes Linux et activer celle des comptes virtuels :
+
+```ini
+#!include auth-system.conf.ext
+!include auth-passwdfile.conf.ext
+```
+
+#### Comptes virtuels — `auth-passwdfile.conf.ext`
+
+Dovecot dispose d'un fichier de configuration permettant d'authentifier les utilisateurs à partir d'une liste de comptes virtuels. **Par défaut, les blocs `passdb` et `userdb` sont commentés et donc inactifs.**
+
+Ouvrez le fichier :
+
+```bash
+sudo nano /etc/dovecot/conf.d/auth-passwdfile.conf.ext
+```
+
+Décommentez les blocs `passdb` et `userdb`, puis adaptez les directives existantes pour obtenir :
+
+```ini
 passdb passwd-file {
+  default_password_scheme = crypt
+  auth_username_format = %{user | username | lower}
   passwd_file_path = /etc/dovecot/users
 }
+
 userdb passwd-file {
+  auth_username_format = %{user | username | lower}
   passwd_file_path = /etc/dovecot/users
+
   fields {
     uid:default = vmail
     gid:default = vmail
-    home:default = /var/vmail/%{user | domain}/%{user | username}
+    home:default = /var/vmail/%{user}
   }
 }
+```
 
-mail_driver = maildir
-mail_path = ~/Maildir
-namespace inbox {
-  inbox = yes
-  separator = /
+- **`passdb`** vérifie l'identifiant et le mot de passe dans `/etc/dovecot/users`.
+- **`userdb`** fournit les informations nécessaires pour accéder aux boîtes aux lettres : UID, GID et répertoire personnel.
+- **`auth_username_format`** transforme l'adresse électronique en identifiant court, en supprimant le domaine et en convertissant les caractères en minuscules.
+- **`fields`** définit des valeurs par défaut pour l'UID, le GID et le répertoire personnel. Les informations explicitement renseignées dans `/etc/dovecot/users` peuvent les remplacer.
+
+!!! note "Cohérence des identifiants"
+    Avec `auth_username_format = %{user | username | lower}`, l'adresse `alice@orleans.sportludique.fr` devient `alice`.
+
+    Le fichier `/etc/dovecot/users` doit donc contenir un compte nommé `alice`, et non son adresse complète.
+
+    Cette configuration convient à notre serveur, mais impose des identifiants uniques : deux utilisateurs portant le même nom dans des domaines différents ne peuvent pas disposer de comptes distincts avec cette normalisation.
+
+!!! warning "Compte technique vmail"
+    Les boîtes aux lettres appartiennent au compte Linux `vmail`, et non à des comptes Linux individuels `alice` et `bob`.
+
+    Vérifiez son UID et son GID :
+
+    ```bash
+    id vmail
+    ```
+
+    Ces identifiants doivent correspondre aux valeurs renseignées dans `/etc/dovecot/users`. Les directives `uid:default` et `gid:default` fournissent des valeurs de secours lorsque ces champs ne sont pas définis dans le fichier.
+
+**Vérifiez que Dovecot charge correctement la configuration :**
+
+```bash
+sudo doveconf -n
+```
+
+Puis redémarrez le service :
+
+```bash
+sudo systemctl restart dovecot
+```
+
+Enfin, testez l'authentification complète :
+
+```bash
+sudo doveadm auth login alice@orleans.sportludique.fr
+```
+
+Le résultat doit confirmer la réussite de `passdb` et la récupération des informations `userdb`, notamment l'UID, le GID et le répertoire `/var/vmail/alice`.
+
+
+Dovecot dispose d'un fichier de configuration pour l'authentification à partir d'une liste de comptes virtuels. **Par défaut, les blocs `passdb` et `userdb` sont commentés et donc inactifs.**
+
+Ouvrir le fichier :
+
+```bash
+sudo nano /etc/dovecot/conf.d/auth-passwdfile.conf.ext
+```
+
+Décommenter les blocs `passdb` et `userdb`, puis adapter leur contenu pour obtenir :
+
+```ini
+passdb passwd-file {
+  passwd_file_path = /etc/dovecot/users
 }
 
+userdb passwd-file {
+  passwd_file_path = /etc/dovecot/users
+
+  fields {
+    uid:default = vmail
+    gid:default = vmail
+    home:default = /var/vmail/%{user}
+  }
+}
+```
+
+- **`passdb`** vérifie les identifiants et les mots de passe enregistrés dans `/etc/dovecot/users`.
+- **`userdb`** définit le compte système `vmail` utilisé pour accéder aux fichiers et le répertoire personnel virtuel de chaque utilisateur.
+
+Avec la normalisation des identifiants définie précédemment (`auth_username_format = %{user | username | lower}`), les comptes `alice` et `bob` utiliseront respectivement :
+
+```text
+/var/vmail/alice
+/var/vmail/bob
+```
+
+!!! warning "Activer l'authentification des comptes virtuels"
+    La configuration de `auth-passwdfile.conf.ext` ne suffit pas : vérifiez que le fichier est bien inclus dans `10-auth.conf` avec la directive :
+
+    ```ini
+    !include auth-passwdfile.conf.ext
+    ```
+
+    Sans cette inclusion, Dovecot ne charge aucune base `passdb` et l'authentification échoue.
+
+**Vérifier la configuration :**
+
+```bash
+sudo doveconf -n
+```
+
+La configuration effective doit désormais contenir les blocs `passdb passwd-file` et `userdb passwd-file`.
+
+
+#### Sécurisation TLS — `10-ssl.conf`
+
+Par défaut, Dovecot utilise un certificat autosigné fourni lors de son installation. Nous allons le remplacer par le certificat de notre serveur de messagerie, signé par la PKI SportLudique.
+
+Ouvrir le fichier :
+
+```bash
+sudo nano /etc/dovecot/conf.d/10-ssl.conf
+```
+
+Rechercher les directives existantes et modifier leurs valeurs pour obtenir :
+
+```ini
 ssl = required
+
+ssl_server_cert_file = /etc/ssl/fullchain-mail.pem
+ssl_server_key_file = /etc/ssl/srv-mail.key
+```
+
+**Adaptez les chemins** à l'emplacement réel de votre certificat et de votre clé privée.
+
+- `ssl = required` : impose TLS pour les connexions des clients.
+- `ssl_server_cert_file` : indique le certificat serveur et sa chaîne de certification intermédiaire.
+- `ssl_server_key_file` : indique la clé privée associée au certificat.
+
+Ajouter également la directive suivante si elle est absente :
+
+```ini
 ssl_min_protocol = TLSv1.2
-ssl_server_cert_file = /etc/ssl/certs/sportludique/fullchain.pem
-ssl_server_key_file = /etc/ssl/private/sportludique/mail.key
-
-service imap-login {
-  inet_listener imap {
-    port = 143
-  }
-  inet_listener imaps {
-    port = 0
-  }
-}
-
-service lmtp {
-  unix_listener /var/spool/postfix/private/dovecot-lmtp {
-    mode = 0600
-    user = postfix
-    group = postfix
-  }
-}
-protocol lmtp {
-  postmaster_address = postmaster@orleans.sportludique.fr
-}
-
-log_path = syslog
-syslog_facility = mail
 ```
 
-**Ne conserver aucune ligne `!include` de l'ancien fichier.** Cette configuration autonome ne charge ni `conf.d/*.conf`, ni `local.conf`, ni une pile PAM. Les fichiers d'exemple restent sur disque ; il n'est pas nécessaire de les supprimer.
+Elle impose TLS 1.2 comme version minimale autorisée.
 
-Fixer les permissions du fichier :
+!!! warning "Attention aux certificats"
+    Le fichier `fullchain.pem` doit contenir le certificat du serveur suivi de celui de l'autorité intermédiaire. La clé privée doit rester protégée et ne doit jamais être intégrée à ce fichier.
+
+**Vérifier la configuration :**
 
 ```bash
-chown root:root /etc/dovecot/dovecot.conf
-chmod 644 /etc/dovecot/dovecot.conf
+sudo doveconf -n
 ```
 
-| Réglage | Ce qu'il réalise |
-| --- | --- |
-| `protocols` | Active IMAP et LMTP ; aucun serveur SMTP Dovecot n'est utilisé. |
-| `passdb passwd-file` | Vérifie le mot de passe dans `/etc/dovecot/users`. |
-| `userdb passwd-file` | Recherche le même utilisateur pour obtenir son identité de stockage ; un compte absent n'est pas accepté. |
-| `uid:default`, `gid:default` | Font travailler les boîtes sous le compte technique `vmail`, sans recopier son numéro d'UID dans chaque ligne de compte. |
-| `home:default` | Calcule un domicile différent pour chaque adresse : domaine, puis utilisateur. |
-| `auth_username_format` | Met l'identifiant en minuscules en conservant le domaine. |
-| `mail_path = ~/Maildir` | Place les messages sous `Maildir` dans le domicile fourni par `userdb`. |
-| `ssl = required` | Exige une connexion protégée pour l'authentification des clients réseau. |
-| `auth_allow_cleartext = no` | Refuse PLAIN/LOGIN sur une connexion réseau non protégée. |
-| Listener IMAP `143` | Fournit IMAP avec STARTTLS ; le listener implicite 993 est désactivé avec `port = 0`. |
-| Socket LMTP | Reçoit les messages de Postfix ; son mode `0600` limite l'accès au propriétaire `postfix`. |
+La configuration effective doit désormais faire référence à votre certificat et à votre clé privée, et non aux fichiers autosignés installés par défaut.
 
-Contrôler la syntaxe **avant** de redémarrer :
+
+### Configuration du stockage des messages — Maildir
+
+Par défaut, Debian 13 configure Dovecot avec le format **mbox**, dans lequel plusieurs messages sont regroupés dans un même fichier.
+
+Nous utiliserons **Maildir**, qui stocke chaque message dans un fichier distinct. Ce format facilite notamment la manipulation et l'inspection des messages.
+
+Ouvrez le fichier `/etc/dovecot/conf.d/10-mail.conf` :
 
 ```bash
-doveconf -n
+sudo nano /etc/dovecot/conf.d/10-mail.conf
 ```
 
-**Validation :** aucune erreur de syntaxe. La sortie montre une seule base de mots de passe et une seule base d'utilisateurs, toutes deux `passwd-file`. Elle peut présenter les réglages TLS sous un bloc normalisé `ssl_server` : c'est équivalent aux directives saisies.
+Repérez les quatre directives définies par défaut et **commentez-les** :
 
-### 3.6 — Démarrer et tester les comptes
+```ini
+#mail_driver = mbox
+#mail_home = /home/%{user | username}
+#mail_path = %{home}/mail
+#mail_inbox_path = /var/mail/%{user}
+```
+
+Ajoutez ensuite la configuration suivante :
+
+```ini
+# Stockage des messages au format Maildir
+mail_driver = maildir
+mail_home = /var/vmail/%{user}
+mail_path = ~/Maildir
+```
+
+- `mail_driver` sélectionne le format Maildir.
+- `mail_home` définit le répertoire personnel virtuel de chaque utilisateur.
+- `mail_path` définit l'emplacement de stockage des messages, relativement à ce répertoire.
+
+Ainsi, les messages d'Alice seront stockés dans `/var/vmail/alice/Maildir`.
+
+!!! note "Organisation d'une boîte Maildir"
+    Une boîte Maildir comporte trois sous-répertoires :
+
+    - `new` : messages nouvellement reçus ;
+    - `cur` : messages déjà pris en charge par le client de messagerie ;
+    - `tmp` : fichiers temporaires utilisés pendant la livraison.
+
+**Vérifiez la configuration :**
+
+```bash
+sudo doveconf -n | grep -E 'mail_driver|mail_home|mail_path'
+```
+
+Le résultat attendu est :
+
+```text
+mail_driver = maildir
+mail_home = /var/vmail/%{user}
+mail_path = ~/Maildir
+```
+
+Redémarrez Dovecot, puis vérifiez la résolution du compte :
+
+```bash
+sudo systemctl restart dovecot
+sudo doveadm user alice@sportludique.fr
+```
+
+Vous devez notamment retrouver :
+
+```text
+user       alice
+uid        1002
+gid        1002
+home       /var/vmail/alice
+mail_path  /var/vmail/alice/Maildir
+```
+
+!!! tip "À retenir"
+    Les utilisateurs Alice et Bob sont des comptes virtuels : ils ne disposent pas de comptes Linux individuels. Le compte technique `vmail` possède leurs boîtes aux lettres.
+
+    Le symbole `~` dans `~/Maildir` correspond ici au répertoire personnel virtuel fourni par `userdb`.
+
+
+### 3.5 — Démarrer et tester les comptes
 
 **Modification — activation du service :**
 
 ```bash
-systemctl enable dovecot
 systemctl restart dovecot
 systemctl status dovecot --no-pager
 ```
@@ -543,8 +713,12 @@ systemctl status dovecot --no-pager
 Tester Alice et Bob ; le mot de passe est demandé :
 
 ```bash
-doveadm auth test alice@orleans.sportludique.fr
-doveadm auth test bob@orleans.sportludique.fr
+admin@srv-mail:/etc/dovecot/conf.d$ sudo doveadm auth test alice@sportludique.fr
+Password:
+passdb: alice@sportludique.fr auth succeeded
+extra fields:
+  user=alice
+  original_user=alice@sportludique.fr
 ```
 
 **Validation :** les bons mots de passe produisent `auth succeeded`. Refaire un essai avec un mot de passe volontairement faux : il doit être refusé. Un nom court tel que `alice` ne correspond pas à une ligne du fichier et doit aussi échouer.
@@ -554,22 +728,94 @@ Ces tests passent par une interface locale d'administration. Ils ne prouvent pas
 ### 3.7 — Vérifier le domicile et le socket LMTP
 
 ```bash
-doveadm user alice@orleans.sportludique.fr
-doveadm user bob@orleans.sportludique.fr
+sudo doveadm user alice@ville.sportludique.fr
 ```
 
 Les UID/GID doivent correspondre à `id vmail`. Les domiciles attendus sont :
-
-```text
-/var/vmail/orleans.sportludique.fr/alice
-/var/vmail/orleans.sportludique.fr/bob
-```
 
 Vérifier aussi qu'un compte inexistant n'est pas trouvé :
 
 ```bash
 doveadm user inconnu@orleans.sportludique.fr
 ```
+
+
+#### Configuration du socket LMTP — `10-master.conf`
+
+Pour transmettre les messages aux boîtes aux lettres virtuelles, **Postfix utilise le protocole LMTP (Local Mail Transfer Protocol)** pour communiquer avec Dovecot.
+
+Nous utiliserons un **socket Unix**, permettant une communication locale entre les deux services, sans ouvrir de port TCP supplémentaire.
+
+Ouvrez le fichier :
+
+```bash
+sudo nano /etc/dovecot/conf.d/10-master.conf
+```
+
+Repérez le bloc `service lmtp` présent par défaut :
+
+```ini
+service lmtp {
+  unix_listener lmtp {
+    #mode = 0666
+  }
+
+  # Create inet listener only if you can't use the above UNIX socket
+  #inet_listener lmtp {
+    # Avoid making LMTP visible for the entire internet
+    #listen = 127.0.0.1
+    #port = 24
+  #}
+}
+```
+
+Commentez ce bloc et ajoutez à sa suite :
+
+```ini
+service lmtp {
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {
+    mode = 0600
+    user = postfix
+    group = postfix
+  }
+}
+```
+
+- **`unix_listener`** définit l'emplacement du socket utilisé par Postfix pour communiquer avec Dovecot.
+- **`mode = 0600`** limite l'accès au propriétaire du socket.
+- **`user = postfix` et `group = postfix`** attribuent ce socket au compte système Postfix.
+
+!!! note "Pourquoi placer le socket dans le répertoire de Postfix ?"
+    Le répertoire `/var/spool/postfix/private/` permet à Postfix d'accéder au socket LMTP, notamment lorsqu'il fonctionne dans un environnement *chroot*.
+
+    Le socket n'est pas accessible depuis le réseau : seuls les processus disposant des permissions nécessaires peuvent l'utiliser.
+
+**Vérifiez la configuration et redémarrez Dovecot :**
+
+```bash
+sudo doveconf -n
+sudo systemctl restart dovecot
+```
+
+Vérifiez ensuite que le socket a été créé :
+
+```bash
+sudo ls -l /var/spool/postfix/private/dovecot-lmtp
+```
+
+Résultat attendu :
+
+```text
+srw------- 1 postfix postfix ... /var/spool/postfix/private/dovecot-lmtp
+```
+
+Le caractère `s` au début des permissions indique qu'il s'agit d'un **socket Unix**.
+
+!!! tip "À retenir"
+    Postfix assure la réception des messages via SMTP. Dovecot assure leur distribution dans les boîtes aux lettres via LMTP, puis leur consultation par les utilisateurs via IMAP.
+
+    Le socket LMTP constitue donc le point de communication entre les deux logiciels.
+
 
 Puis vérifier le socket :
 
@@ -582,34 +828,20 @@ ss -xlpn | grep dovecot-lmtp
 
 ### 3.8 — Tester LMTP et le premier fichier de message
 
-Ce test est effectué **sur la VM, en root**. Il utilise directement le socket LMTP, sans SMTP AUTH ni connexion TLS réseau :
+Vérifiez que le message a bien été distribué dans la boîte Maildir de Bob :
 
 ```bash
-swaks --protocol LMTP --socket /var/spool/postfix/private/dovecot-lmtp \
-  --from alice@orleans.sportludique.fr --to bob@orleans.sportludique.fr \
-  --header 'Subject: SL-LMTP-001' --body 'Premier message remis directement a Dovecot.'
+sudo ls -l /var/vmail/bob/Maildir/new
+sudo grep -l 'SL-LMTP-001' /var/vmail/bob/Maildir/new/*
 ```
 
-**Validation de la remise :** LMTP accepte Bob puis confirme la sauvegarde du message après DATA. Une erreur ici concerne LMTP, le compte ou le stockage ; elle ne concerne pas SASL Postfix.
+Le message doit être présent dans le répertoire `new/`, appartenir à `vmail:vmail` et contenir le sujet attendu.
 
-Vérifier le répertoire et rechercher le sujet :
+!!! success "Validation"
+    L'authentification des comptes virtuels fonctionne, le socket LMTP est disponible et Dovecot distribue correctement les messages dans les boîtes Maildir.
 
-```bash
-ls -l /var/vmail/orleans.sportludique.fr/bob/Maildir/new
-grep -R 'SL-LMTP-001' /var/vmail/orleans.sportludique.fr/bob/Maildir/new
-```
+    Nous pouvons maintenant configurer Postfix pour assurer la réception SMTP et transmettre les messages à Dovecot.
 
-**Validation sur disque :** un message appartient à `vmail:vmail`, généralement avec le mode `0600`, et contient le sujet attendu.
-
-| Répertoire Maildir | Fonction |
-| --- | --- |
-| `tmp/` | Message en cours d'écriture. |
-| `new/` | Message nouvellement distribué. |
-| `cur/` | Messages pris en charge comme messages courants, avec des indicateurs dans les noms de fichiers. |
-
-Le passage vers `cur/` ne signifie pas nécessairement que le message a été lu ; l'indicateur `S` correspond à « vu ». Dovecot crée également des fichiers d'index et de suivi autour de ces répertoires.
-
-**Validation de la partie 3 :** comptes virtuels reconnus, compte inconnu refusé, authentification vérifiée, LMTP disponible et premier message présent sur disque. On peut maintenant vérifier le trajet complet passant par Postfix.
 
 ## Partie 4 — Configurer la réception Postfix et la distribution LMTP
 
@@ -626,8 +858,8 @@ nano /etc/postfix/vmailbox
 Contenu complet :
 
 ```text
-alice@orleans.sportludique.fr 1
-bob@orleans.sportludique.fr 1
+alice@ville.sportludique.fr 1
+bob@ville.sportludique.fr 1
 ```
 
 Le `1` signifie ici « adresse connue ». **Il ne désigne pas un fichier de boîte** : Dovecot choisira le chemin lors de la distribution LMTP. Aucun mot de passe ne figure dans cette table.
@@ -659,71 +891,103 @@ nano /etc/postfix/virtual
 Contenu :
 
 ```text
-postmaster@orleans.sportludique.fr alice@orleans.sportludique.fr
+postmaster@sportludique.fr bob@sportludique.fr
 ```
 
-Cet alias n'est pas un troisième compte : les messages destinés à `postmaster` sont redirigés vers Alice.
+Cet alias n'est pas un troisième compte : les messages destinés à `postmaster` sont redirigés vers Bob.
 
 ```bash
-postmap /etc/postfix/virtual
-chmod 644 /etc/postfix/virtual /etc/postfix/virtual.db
-postmap -q postmaster@orleans.sportludique.fr hash:/etc/postfix/virtual
+sudo postmap /etc/postfix/virtual
+sudo chmod 644 /etc/postfix/virtual /etc/postfix/virtual.db
+sudo postmap -q postmaster@sportludique.fr hash:/etc/postfix/virtual
 ```
 
 **Validation :** la recherche renvoie l'adresse complète d'Alice.
 
-### 4.3 — Écrire `main.cf`
+### 4.3 — Configuration principale de Postfix  `main.cf`
 
-**Modification — remplacer `/etc/postfix/main.cf` :**
+Le fichier `/etc/postfix/main.cf` définit le fonctionnement général du serveur SMTP.
+
+Ouvrez-le :
 
 ```bash
-nano /etc/postfix/main.cf
+sudo nano /etc/postfix/main.cf
 ```
 
-Contenu complet :
+**Repérez et adaptez les directives existantes**. Certaines sont déjà correctement configurées par Debian et ne nécessitent aucune modification.
+
+#### Identité du serveur
 
 ```ini
-compatibility_level = 3.10
-
-myhostname = mail.orleans.sportludique.fr
-mydomain = orleans.sportludique.fr
-myorigin = $mydomain
-mydestination = $myhostname, localhost.$mydomain, localhost
-
+myhostname = mail2.sportludique.fr
+myorigin = /etc/mailname
 inet_interfaces = all
-inet_protocols = ipv4
-mynetworks = 127.0.0.0/8
-relay_domains =
-relayhost =
-
-alias_maps = hash:/etc/aliases
-alias_database = hash:/etc/aliases
-virtual_mailbox_domains = orleans.sportludique.fr
-virtual_mailbox_maps = hash:/etc/postfix/vmailbox
-virtual_alias_maps = hash:/etc/postfix/virtual
-virtual_transport = lmtp:unix:private/dovecot-lmtp
-
-smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
-smtpd_recipient_restrictions = reject_unlisted_recipient
-
-smtpd_sasl_type = dovecot
-smtpd_sasl_path = private/auth
-smtpd_sasl_security_options = noanonymous
-smtpd_sasl_auth_enable = no
-smtpd_tls_auth_only = yes
-
-smtpd_tls_chain_files = /etc/ssl/private/sportludique/postfix-chain.pem
-smtpd_tls_security_level = may
-smtpd_tls_protocols = >=TLSv1.2
-smtpd_tls_mandatory_protocols = >=TLSv1.2
-smtpd_tls_loglevel = 1
-
-smtp_tls_security_level = may
-smtp_tls_protocols = >=TLSv1.2
-
-biff = no
-append_dot_mydomain = no
 ```
+
+- `myhostname` définit le nom DNS complet du serveur SMTP.
+- `myorigin` définit le domaine utilisé pour les messages émis localement, à partir du fichier `/etc/mailname`.
+- `inet_interfaces` autorise Postfix à écouter sur toutes les interfaces réseau.
+
+#### Domaines de destination
+
+```ini
+mydestination = $myhostname, localhost.$mydomain, localhost
+```
+
+!!! warning "Comptes locaux et comptes virtuels"
+    `mydestination` désigne les domaines dont les destinataires sont gérés par le mécanisme de distribution locale de Postfix.
+
+    Notre domaine de messagerie `sportludique.fr` utilise des **comptes virtuels gérés par Dovecot**. Il ne doit donc pas être ajouté à `mydestination`.
+
+    Nous le déclarerons comme domaine virtuel dans la configuration LMTP.
+
+#### Sécurisation SMTP avec TLS
+
+Remplacez les chemins des certificats autosignés fournis par Debian par ceux du certificat délivré pour votre serveur :
+
+```ini
+smtpd_tls_cert_file = /etc/ssl/mail2/fullchain.pem
+smtpd_tls_key_file = /etc/ssl/mail2/mail2.key
+smtpd_tls_security_level = may
+```
+
+- `smtpd_tls_cert_file` désigne le certificat du serveur et sa chaîne intermédiaire.
+- `smtpd_tls_key_file` désigne la clé privée correspondante.
+- `smtpd_tls_security_level = may` propose STARTTLS sur le port 25, sans l'imposer aux serveurs SMTP distants.
+
+!!! note "TLS et transport SMTP"
+    Le port 25 est destiné principalement aux échanges entre serveurs SMTP. STARTTLS y est proposé lorsque le serveur distant le prend en charge.
+
+    Pour l'envoi authentifié des utilisateurs, nous configurerons séparément le port **587**, avec authentification SASL et STARTTLS obligatoire.
+
+#### Distribution vers Dovecot via LMTP
+
+Ajoutez les directives suivantes :
+
+```ini
+virtual_mailbox_domains = sportludique.fr
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+```
+
+- `virtual_mailbox_domains` indique les domaines dont les destinataires possèdent des boîtes aux lettres virtuelles.
+- `virtual_transport` transmet les messages à Dovecot via le socket LMTP configuré précédemment.
+
+!!! warning "Validation des destinataires"
+    Déclarer un domaine virtuel ne suffit pas : Postfix doit également disposer d'un mécanisme pour identifier les destinataires valides.
+
+    Nous configurerons une table `virtual_mailbox_maps` afin de reconnaître Alice et Bob et de rejeter les destinataires inconnus.
+
+#### Vérification
+
+Contrôlez la syntaxe et affichez les paramètres utiles :
+
+```bash
+sudo postfix check
+sudo postconf -n
+```
+
+La commande `postconf -n` affiche les paramètres qui diffèrent des valeurs par défaut de Postfix.
+
 
 Le fournisseur SASL est déjà indiqué, mais `smtpd_sasl_auth_enable = no` laisse AUTH **désactivé**. Seul le service 587 l'activera en partie 5. TCP 25 restera sans SMTP AUTH.
 
