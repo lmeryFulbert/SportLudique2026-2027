@@ -1505,7 +1505,7 @@ Et au répertoire personnel retourné par `userdb ldap` :
 home = /var/vmail/%{user}
 ```
 
-**Vérifier le chemin retourné par Dovecot apresès avoir redemarré le service:**
+**Vérifier le chemin retourné par Dovecot après avoir redémarré le service :**
 
 ```bash
 sudo systemctl restart dovecot
@@ -1513,6 +1513,36 @@ sudo doveadm user didier
 ```
 
 Le répertoire personnel attendu est `/var/vmail/didier`.
+
+#### Déclarer le nouvel utilisateur dans Postfix
+
+L'authentification auprès d'Active Directory ne suffit pas à autoriser la réception de messages. Postfix doit également reconnaître l'adresse électronique de Didier comme destinataire valide.
+
+Ouvrez le fichier `/etc/postfix/vmailbox` :
+
+```bash
+sudo nano /etc/postfix/vmailbox
+```
+
+Ajoutez Didier sans supprimer les utilisateurs existants :
+
+```text
+alice@ville.sportludique.fr 1
+bob@ville.sportludique.fr 1
+didier@ville.sportludique.fr 1
+```
+
+Actualisez la table utilisée par Postfix :
+
+```bash
+sudo postmap /etc/postfix/vmailbox
+```
+
+Vérifiez que l'adresse est reconnue :
+
+```bash
+sudo postmap -q didier@ville.sportludique.fr hash:/etc/postfix/vmailbox
+```
 
 !!! important "Authentification et stockage sont indépendants"
 
