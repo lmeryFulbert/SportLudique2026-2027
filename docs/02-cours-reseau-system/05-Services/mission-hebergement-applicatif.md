@@ -2,9 +2,11 @@
 
 ## 1. Contexte professionnel
 
-L'entreprise **SportLudique** souhaite mettre à disposition sur Internet plusieurs applications développées par son équipe de développeurs (SLAM).
+L'entreprise **SportLudique** est spécialisée dans la commercialisation de produits sportifs et ludiques.
 
-Ces applications répondent à différents besoins de l'entreprise : gestion des activités sportives, réservations, suivi des adhérents, administration et autres services numériques.
+Dans le cadre du développement de son activité, elle souhaite mettre à disposition sur Internet plusieurs applications métiers, notamment celles développées par son équipe de développeurs (SLAM).
+
+Ces applications peuvent répondre à différents besoins : gestion du catalogue de produits, commandes, stocks, clients, ventes et autres services numériques.
 
 À terme, l'infrastructure devra également pouvoir accueillir de nouvelles applications, éventuellement développées par des prestataires externes.
 
@@ -25,8 +27,8 @@ L'entreprise dispose d'une contrainte importante : **une seule adresse IPv4 publ
 
 Pourtant, chaque application doit pouvoir être accessible par un nom DNS distinct, par exemple :
 
-- `reservation.sportludique.fr`
-- `adherents.sportludique.fr`
+- `boutique.sportludique.fr`
+- `stocks.sportludique.fr`
 - `gestion.sportludique.fr`
 
 Les applications peuvent être hébergées sur des serveurs différents et utiliser des technologies et des ports distincts.
