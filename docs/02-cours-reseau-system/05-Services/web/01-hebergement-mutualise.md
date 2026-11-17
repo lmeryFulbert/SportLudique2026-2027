@@ -2,9 +2,11 @@
 
 ## Situation et objectif
 
-SportLudique, entreprise spécialisée dans la vente de produits de sport ludiques, souhaite publier deux sites : une vitrine commerciale et une présentation de ses produits. Ces sites sont constitués de fichiers HTML, CSS et JavaScript exécuté dans le navigateur.
+SportLudique souhaite que chaque usine dispose de deux sites web : un site de présentation de l’usine (activités, savoir-faire et produits fabriqués) et un site consacré à ses événements locaux (portes ouvertes, visites et démonstrations).
 
-Vous disposez d'un seul serveur web. Les deux FQDN, par exemple `www.ville.sportludique.fr` et `events.ville.sportludique.fr`, doivent utiliser la même adresse IP et les ports web habituels.
+Ces deux sites sont constitués de fichiers HTML, CSS et JavaScript exécuté dans le navigateur.
+
+Vous disposez d’un seul serveur web pour votre usine. Les deux FQDN, `www.ville.sportludique.fr` et `events.ville.sportludique.fr`, doivent utiliser la même adresse IP et les ports web habituels. Remplacez ville par le nom de votre site géographique.
 
 **Comment le serveur peut-il déterminer quel site retourner lorsque plusieurs noms correspondent à la même adresse IP ?**
 
