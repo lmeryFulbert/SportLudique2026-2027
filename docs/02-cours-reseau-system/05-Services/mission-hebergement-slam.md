@@ -9,7 +9,7 @@ Chaque équipe **SISR** assure l'hébergement et l'exploitation des services inf
 Votre mission est de devenir leur **fournisseur de services d'hébergement** : fournir les ressources, sécuriser les accès, publier les applications, assurer le support et respecter des engagements négociés avec vos clients. Vous devez également choisir et exploiter vos propres outils de support, indépendamment des ressources hébergées pour les SLAM.
 
 !!! info "Périmètre"
-    L'« extérieur » désigne les réseaux extérieurs à votre site dans l'infrastructure pédagogique. Chaque site dispose d'une seule **IPv4 publique simulée**. Aucune publication sur Internet réel n'est demandée.
+    L'« extérieur » désigne les réseaux extérieurs à votre site dans l'infrastructure pédagogique. Chaque site dispose de **deux adresses IPv4 publiques simulées**. Aucune publication sur Internet réel n'est demandée.
 
 Les notions de DMZ, DNS, reverse proxy, TLS et hébergement web ont déjà été étudiées. Il ne s'agit pas de refaire ces cours ni de suivre une procédure d'installation.
 
@@ -28,7 +28,7 @@ La mission est **cumulative** : les trois niveaux fournissent **les mêmes servi
 
 ## 2. Concevoir l'offre d'hébergement
 
-Vous devez proposer une infrastructure capable de publier **plusieurs applications avec une seule adresse IPv4 publique**, tout en accueillant différentes technologies (PHP, Node.js, ASP.NET, etc.). Chaque service doit être accessible avec son propre FQDN et, pour les services web, en HTTPS.
+Vous devez proposer une infrastructure capable de publier **plusieurs applications en disposant de deux adresses IPv4 publiques**, tout en accueillant différentes technologies (PHP, Node.js, ASP.NET, etc.). Chaque service doit être accessible avec son propre FQDN et, pour les services web, en HTTPS.
 
 Votre architecture doit prévoir :
 
@@ -84,7 +84,7 @@ La plateforme doit pouvoir accueillir ensuite des applications de technologies d
 
 ## 4. Concevoir les accès distants — obligatoire pour tous
 
-Vous ne disposez que d'**une seule IPv4 publique** par site. Le reverse proxy permet de publier plusieurs applications HTTP(S), mais **ne résout pas automatiquement le problème des connexions SSH**.
+Vous disposez de **deux adresses IPv4 publiques** par site. Le reverse proxy permet de publier plusieurs applications HTTP(S), mais **ne résout pas automatiquement le problème des connexions SSH**.
 
 Dans un premier temps, étudiez comment les SLAM peuvent joindre :
 
@@ -127,7 +127,7 @@ Vous devez proposer une architecture qui distingue :
 - les services et les données internes du prestataire ;
 - les accès d'administration SISR et les accès des clients SLAM.
 
-**À vous de déterminer le nombre et le rôle des zones de sécurité, leur implantation et les règles de filtrage.** Justifiez votre proposition dans le dossier d'architecture et la matrice des flux, en tenant compte de l'unique IPv4 publique simulée.
+**À vous de déterminer le nombre et le rôle des zones de sécurité, leur implantation et les règles de filtrage.** Justifiez votre proposition dans le dossier d'architecture et la matrice des flux, en tenant compte des deux IPv4 publiques simulées.
 
 ### Mettre le service à disposition
 
@@ -192,7 +192,7 @@ La recette est réalisée **avec les SLAM**, depuis un réseau extérieur au sit
 
 | Vérification | Résultat attendu |
 | --- | --- |
-| Publication | Applications SLAM et portail de support accessibles par leurs FQDN en HTTPS sur l'unique IPv4 publique |
+| Publication | Applications SLAM et portail de support accessibles par leurs FQDN en HTTPS sur les deux IPv4 publiques disponibles, selon la répartition retenue |
 | Responsabilités | Applications installées et maintenues par les SLAM sur la plateforme fournie par les SISR |
 | Dépôt | Transfert SFTP possible uniquement dans l'espace autorisé, sans shell non prévu |
 | Base de données | L’application communique avec le SGBD demandé et accepté ; accès direct depuis l'extérieur refusé |
