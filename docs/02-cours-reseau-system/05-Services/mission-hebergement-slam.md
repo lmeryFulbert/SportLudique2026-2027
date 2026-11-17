@@ -15,11 +15,11 @@ Les notions de DMZ, DNS, reverse proxy, TLS et hébergement web ont déjà été
 
 ## Organisation par niveaux — isolation des services
 
-La mission est **cumulative** : les trois niveaux fournissent **les mêmes services** aux SLAM (hébergement, MariaDB, accès SFTP/SSH, **VPN client**, HTTPS, ticketing, SLA et sauvegardes). La différence entre les niveaux concerne **l'architecture et le degré d'isolation des environnements**. Aucune soutenance orale n'est prévue : les SLAM évaluent le service par leurs demandes, leurs tests et leurs incidents.
+La mission est **cumulative** : les trois niveaux fournissent **les mêmes services** aux SLAM (hébergement, services de données demandés, accès SFTP/SSH, **VPN client**, HTTPS, ticketing, SLA et sauvegardes). La différence entre les niveaux concerne **l'architecture et le degré d'isolation des environnements**. Aucune soutenance orale n'est prévue : les SLAM évaluent le service par leurs demandes, leurs tests et leurs incidents.
 
 | Niveau | Architecture et isolation attendues |
 | --- | --- |
-| 🟢 **Socle** | Séparation des rôles sur des serveurs distincts : applications SLAM, MariaDB clients, ticketing prestataire et base prestataire. Protection des données par les comptes, les droits et les flux nécessaires. |
+| 🟢 **Socle** | Séparation des rôles sur des serveurs distincts : applications SLAM, services de données clients demandés, ticketing prestataire et données du prestataire. Protection des données par les comptes, les droits et les flux nécessaires. |
 | 🔵 **Avancé** | Socle + **zones réseau distinctes** pour les services et données des clients et ceux du prestataire ; filtrage explicite entre les zones et réduction des communications transversales. |
 | 🟣 **Expert** | Avancé + **isolation plus fine des environnements clients** (par application, groupe ou fonction selon la solution), contrôle des communications latérales et démonstration des limites d'une compromission. |
 
@@ -34,7 +34,7 @@ Votre architecture doit prévoir :
 
 - un mécanisme de publication et d'orientation des requêtes vers les applications concernées ;
 - une stratégie TLS précisant l'emplacement des certificats, des clés privées et de la terminaison du chiffrement ;
-- une **zone d'hébergement** pour les applications et une **DMZ privée** pour les bases de données, non accessibles directement depuis l'extérieur ;
+- une **zone d'hébergement** pour les applications et une **zone privée** pour les éventuels services de données, non accessibles directement depuis l'extérieur ;
 - des règles de filtrage limitant les communications aux seuls besoins identifiés ;
 - une solution de sauvegarde et de restauration des fichiers, configurations et données ;
 - des moyens d'administration distincts des accès accordés aux clients SLAM.
@@ -54,7 +54,7 @@ La terminaison TLS sur le reverse proxy est acceptable. Le chiffrement entre cel
 | Fournit la VM et le système d'exploitation, les services et dépendances convenus | Installe, configure et maintient WordPress et ses applications |
 | Met à disposition l'environnement web et sa publication HTTPS | Déploie et teste son code, ses extensions et ses mises à jour |
 | Fournit un accès de dépôt SFTP restreint | Utilise cet accès dans les limites autorisées |
-| Fournit le serveur MariaDB, une base et des identifiants dédiés | Initialise et exploite sa base, gère les évolutions de schéma applicatif |
+| Étudie les demandes de SGBD (PostgreSQL, MariaDB, SQL Server ou autre), leur faisabilité et fournit les services acceptés avec les droits adaptés | Précise ses besoins techniques, utilise le service fourni et gère les évolutions de schéma applicatif |
 | Sécurise les accès, les flux et l'infrastructure ; réalise les sauvegardes convenues | Signale les incidents, documente les besoins et valide les corrections |
 
 ### Dépôt applicatif
@@ -66,19 +66,21 @@ Les comptes de dépôt doivent être individuels et ne doivent pas donner de she
 !!! warning "Attention au confinement"
     Un chroot SFTP restreint le parcours des fichiers **pendant le transfert** ; il ne garantit pas à lui seul l'isolation du code **pendant son exécution**. Vous devez tenir compte des droits des processus applicatifs, des fichiers et des secrets.
 
-### Accès à la base de données
+### Services de données à la demande
 
-Le serveur **MariaDB est distinct de la VM web** et placé dans une zone privée. Les SISR créent une base et un compte disposant uniquement des privilèges nécessaires à chaque application.
+**Aucun SGBD n'est imposé aux équipes SLAM.** Les développeurs formulent leurs besoins par ticket : moteur souhaité (PostgreSQL, MariaDB, SQL Server ou autre), version, capacité, comptes, accès, dépendances et contraintes de disponibilité.
 
-Les SLAM doivent pouvoir administrer les données de leur application **à distance, par un accès SSH sécurisé au serveur de bases de données**, avec des identifiants individuels et des droits limités. Étudiez les possibilités d'accès à MariaDB à travers ce canal, sans exposer directement son port SQL au réseau extérieur. Aucun accès administrateur global MariaDB ne doit être remis aux SLAM.
+Les SISR réalisent une **étude de faisabilité** (compatibilité, licences, ressources, sécurité, sauvegardes et maintenance), puis acceptent la demande, proposent une alternative argumentée ou motivent un refus. Ils mettent à disposition les services convenus, sur une infrastructure distincte de celle des applications, avec des comptes et privilèges adaptés. Les services de données des clients restent isolés des données internes du prestataire.
 
-Les SISR transmettent les paramètres de connexion et les secrets par un moyen adapté, **jamais en clair dans un ticket GLPI**.
+Les SLAM doivent pouvoir gérer leurs données à distance au moyen d'un **accès sécurisé et limité**, sans exposition directe du port du SGBD sur le réseau extérieur. Selon le moteur et le besoin, ils peuvent utiliser un client SQL via VPN, un tunnel SSH ou une autre méthode justifiée. Un accès SSH au serveur de données ne doit pas être accordé systématiquement s'il n'est pas nécessaire.
 
-### Première mise en service : WordPress
+Les paramètres non secrets peuvent figurer dans le ticket ; les identifiants et autres secrets sont transmis séparément par un moyen approprié.
 
-Une équipe SLAM installe elle-même **WordPress**, le configure et le relie à sa base MariaDB. Les SISR ne réalisent pas l'installation applicative à sa place : ils fournissent les ressources, les accès, les flux et l'environnement nécessaires.
+### Première mise en service : une application SLAM
 
-Une fois WordPress opérationnel, la plateforme doit pouvoir accueillir d'autres applications développées par les SLAM, y compris avec des technologies différentes.
+Les SLAM choisissent et installent eux-mêmes leur application, **WordPress pouvant constituer un premier cas de validation**. Ils précisent par ticket ses prérequis techniques, notamment le moteur de base de données compatible et les accès nécessaires. Les SISR fournissent les ressources convenues, sans installer ni maintenir l'application à la place des développeurs.
+
+La plateforme doit pouvoir accueillir ensuite des applications de technologies différentes, sous réserve de faisabilité et des engagements négociés.
 
 ## 4. Concevoir les accès distants — obligatoire pour tous
 
@@ -87,9 +89,9 @@ Vous ne disposez que d'**une seule IPv4 publique** par site. Le reverse proxy pe
 Dans un premier temps, étudiez comment les SLAM peuvent joindre :
 
 - leur VM d'hébergement pour déposer les fichiers ;
-- le serveur MariaDB pour administrer leur base via SSH.
+- le service de données demandé, si une administration distante est nécessaire.
 
-Deux serveurs distincts peuvent conduire à publier **deux points d'entrée SSH, avec des ports externes différents**. Que se passe-t-il si vous accueillez cinq, dix ou vingt équipes et leurs applications ? Quels sont les risques, les difficultés d'exploitation et les conséquences sur les règles de filtrage ?
+Plusieurs serveurs peuvent conduire à publier **plusieurs points d'entrée SSH, avec des ports externes différents**. Que se passe-t-il si vous accueillez cinq, dix ou vingt équipes et leurs applications ? Quels sont les risques, les difficultés d'exploitation et les conséquences sur les règles de filtrage ?
 
 **Déployez un VPN d’accès client**, permettant aux SLAM de rejoindre uniquement les ressources qui leur sont autorisées, sans multiplier les services SSH publiés. Justifiez son point de terminaison, son authentification, son adressage et les règles de filtrage. La publication de plusieurs ports SSH peut servir de point de départ à l’étude, mais ne constitue pas l’architecture cible.
 
@@ -163,9 +165,9 @@ Les fonctionnalités sont **communes aux trois niveaux**. Ce qui progresse est l
 
 ### 🟢 Socle — Séparer les rôles et les données
 
-- Fournir sur des **serveurs distincts** la VM d'hébergement des SLAM, le serveur MariaDB clients, le serveur de ticketing et le SGBD du prestataire.
-- Placer MariaDB clients hors de portée directe du réseau extérieur ; n'autoriser que les flux nécessaires depuis les applications et les accès clients autorisés via VPN.
-- Isoler les données du prestataire de celles des SLAM : instances/serveurs distincts, comptes dédiés, privilèges minimaux et sauvegardes séparées.
+- Fournir sur des **serveurs distincts** la VM d'hébergement des SLAM, les services de données clients demandés, le serveur de ticketing et les services de données du prestataire.
+- Placer les services de données clients hors de portée directe du réseau extérieur ; n'autoriser que les flux nécessaires depuis les applications et les accès clients autorisés via VPN.
+- Isoler les données du prestataire de celles des SLAM : serveurs ou environnements distincts, comptes dédiés, privilèges minimaux et sauvegardes séparées.
 - Justifier l'emplacement des serveurs dans les zones existantes et documenter les flux ; ne pas confondre séparation des machines et segmentation réseau.
 
 ### 🔵 Avancé — Séparer les environnements réseau
@@ -190,11 +192,11 @@ La recette est réalisée **avec les SLAM**, depuis un réseau extérieur au sit
 
 | Vérification | Résultat attendu |
 | --- | --- |
-| Publication | WordPress, autres applications et portail de support accessibles par leurs FQDN en HTTPS sur l'unique IPv4 publique |
-| Responsabilités | WordPress installé et maintenu par les SLAM sur la plateforme fournie par les SISR |
+| Publication | Applications SLAM et portail de support accessibles par leurs FQDN en HTTPS sur l'unique IPv4 publique |
+| Responsabilités | Applications installées et maintenues par les SLAM sur la plateforme fournie par les SISR |
 | Dépôt | Transfert SFTP possible uniquement dans l'espace autorisé, sans shell non prévu |
-| Base de données | WordPress communique avec MariaDB ; accès SQL direct depuis l'extérieur refusé |
-| Accès client à MariaDB | Administration des données via le canal sécurisé autorisé, sans privilèges globaux |
+| Base de données | L’application communique avec le SGBD demandé et accepté ; accès direct depuis l'extérieur refusé |
+| Administration des données | Accès sécurisé selon le besoin validé, sans privilèges globaux |
 | Cloisonnement | Un groupe ne peut pas consulter les fichiers, données ou tickets d'un autre groupe |
 | Assistance | Demande et incident réels suivis dans l’outil retenu, avec échanges et validation des SLAM |
 | SLA | Délais observables, échéances correctement calculées et retards expliqués |
