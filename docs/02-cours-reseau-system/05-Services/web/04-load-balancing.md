@@ -4,17 +4,27 @@
 
 L'application de SportLudique reçoit davantage de visites. L'entreprise souhaite faire fonctionner plusieurs instances de cette application et répartir les requêtes entre elles.
 
-****Comment utiliser plusieurs serveurs sans compromettre les sessions, la cohérence des données et la disponibilité du service ?****
+!!! question "Problématique"
+    Comment utiliser plusieurs serveurs sans compromettre les sessions, la cohérence des données et la disponibilité du service ?
 
 Les deux sites statiques peuvent rester mutualisés sur WEB1. La nouvelle évolution concerne l'application dynamique : une instance APP1 et une instance APP2 doivent proposer les mêmes fonctionnalités et accéder à des données cohérentes.
 
 ## 1. Distinguer routage, répartition et reprise
 
-Le [reverse proxy](02-reverse-proxy.md) choisissait la bonne application d'après le FQDN. Le ****load balancing****, ou répartition de charge, choisit une instance parmi plusieurs capables de traiter la demande pour la même application.
+Le [reverse proxy](02-reverse-proxy.md) choisissait la bonne application d'après le FQDN. Le `load balancing`, ou la `répartition de charge`, choisit une instance parmi plusieurs capables de traiter la demande pour la même application.
 
 Envoyer `www.chartres.sportludique.fr` vers un serveur statique et `app.chartres.sportludique.fr` vers un serveur dynamique est du routage entre publications. Répartir les requêtes de `app.chartres.sportludique.fr` entre APP1 et APP2 est de la répartition de charge.
 
 Le **`failover`** répond à la panne d'un composant ; il ne nécessite pas que les deux nœuds travaillent simultanément. Un répartiteur peut à la fois distribuer le trafic et retirer une instance défaillante, mais sa propre disponibilité doit être traitée séparément.
+
+!!! warning "HAProxy et Nginx : des possibilités différentes"
+    **HAProxy** ne se limite pas à la répartition de charge HTTP/HTTPS. Il peut également fonctionner en **mode TCP (couche 4)** et répartir des connexions pour de nombreux services : SMTP, IMAP, SSH, bases de données (MySQL, PostgreSQL), etc.
+
+    **Nginx** est principalement un serveur web et un reverse proxy HTTP/HTTPS. Il permet également de réaliser du **load balancing HTTP/HTTPS (couche 7)**.
+
+    Attention toutefois : Nginx peut aussi répartir des connexions **TCP et UDP (couche 4)** grâce à son module `stream`.
+
+    Le choix entre HAProxy et Nginx dépend donc des protocoles à prendre en charge et des fonctionnalités attendues.
 
 ## 2. Choisir où placer la répartition
 
@@ -44,47 +54,112 @@ Choisissez une architecture et justifiez chaque composant. Si HAProxy remplace N
 
 ## 3. Répartir en niveau 4 ou en niveau 7
 
-| Mode | Décision et visibilité | Conséquence |
+
+### Répartition de charge : couche 4 ou couche 7 ?
+
+| Mode | Principe | Conséquence |
 | --- | --- | --- |
-| Niveau 4, ici TCP | Choix d'un backend pour une connexion, sans traitement HTTP | Toutes les données de cette connexion vont au même backend |
-| Niveau 7, ici HTTP | Lecture de la requête ; règles possibles sur le nom, le chemin ou les en-têtes | Routage applicatif et possibilité de choisir une instance pour les requêtes |
+| **Couche 4 (TCP)** | Le répartiteur choisit un serveur en fonction des informations de transport (adresses IP, ports). | Toutes les données d'une même connexion TCP sont transmises au même serveur. |
+| **Couche 7 (HTTP)** | Le répartiteur analyse les requêtes HTTP et peut appliquer des règles sur le nom de domaine, l'URL, les en-têtes ou les cookies. | Les requêtes peuvent être orientées vers différents serveurs selon des critères applicatifs. |
 
-En transfert TLS transparent sur TCP, le répartiteur ne déchiffre pas le contenu HTTP : il ne peut donc pas lire `Host` ou un cookie. Certains montages inspectent le SNI lorsqu'il est visible ; cela ne fournit pas l'ensemble des capacités d'un proxy HTTP.
+**La gestion de TLS dépend du mode de fonctionnement choisi :**
 
-Pour analyser HTTP sur un accès HTTPS, le répartiteur doit disposer du trafic déchiffré, soit parce qu'il termine TLS, soit parce qu'un proxy précédent lui transmet HTTP. Une nouvelle connexion TLS vers les instances est possible et doit vérifier leur identité selon les principes du support 2.
+- **En couche 4**, le répartiteur peut transmettre les connexions HTTPS sans déchiffrer leur contenu (*TLS passthrough*). Il ne peut donc pas analyser les requêtes HTTP. Il peut toutefois exploiter certaines informations visibles, comme le SNI.
+- **En couche 7**, pour analyser les requêtes HTTPS, le répartiteur doit accéder au contenu HTTP déchiffré. Il peut terminer la connexion TLS puis transmettre les requêtes aux serveurs, en HTTP ou en HTTPS (*réencryptage TLS*).
 
-Une connexion persistante n'est pas une session utilisateur. La réutilisation de connexions et le multiplexage HTTP peuvent influencer les observations : ne concluez pas à une alternance stricte à partir de deux rafraîchissements dans un navigateur.
+
+!!! info "Ne pas confondre SNI, CN, SAN et FQDN"
+    - **FQDN (Fully Qualified Domain Name)** : nom de domaine complet d'une machine ou d'un service, par exemple `www.chartres.sportludique.fr`.
+    - **CN (Common Name)** : champ du certificat X.509 qui pouvait historiquement identifier le serveur. Il n'est plus utilisé pour vérifier son nom dans les certificats TLS modernes.
+    - **SAN (Subject Alternative Name)** : extension du certificat qui indique les noms DNS (ou adresses IP) pour lesquels le certificat est valide.
+    - **SNI (Server Name Indication)** : extension de TLS par laquelle le client indique le nom du serveur qu'il souhaite joindre lors de la négociation TLS.
+
+    **À retenir :** le SNI est envoyé par le client lors de la connexion TLS, tandis que le CN et le SAN sont des informations contenues dans le certificat présenté par le serveur. Le FQDN désigne simplement un nom de domaine complet.
+
+
+!!! note "Attention aux tests de répartition de charge"
+    Rafraîchir plusieurs fois une page dans un navigateur ne garantit pas de solliciter des serveurs différents. Les navigateurs réutilisent les connexions TCP et HTTP peut transporter plusieurs requêtes sur une même connexion.
+
+    **Une connexion TCP ne doit pas être confondue avec une session utilisateur.** La répartition de charge ne garantit pas, à elle seule, la persistance des sessions applicatives.
+
+
+
+### Création des pages de démonstration
+
+Sur chacun des deux serveurs Apache, créez une page `index.php` permettant d'identifier le serveur qui traite la requête.
+
+Les deux pages affichent les mêmes informations. Le second serveur utilise un **fond jaune** pour faciliter l'observation de la répartition de charge.
+
+=== "Serveur 1 — APP1"
+
+    ```php
+    <html>
+        <h1>Mon App Hautement disponible sur un cluster</h1>
+    <?php
+    echo "<h2>IP serveur WEB: ".$_SERVER['SERVER_ADDR']."</h2>";
+    echo "<h3>IP Repartiteur de charge: ".$_SERVER['REMOTE_ADDR']."</h3>";
+    echo "<h3>Client d'origine: ".($_SERVER['HTTP_X_FORWARDED_FOR'] ?? 'Non transmis')."</h3>";
+    ?>
+    </html>
+    ```
+
+=== "Serveur 2 — APP2"
+
+    ```php
+    <html>
+    <body style="background-color:yellow;">
+        <h1>Mon App Hautement disponible sur un cluster</h1>
+    <?php
+    echo "<h2>IP serveur WEB: ".$_SERVER['SERVER_ADDR']."</h2>";
+    echo "<h3>IP Repartiteur de charge: ".$_SERVER['REMOTE_ADDR']."</h3>";
+    echo "<h3>Client d'origine: ".($_SERVER['HTTP_X_FORWARDED_FOR'] ?? 'Non transmis')."</h3>";
+    ?>
+    </body>
+    </html>
+    ```
+
+!!! info "Informations affichées"
+    - **`SERVER_ADDR`** : adresse IP du serveur Apache qui traite la requête.
+    - **`REMOTE_ADDR`** : adresse IP du répartiteur HAProxy, qui établit la connexion vers Apache.
+    - **`HTTP_X_FORWARDED_FOR`** : adresse IP du client d'origine, transmise par HAProxy grâce à la directive `option forwardfor`.
+
+    Lors des tests, vérifiez que l'adresse du serveur web change, tandis que l'adresse du répartiteur et celle du client restent identiques.
 
 ## 4. HAProxy et Nginx
 
-HAProxy organise notamment sa configuration autour d'un `frontend`, qui reçoit le trafic, et d'un `backend`, qui décrit les destinations et leur politique de sélection. Un `pool` est le groupe d'instances candidates ; chaque ligne `server` de HAProxy décrit un membre de ce groupe.
+### Organisation d'un répartiteur de charge
 
-Nginx peut assurer la même fonction au moyen de groupes `upstream`. Il permet notamment le round robin, les pondérations et le choix selon le nombre de connexions. Il peut ainsi cumuler service de fichiers, reverse proxy et répartition de charge.
+Dans **HAProxy**, la configuration repose principalement sur deux éléments :
 
-HAProxy est particulièrement adapté à l'étude des contrôles de santé actifs et des politiques de répartition. Nginx dispose de contrôles passifs ; vérifiez dans la documentation de votre version et de votre édition les possibilités de contrôles actifs, certaines fonctions étant associées à NGINX Plus. Ne transposez pas une directive d'une édition à l'autre sans vérification.
+- **`frontend`** : point d'entrée qui reçoit les connexions des clients et les oriente vers un backend.
+- **`backend`** : groupe de serveurs disponibles pour traiter les demandes. Chaque serveur est déclaré avec une directive `server`.
 
-L'activité privilégie `HAProxy`, tout en permettant une autre solution motivée. La documentation doit correspondre à la version installée.
+Le répartiteur sélectionne un serveur selon une politique de répartition (*round robin*, pondération, nombre de connexions actives, etc.).
+
+Il peut également effectuer des **contrôles de santé (health checks)** afin de détecter un serveur indisponible et de l'exclure temporairement de la répartition.
+
+**Nginx** propose des fonctionnalités comparables grâce à ses groupes `upstream`, mais les mécanismes de contrôle de santé disponibles dépendent de son édition.
+
+!!! note "Choix de la solution"
+    L'activité utilise **HAProxy** pour étudier la répartition de charge et les contrôles de santé. Une autre solution, comme Nginx, reste envisageable à condition de justifier ce choix technique.
 
 ### Suivre une requête dans les fichiers de configuration
 
-Pour cet exemple, Nginx termine TLS. Les trois noms publics utilisent la même IP de publication. Seul le bloc du site `app.chartres.sportludique.fr` transmet ses requêtes à HAProxy. Les deux sites statiques restent sur WEB1.
+Pour cet exemple, **HAProxy reçoit directement les connexions des clients** à destination de `app.mery.test` et répartit les requêtes entre plusieurs serveurs web.
 
-**Sur Nginx** — Dans le bloc `server` HTTPS de l’application, étudié dans le support 2, adaptez la destination de `location /`. Les adresses sont données à titre d’exemple. Ici Nginx reçoit directement les connexions clientes.
+Dans un premier temps, les échanges s'effectuent en **HTTP**, afin de se concentrer sur le fonctionnement du répartiteur et les politiques de distribution des requêtes.
 
-```nginx
-location / {
-    proxy_pass http://10.251.0.200:80;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_set_header X-Real-IP $remote_addr;
-}
-```
+La **sécurisation des échanges HTTPS et la terminaison TLS sur HAProxy** seront étudiées dans un second temps.
 
-**Sur HAProxy** — Dans `/etc/haproxy/haproxy.cfg`, ajoutez ces deux sections après les réglages `global` et `defaults` de votre installation. L’adresse de `bind` doit être portée par HAProxy. Les délais de connexion, client et serveur sont définis dans `defaults`.
+**Sur HAProxy** — Configurez un `frontend` pour recevoir les requêtes HTTP et un `backend` regroupant les serveurs web. Les adresses IP utilisées sont données à titre d'exemple.
+
+
+**Sur HAProxy** — Modifiez le fichier `/etc/haproxy/haproxy.cfg` en ajoutant les sections `frontend` et `backend` à la suite des sections `global` et `defaults` existantes.
+
+L'adresse IP indiquée dans `bind` doit être configurée sur une interface réseau du serveur HAProxy. Les délais d'attente (`timeout connect`, `timeout client`, `timeout server`) sont définis dans la section `defaults`.
 
 ```haproxy
-frontend depuis_nginx
+frontend myapp
     bind 10.251.0.200:80
     mode http
     default_backend application
@@ -96,9 +171,13 @@ backend application
     server app2 10.251.0.202:80 check
 ```
 
-1. **Où arrive la requête ?** La destination de `proxy_pass` correspond à l’adresse et au port de `bind`.
-2. **Quel groupe reçoit la requête ?** Le nom qui suit `default_backend` correspond à la section `backend application`.
-3. **Qui répond ?** HAProxy choisit une instance disponible parmi les lignes `server`. Dans cet extrait, `check` teste l’ouverture de la connexion TCP.
+**Analyse de la configuration :**
+
+1. **`frontend myapp`** : définit le point d'entrée des connexions clientes. HAProxy écoute sur l'adresse `10.251.0.200`, port `80`, en mode HTTP.
+2. **`default_backend application`** : indique le groupe de serveurs auquel les requêtes sont transmises.
+3. **`balance roundrobin`** : répartit les requêtes successivement entre les serveurs disponibles.
+4. **`server app1` et `server app2`** : déclarent les deux serveurs web et leurs adresses IP respectives.
+5. **`check`** : active un contrôle de disponibilité. Dans cette configuration, HAProxy vérifie que chaque serveur accepte les connexions TCP sur le port 80. Un serveur indisponible est temporairement exclu de la répartition.
 
 Validez le fichier avant de recharger le service.
 
@@ -137,94 +216,89 @@ frontend publication_https
 
 ## 5. Choisir un algorithme
 
-| Politique | Principe | Cas pertinent et limite |
+
+### Les algorithmes de répartition de charge
+
+HAProxy propose plusieurs algorithmes permettant de déterminer vers quel serveur transmettre les requêtes.
+
+| Algorithme HAProxy | Principe | Intérêt et limites |
 | --- | --- | --- |
-| Round Robin | Distribution à tour de rôle entre les instances disponibles, avec prise en compte éventuelle des poids | Simple avec des instances comparables ; le nombre de requêtes ne mesure pas leur coût |
-| Least Connections | Préférence pour l'instance ayant le moins de connexions actives, selon la pondération | Utile lorsque les durées de connexion diffèrent ; ne mesure pas directement la charge CPU |
-| Répartition pondérée | Attribution d'un poids relatif aux instances dans un algorithme compatible | Permet de tenir compte de capacités différentes ; un poids n'est pas une mesure automatique de capacité |
+| `roundrobin` | Répartit les requêtes à tour de rôle entre les serveurs disponibles, en tenant compte de leur pondération. | Simple et adapté aux serveurs de capacités comparables. Ne tient pas compte du coût réel des requêtes. |
+| `leastconn` | Privilégie les serveurs ayant le moins de connexions actives, en tenant compte de leur pondération. | Adapté aux connexions longues ou de durées variables. Ne mesure pas directement la charge CPU. |
+| `source` | Calcule un hash à partir de l'adresse IP du client pour sélectionner un serveur. | Favorise l'affinité de session : un même client est généralement dirigé vers le même serveur. Limites : NAT, changement d'IP ou indisponibilité d'un serveur. |
+| `uri` | Calcule un hash à partir de l'URI demandée pour sélectionner un serveur. | Intéressant pour répartir des ressources entre serveurs de cache. Ne garantit pas la persistance des sessions utilisateur. |
+
+!!! info "Équivalences avec Nginx"
+    Nginx propose des mécanismes de répartition comparables, configurés dans un groupe `upstream`.
+
+    | HAProxy | Nginx | Particularité |
+    | --- | --- | --- |
+    | `roundrobin` | `round robin` | Comportement par défaut de Nginx, sans directive spécifique. |
+    | `leastconn` | `least_conn` | Privilégie les serveurs ayant le moins de connexions actives. |
+    | `source` | `ip_hash` | Favorise l'affinité d'un client avec un serveur selon son adresse IP. Les méthodes de hachage ne sont pas identiques. |
+    | `uri` | `hash $request_uri` | Répartition fondée sur l'URI de la requête. |
+
+    **Exemple Nginx avec affinité par adresse IP :**
+
+    ```nginx
+    upstream application {
+        ip_hash;
+        server 10.251.0.201:80;
+        server 10.251.0.202:80;
+    }
+    ```
+
+    **Équivalent fonctionnel avec HAProxy :**
+
+    ```haproxy
+    backend application
+        mode http
+        balance source
+        server app1 10.251.0.201:80 check
+        server app2 10.251.0.202:80 check
+    ```
+
+!!! warning "Affinité et persistance des sessions"
+    L'affinité par adresse IP (`source` ou `ip_hash`) ne garantit pas la conservation des sessions applicatives.
+
+    Si un serveur devient indisponible, les requêtes sont redirigées vers un autre serveur, qui ne possède pas nécessairement les données de session du client.
+
+    Pour garantir la continuité des sessions, il faut envisager un **stockage partagé des sessions** (base de données, Redis, etc.) ou un mécanisme adapté à l'application.
 
 Une pondération 2:1 vise davantage de trafic vers la première instance. Elle ne garantit ni deux fois plus de performances ni une proportion exacte sur un petit échantillon. L'affinité, les pannes et la durée des échanges peuvent modifier la distribution observée.
 
-Justifiez votre choix avec la nature des requêtes, les ressources disponibles et des mesures. Un catalogue simple et des traitements longs ne présentent pas forcément le même profil.
-
-## 6. Contrôler la santé des instances
-
-Un contrôle ****passif**** utilise les erreurs observées lors du trafic réel. Un contrôle ****actif**** sonde périodiquement une instance, même en l'absence de visiteurs.
-
-Un test TCP vérifie que la connexion peut s'établir. Il ne prouve pas que l'application est capable de répondre correctement. Une requête HTTP vers une ressource dédiée peut vérifier plus précisément l'aptitude à recevoir du trafic.
-
-Dans le fichier précédent, remplacez la section `backend application` par celle-ci. Le frontend continue de désigner le même groupe.
-
-```haproxy
-backend application
-    mode http
-    balance roundrobin
-    option httpchk
-    http-check send meth GET uri /health ver HTTP/1.1 hdr Host app.chartres.sportludique.fr
-    http-check expect status 200
-    server app1 10.251.0.201:80 check inter 3s fall 3 rise 2
-    server app2 10.251.0.202:80 check inter 3s fall 3 rise 2
-```
-
-L'application doit réellement fournir `/health` et accepter le nom indiqué. `fall` fixe le nombre d'échecs avant retrait, `rise` le nombre de succès avant réintégration et `inter` l'intervalle des contrôles. Le délai réel de détection dépend aussi des délais d'attente et de l'instant de la panne ; il ne se réduit pas systématiquement à une multiplication exacte.
-
-Le contrôle doit être peu coûteux, ne pas modifier les données et ne pas exposer d'informations sensibles. Choisissez s'il teste seulement l'instance ou aussi une dépendance indispensable. Si la base commune tombe, les deux instances peuvent échouer simultanément : la répartition ne réparera pas cette dépendance.
-
-Après détection, les nouvelles requêtes sont dirigées vers les instances restantes selon la politique retenue. Les requêtes déjà engagées peuvent échouer. Une répétition automatique d'une opération d'écriture présente un risque de doublon si son résultat est inconnu.
-
-### Suivre les requêtes avant et après une panne
-
-Le navigateur consulte toujours `https://app.chartres.sportludique.fr/catalogue`. Les deux premières requêtes illustrent une distribution possible sans affinité. Les contrôles de santé s’exécutent indépendamment des visites.
-
-```mermaid
-sequenceDiagram
-    participant C as Navigateur
-    participant N as Nginx
-    participant H as HAProxy
-    participant A as APP1
-    participant B as APP2
-    C->>N: GET /catalogue en HTTPS
-    N->>H: GET /catalogue
-    H->>A: GET /catalogue
-    A-->>H: 200 OK · catalogue
-    H-->>N: Réponse
-    N-->>C: Catalogue
-    C->>N: GET /catalogue en HTTPS
-    N->>H: GET /catalogue
-    H->>B: GET /catalogue
-    B-->>H: 200 OK · catalogue
-    H-->>N: Réponse
-    N-->>C: Catalogue
-    Note over A: Arrêt du service sur APP1
-    loop Trois contrôles consécutifs échouent
-        H->>A: Tentative de contrôle GET /health
-    end
-    H->>H: Retire APP1 de la répartition
-    C->>N: GET /catalogue en HTTPS
-    N->>H: GET /catalogue
-    H->>B: GET /catalogue
-    B-->>H: 200 OK · catalogue
-    H-->>N: Réponse
-    N-->>C: Catalogue
-```
-
-**À expliquer à l’oral** — Que peut observer un visiteur entre la panne d’APP1 et son retrait ? Après son redémarrage, combien de contrôles réussis faut-il avant qu’APP1 reçoive de nouvelles requêtes ?
-
 ## 7. Préserver les sessions et les données
+
 
 ### Sessions utilisateurs
 
-Un utilisateur se connecte sur APP1, qui conserve sa session en mémoire locale. Si la requête suivante arrive sur APP2, cette instance peut ne pas reconnaître la session. La présence du même code sur les deux machines ne résout pas ce problème.
+Un utilisateur se connecte à une application sur APP1. Le serveur conserve les informations de sa session (identifiant, panier, préférences, etc.) dans sa mémoire locale.
 
-Plusieurs approches sont possibles :
+Si la requête suivante est dirigée vers APP2, ce dernier ne dispose pas nécessairement de ces informations. L'utilisateur risque alors de perdre sa session, voire de devoir s'authentifier à nouveau.
 
-- ****Affinité de session****, par exemple avec un cookie : orienter un utilisateur vers la même instance. Elle limite certains changements d'instance mais ne préserve pas les données locales lors d'une panne.
+**Comment garantir la continuité des sessions lorsque les requêtes sont réparties entre plusieurs serveurs ?**
 
-- ****Stockage partagé des sessions**** : les instances consultent un service commun. Sa sécurité, sa capacité et sa disponibilité doivent alors être étudiées.
+Trois solutions peuvent être envisagées :
 
-- ****Mécanisme sans état local****, lorsque l'application le permet : les instances valident des éléments communs, par exemple un jeton signé, avec une gestion cohérente des clés, de l'expiration et de la révocation.
+- **Affinité de session (sticky session)** : le répartiteur dirige les requêtes d'un utilisateur vers le même serveur, par exemple grâce à un cookie ou à son adresse IP (`balance source`). Cette solution est simple, mais si le serveur tombe en panne, les sessions stockées localement sont perdues.
 
-Une affinité fondée sur l'adresse IP peut concentrer de nombreux utilisateurs derrière un même NAT. Elle doit être choisie en connaissance de cause, pas ajoutée pour masquer un défaut de conception.
+- **Stockage partagé des sessions** : les serveurs APP1 et APP2 utilisent un stockage commun, par exemple Redis. Un utilisateur peut ainsi passer d'un serveur à l'autre sans perdre sa session, tant que ce stockage reste disponible.
+
+- **Sessions sans état côté serveur (stateless)** : les informations nécessaires à l'authentification sont portées par un jeton, par exemple un JWT signé. Chaque serveur peut vérifier ce jeton sans consulter une session locale. Cette approche nécessite toutefois une gestion rigoureuse des clés, de l'expiration et de la révocation.
+
+!!! info "Redis : une base de données en mémoire vive"
+    **Redis** est une base de données de type **clé-valeur**, qui conserve principalement ses données en mémoire vive (RAM).
+
+    Contrairement à une base relationnelle comme PostgreSQL ou MariaDB, Redis est particulièrement adapté au stockage et à la consultation rapides de données temporaires.
+
+    Il est notamment utilisé pour :
+
+    - **Les sessions utilisateurs** : partager les informations de session entre plusieurs serveurs web.
+    - **Le cache applicatif** : conserver temporairement des résultats pour éviter de solliciter systématiquement la base de données principale.
+
+    Redis peut également enregistrer ses données sur disque grâce à des mécanismes de persistance.
+
+    **Attention :** Redis devient un service commun dont la disponibilité doit être assurée. Une panne de Redis peut affecter simultanément toutes les instances applicatives.
 
 ### Fichiers et données métier
 
@@ -233,18 +307,6 @@ Un fichier téléversé sur le disque local d'APP1 n'apparaît pas automatiqueme
 Les deux instances doivent utiliser une base cohérente. Dupliquer les serveurs web ne réplique pas le SGBD. Des écritures concurrentes nécessitent des transactions et des contraintes applicatives adaptées ; la cohérence ne repose pas sur le répartiteur.
 
 Les versions du code, paramètres, secrets de signature et schémas de données doivent être compatibles. Une tâche planifiée lancée sur chaque instance peut s'exécuter deux fois : identifiez les traitements qui exigent une coordination.
-
-### Conserver une chaîne de confiance cohérente
-
-Si Nginx et HAProxy sont chaînés, revoyez la transmission de l'adresse cliente et du schéma public. HAProxy ne doit pas remplacer aveuglément `https` par `http` simplement parce que la liaison Nginx–HAProxy est en HTTP. Les en-têtes sont acceptés uniquement depuis les relais autorisés, conformément au [support 2](02-reverse-proxy.md).
-
-## 8. Mesurer la capacité réelle
-
-Deux instances peuvent augmenter la capacité applicative, mais le SGBD, le stockage, le réseau ou le répartiteur peuvent devenir le facteur limitant. Deux VM utilisant les mêmes ressources physiques peuvent aussi entrer en concurrence.
-
-Comparez, dans des conditions semblables, le débit utile, les temps de réponse et le taux d'erreurs avec une puis deux instances. Le simple fait d'observer des réponses provenant des deux machines prouve une distribution, pas un gain de performances.
-
-Après perte d'une instance, la capacité restante doit supporter la charge visée. Un service qui reste joignable mais répond trop lentement n'atteint pas forcément l'objectif de disponibilité.
 
 ## Pour relire les captures de la maquette initiale
 
@@ -271,5 +333,3 @@ La maquette publiait aussi `app2.mery.test` sur les deux serveurs Apache. Compar
 - [HAProxy — Contrôles de santé](https://www.haproxy.com/documentation/haproxy-configuration-tutorials/reliability/health-checks/) : choisir un contrôle TCP ou HTTP.
 
 - [Nginx — Répartition de charge HTTP](https://nginx.org/en/docs/http/load_balancing.html) : comparer les algorithmes et les contrôles passifs.
-
-****À relier :**** la [mutualisation des sites](01-hebergement-mutualise.md), la [publication sécurisée](02-reverse-proxy.md) et la [disponibilité du point d'entrée](03-haute-disponibilite.md) restent des fonctions complémentaires de cette architecture.
