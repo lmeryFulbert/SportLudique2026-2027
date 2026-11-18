@@ -31,6 +31,13 @@ GET /index.html HTTP/1.1
 Host: produits.sportludique.fr
 
 ```
+```mermaid
+flowchart TD
+    WEB["Un seul serveur web<br/>Même adresse IP, port 80 ou 443"]
+    WEB -->|"GET /index.html"| HOST{"Quel nom figure dans<br/>l’en-tête Host ?"}
+    HOST -->|"www.chartres.sportludique.fr"| WWW["Hôte virtuel de l’usine<br/>/srv/www/vitrine/index.html"]
+    HOST -->|"events.chartres.sportludique.fr"| EVENTS["Hôte virtuel des événements<br/>/srv/www/events/index.html"]
+```
 
 La ligne `GET` indique la ressource demandée. L'en-tête **`Host`** indique le nom visé, avec éventuellement un port. Le même chemin `/index.html` peut donc désigner des fichiers différents selon le site. En HTTP/2 et HTTP/3, le pseudo-en-tête `:authority` porte cette information d'autorité.
 

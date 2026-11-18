@@ -37,6 +37,11 @@ Une **adresse IP virtuelle**, ou VIP, est une adresse de service portée par le 
 
 Dans le scénario étudié, la VIP appartient au sous-réseau de la DMZ publique. Le pare-feu traduit le trafic de l'IP publique vers cette VIP. Les clients continuent donc d'utiliser les mêmes FQDN et la même adresse publique après basculement.
 
+!!! info "Le basculement de la VIP s’effectue en couche 3"
+    Nous avons déjà étudié la haute disponibilité d’Apache avec Pacemaker. Ici, Nginx fonctionne sur les deux serveurs. Le pare-feu transmet les connexions HTTPS vers une même adresse IP virtuelle (VIP), portée par le serveur actif. Si ce serveur tombe en panne, le serveur de secours reprend la VIP grâce à Keepalived et à VRRP.
+
+    **Le basculement s’effectue en couche 3** car la ressource transférée est une adresse IP. **La détection d’une panne peut aussi s’appuyer sur la couche 7** si Keepalived teste la réponse HTTP de Nginx. Ce contrôle permet de déclencher la reprise même lorsque la VM reste joignable.
+
 ```mermaid
 flowchart TD
     C[Clients] -->|HTTPS| F[Pare-feu — IP publique]
@@ -102,6 +107,36 @@ La VIP permet aux nouvelles connexions de rejoindre le second proxy. Les connexi
 Le navigateur peut ouvrir une nouvelle connexion, mais l'application doit gérer les conséquences d'une interruption. Une opération d'écriture ne doit pas être répétée aveuglément : la commande a pu être enregistrée avant que sa réponse ne soit perdue.
 
 Définissez aussi le comportement au retour du premier nœud : reprise automatique du rôle par préemption ou maintien du nœud devenu actif. Un retour trop rapide et des contrôles instables peuvent provoquer des oscillations.
+
+Nous avons déjà étudié la haute disponibilité d’Apache avec Pacemaker. Ici, Nginx est démarré sur les deux serveurs et chacun est prêt à traiter les requêtes. Le pare-feu transmet les connexions HTTPS vers une adresse IP virtuelle (VIP), portée par un seul serveur à la fois. En cas de panne du serveur actif, Keepalived permet au second de reprendre cette adresse.
+
+On est sur une haute disponibilité de la couche 3 pas de la couche 7.
+
+````mermaid
+sequenceDiagram
+    participant C as Navigateur
+    participant F as Pare-feu
+    participant A as Proxy A
+    participant B as Proxy B
+
+    Note over A,B: A porte la VIP. B est en secours.
+    A-->>B: Annonces VRRP périodiques
+    C->>F: Connexion HTTPS à l’IP publique
+    F->>A: DNAT vers la VIP portée par A
+    A-->>F: Réponse HTTPS
+    F-->>C: Réponse reçue
+
+    Note over A: Arrêt brutal de la VM
+    Note over C,A: La connexion en cours est interrompue
+    B->>B: Le délai d’attente des annonces VRRP expire
+    B->>B: Devient actif et prend la VIP
+    B-->>F: Annonce ARP gratuite sur la DMZ
+
+    C->>F: Nouvelle connexion HTTPS à la même IP publique
+    F->>B: Même règle DNAT, VIP désormais portée par B
+    B-->>F: Réponse HTTPS
+    F-->>C: Accès rétabli
+````
 
 ## 8. Travail attendu : concevoir et éprouver la redondance
 

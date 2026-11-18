@@ -26,13 +26,29 @@ Un **forward proxy** agit pour des clients qui accèdent à des services externe
 
 Le **frontend** est le côté qui reçoit les connexions clientes ; le **backend** est le service interne auquel le proxy s'adresse. Ce vocabulaire décrit des rôles, pas nécessairement des machines distinctes.
 
-Exemple de correspondances, à adapter à votre groupe :
+```mermaid
+sequenceDiagram
+    participant C as Navigateur
+    participant P as Reverse proxy
+    participant W1 as WEB1 · sites statiques
+    participant W2 as WEB2 · application
+    participant D as DB1 · base de données
 
-| Nom public | Destination du reverse proxy | Traitement |
-| --- | --- | --- |
-| `www.sportludique.fr` | WEB1 | Site vitrine |
-| `produits.sportludique.fr` | WEB1 | Second hôte virtuel du même serveur |
-| `app.sportludique.fr` | WEB2 | Application dynamique utilisant DB1 |
+    C->>P: Requête HTTPS vers le nom choisi
+
+    alt www.chartres.sportludique.fr ou events.chartres.sportludique.fr
+        P->>W1: GET /index.html avec le Host public
+        W1->>W1: Sélectionner la racine vitrine ou events selon Host
+        W1-->>P: Fichier index.html du site demandé
+    else app.chartres.sportludique.fr
+        P->>W2: Transmettre la requête à l’application
+        W2->>D: Demander les données nécessaires
+        D-->>W2: Renvoyer les résultats
+        W2-->>P: Page générée par l’application
+    end
+
+    P-->>C: Réponse HTTPS à la requête initiale
+```
 
 Les trois noms publics aboutissent à la même IP publique. Le pare-feu transmet le trafic HTTPS au reverse proxy. Après terminaison TLS, celui-ci sélectionne le backend d'après le nom HTTP. WEB1 doit recevoir le nom initial pour choisir son propre hôte virtuel.
 
