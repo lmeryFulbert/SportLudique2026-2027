@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980" role="img" aria-labelledby="title desc">
+<title id="title">La défense en profondeur</title>
+<desc id="desc">Quatre couches de protection concentriques entourent les données : périmètre, réseau, systèmes et applications. La journalisation et la supervision couvrent toutes les couches. Les sauvegardes protégées permettent la restauration.</desc>
+<rect width="1240" height="980" rx="24" fill="#111827"/>
+<g font-family="DejaVu Sans, Arial, sans-serif" fill="#f8fafc">
+<text x="48" y="48" font-size="14" letter-spacing="2" fill="#94a3b8">SPORTLUDIQUE · CYBERSÉCURITÉ</text>
+<text x="48" y="92" font-size="34" font-weight="700">La défense en profondeur</text>
+<text x="48" y="122" font-size="18" fill="#cbd5e1">Plusieurs protections complémentaires autour des données.</text>
+
+<circle cx="405" cy="520" r="360" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 8"/>
+<circle cx="405" cy="520" r="340" fill="#1e3a5f" stroke="#60a5fa" stroke-width="2"/>
+<circle cx="405" cy="520" r="265" fill="#15545b" stroke="#2dd4bf" stroke-width="2"/>
+<circle cx="405" cy="520" r="190" fill="#344a35" stroke="#a3d977" stroke-width="2"/>
+<circle cx="405" cy="520" r="115" fill="#543a68" stroke="#c4a1ef" stroke-width="2"/>
+<text x="405" y="212" font-size="18" fill="#f8fafc" font-weight="700" text-anchor="middle">PÉRIMÈTRE</text>
+<text x="405" y="287" font-size="18" fill="#f8fafc" font-weight="700" text-anchor="middle">RÉSEAU</text>
+<text x="405" y="362" font-size="18" fill="#f8fafc" font-weight="700" text-anchor="middle">SYSTÈMES</text>
+<text x="405" y="446" font-size="16" fill="#f8fafc" font-weight="700" text-anchor="middle">APPLICATIONS</text>
+<circle cx="405" cy="520" r="58" fill="#f4c66a" stroke="#ffe3a8" stroke-width="2"/>
+<g fill="none" stroke="#49300c" stroke-width="2"><ellipse cx="405" cy="499" rx="16" ry="5"/><path d="M389 499v16c0 7 32 7 32 0v-16 M389 507c0 7 32 7 32 0"/></g>
+<text x="405" y="545" font-size="15" fill="#342306" font-weight="700" text-anchor="middle">DONNÉES</text>
+<rect x="798" y="185" width="394" height="108" rx="12" fill="#1b2535"/><rect x="798" y="202" width="4" height="74" rx="2" fill="#60a5fa"/>
+<text x="817" y="216" font-size="15" fill="#60a5fa" font-weight="700" text-anchor="start">01</text>
+<text x="853" y="216" font-size="22" fill="#f8fafc" font-weight="700" text-anchor="start">Périmètre</text>
+<text x="817" y="246" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Pare-feu et filtrage des accès</text>
+<text x="817" y="272" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">VPN pour les accès distants</text>
+<rect x="798" y="307" width="394" height="108" rx="12" fill="#1b2535"/><rect x="798" y="324" width="4" height="74" rx="2" fill="#2dd4bf"/>
+<text x="817" y="338" font-size="15" fill="#2dd4bf" font-weight="700" text-anchor="start">02</text>
+<text x="853" y="338" font-size="22" fill="#f8fafc" font-weight="700" text-anchor="start">Réseau</text>
+<text x="817" y="368" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Segmentation en VLAN</text>
+<text x="817" y="394" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Filtrage entre les zones</text>
+<rect x="798" y="429" width="394" height="108" rx="12" fill="#1b2535"/><rect x="798" y="446" width="4" height="74" rx="2" fill="#a3d977"/>
+<text x="817" y="460" font-size="15" fill="#a3d977" font-weight="700" text-anchor="start">03</text>
+<text x="853" y="460" font-size="22" fill="#f8fafc" font-weight="700" text-anchor="start">Systèmes</text>
+<text x="817" y="490" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Mises à jour et durcissement</text>
+<text x="817" y="516" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Protection des postes et serveurs</text>
+<rect x="798" y="551" width="394" height="108" rx="12" fill="#1b2535"/><rect x="798" y="568" width="4" height="74" rx="2" fill="#c4a1ef"/>
+<text x="817" y="582" font-size="15" fill="#c4a1ef" font-weight="700" text-anchor="start">04</text>
+<text x="853" y="582" font-size="22" fill="#f8fafc" font-weight="700" text-anchor="start">Applications</text>
+<text x="817" y="612" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Authentification et droits</text>
+<text x="817" y="638" font-size="17" fill="#d5deeb" font-weight="400" text-anchor="start">Sécurisation des services</text>
+<rect x="798" y="689" width="394" height="135" rx="12" fill="#292839" stroke="#9589b4"/>
+<text x="817" y="719" font-size="18" fill="#e0d6f4" font-weight="700" text-anchor="start">SAUVEGARDES PROTÉGÉES</text>
+<text x="817" y="750" font-size="16" fill="#ddd7e9" font-weight="400" text-anchor="start">Copies isolées ou immuables</text>
+<text x="817" y="775" font-size="16" fill="#ddd7e9" font-weight="400" text-anchor="start">Restauration régulièrement testée</text>
+<text x="817" y="800" font-size="16" fill="#ddd7e9" font-weight="400" text-anchor="start">Pour retrouver les données et repartir.</text>
+<rect x="166" y="836" width="478" height="48" rx="24" fill="#243247" stroke="#94a3b8"/>
+<text x="405" y="865" font-size="18" fill="#f8fafc" font-weight="700" text-anchor="middle">JOURNALISATION ET SUPERVISION</text>
+<text x="405" y="908" font-size="16" fill="#cbd5e1" font-weight="400" text-anchor="middle">Détecter et analyser les événements à toutes les couches.</text>
+<path d="M48 931H1192" stroke="#334155"/>
+<text x="620" y="960" font-size="19" fill="#f8fafc" font-weight="500" text-anchor="middle">Si une protection est contournée, les autres limitent encore la progression de l’attaquant.</text>
+</g></svg>
